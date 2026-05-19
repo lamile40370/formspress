@@ -1,0 +1,1064 @@
+/* =====================================================================
+   ADMIN SHELL — sidebar, layout, nav, mobile
+===================================================================== */
+
+.flowforms-wrap {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	overflow: hidden;
+}
+
+.ff-admin {
+	display: flex;
+	height: 100%;
+	background: $sidebar-bg;
+
+	&--fse {
+		@media (max-width: $mobile-breakpoint) {
+			flex-direction: column;
+		}
+	}
+}
+
+/* SIDEBAR */
+.ff-sidebar {
+	width: $sidebar-width;
+	height: 100%;
+	background: $sidebar-bg;
+	color: $sidebar-text;
+	display: flex;
+	flex-direction: column;
+	flex-shrink: 0;
+	overflow-y: auto;
+	transition: transform 0.25s ease;
+	z-index: 100;
+
+	@media (max-width: $mobile-breakpoint) {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		height: auto;
+		transform: translateX(-100%);
+		box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
+
+		&.is-open {
+			transform: translateX(0);
+		}
+	}
+
+	&__brand {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 20px 20px 0;
+		min-height: 56px;
+		flex-shrink: 0;
+	}
+
+	&__brand-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		line-height: 0;
+		text-decoration: none;
+		color: inherit;
+		border-radius: 6px;
+
+		&:hover,
+		&:focus {
+			text-decoration: none;
+			color: inherit;
+		}
+	}
+
+	&__brand-icon {
+		display: block;
+		flex-shrink: 0;
+	}
+
+	&__brand-title {
+		color: #fff;
+		font-size: 20px;
+		font-weight: 600;
+		line-height: 1.2;
+		letter-spacing: -0.01em;
+		flex: 1;
+	}
+
+	&__search-btn {
+		margin-left: auto;
+		color: $sidebar-muted !important;
+		box-shadow: none !important;
+		outline: none !important;
+		border-radius: 4px !important;
+
+		&:hover {
+			color: $sidebar-text !important;
+			background: rgba(255, 255, 255, 0.04) !important;
+			box-shadow: none !important;
+		}
+
+		&:focus,
+		&:focus-visible {
+			box-shadow: none !important;
+			outline: none !important;
+		}
+	}
+
+	&__navigator {
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+		align-items: stretch;
+		padding-top: 56px;
+
+		> div {
+			display: flex;
+			flex-direction: column;
+			min-height: 0;
+			overflow: hidden;
+		}
+	}
+
+	&__subscreen {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	&__subscreen-header {
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+		padding: 0 20px;
+		margin-bottom: $spacing-sm;
+
+		&--root {
+			margin-bottom: 0;
+		}
+	}
+
+	&__subscreen-title {
+		flex: 1;
+		color: #fff;
+		font-size: 20px;
+		font-weight: 600;
+		line-height: 1.18;
+		letter-spacing: -0.01em;
+	}
+
+	&__subscreen-desc {
+		color: $sidebar-muted;
+		font-size: 13px;
+		line-height: 1.5;
+		padding: 0 20px 20px;
+		margin: 0;
+
+		&--root {
+			padding-top: 10px;
+			padding-bottom: 10px;
+		}
+	}
+
+	&__back.components-button.is-link {
+		padding: 4px;
+		min-width: 0;
+		color: $sidebar-muted !important;
+		text-decoration: none !important;
+		box-shadow: none !important;
+		outline: none !important;
+
+		&:hover {
+			color: $sidebar-text !important;
+			background: rgba(255, 255, 255, 0.04) !important;
+			box-shadow: none !important;
+		}
+
+		&:focus,
+		&:focus-visible {
+			box-shadow: none !important;
+			outline: none !important;
+		}
+
+		svg {
+			width: 24px;
+			height: 24px;
+			fill: currentColor;
+		}
+	}
+
+	&__nav {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding: 0 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
+
+		&--root {
+			padding-top: 6px;
+		}
+	}
+
+	&__item.components-button.is-link {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		padding: 8px 10px;
+		height: auto;
+		min-height: 44px;
+		font-size: 13px;
+		font-weight: 400;
+		justify-content: flex-start;
+		color: $sidebar-muted !important;
+		text-decoration: none !important;
+		box-shadow: none !important;
+		border-radius: 4px;
+		line-height: 1.3;
+
+		&:hover {
+			color: $sidebar-muted !important;
+			background: transparent !important;
+			text-decoration: none !important;
+			box-shadow: none !important;
+		}
+
+		&:focus,
+		&:focus-visible {
+			color: $sidebar-muted !important;
+			background: transparent !important;
+			box-shadow: none !important;
+			outline: none !important;
+		}
+
+		&.is-active {
+			color: $sidebar-text !important;
+			background: rgba(255, 255, 255, 0.08) !important;
+		}
+
+		svg {
+			width: 24px;
+			height: 24px;
+			fill: currentColor;
+			flex-shrink: 0;
+		}
+	}
+
+	&__chevron {
+		margin-left: auto;
+		opacity: 0.4;
+		flex-shrink: 0;
+	}
+
+	&__footer {
+		padding: $spacing-sm 0 0;
+		margin-top: auto;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+
+	&__global-footer {
+		flex-shrink: 0;
+		padding: 8px 0 12px;
+		margin-top: 0;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	&__wp-admin-link {
+		display: flex;
+		align-items: center;
+		box-sizing: border-box;
+		width: calc(100% - 24px);
+		gap: 10px;
+		min-height: 40px;
+		margin: 0 12px;
+		padding: 8px 10px;
+		font-size: 13px;
+		line-height: 1.3;
+		color: $sidebar-text;
+		text-decoration: none;
+		border-radius: 4px;
+
+		&:hover {
+			color: $sidebar-text;
+			background: rgba(255, 255, 255, 0.04);
+			text-decoration: none;
+		}
+
+		&:focus,
+		&:focus-visible {
+			color: $sidebar-text;
+			box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.35);
+			outline: none;
+		}
+
+		svg,
+		svg path {
+			fill: currentColor;
+		}
+	}
+}
+
+.ff-sidebar-overlay {
+	display: none;
+
+	@media (max-width: $mobile-breakpoint) {
+		display: block;
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 9998;
+	}
+}
+
+/* MOBILE HEADER */
+.ff-mobile-header {
+	display: none;
+
+	@media (max-width: $mobile-breakpoint) {
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+		height: 48px;
+		padding: 0 $spacing-md;
+		background: $sidebar-bg;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		position: sticky;
+		top: 0;
+		z-index: 100;
+
+		.components-button {
+			color: $sidebar-muted !important;
+			&:hover {
+				color: $sidebar-text !important;
+			}
+		}
+	}
+
+	&__brand {
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+		font-weight: 600;
+		font-size: 14px;
+		color: $sidebar-text;
+	}
+}
+
+/* MAIN CONTENT */
+.ff-main {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	padding: 16px 16px 16px 0;
+
+	@media (max-width: $mobile-breakpoint) {
+		padding: 0;
+		width: 100%;
+	}
+}
+
+.ff-content {
+	background: #fff;
+	border-radius: $radius-md;
+	height: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+
+	@media (max-width: $mobile-breakpoint) {
+		border-radius: 0;
+	}
+}
+
+/* PAGE */
+.ff-page {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+
+	&--loading {
+		align-items: center;
+		justify-content: center;
+		.components-spinner {
+			width: 32px;
+			height: 32px;
+		}
+	}
+
+	&__body {
+		flex: 1;
+		overflow-y: auto;
+		padding: $spacing-lg $spacing-xl $spacing-xl;
+		display: flex;
+		flex-direction: column;
+		gap: $spacing-md;
+
+		@media (max-width: $mobile-breakpoint) {
+			padding: $spacing-md;
+		}
+	}
+
+	/* DataViews pages — body is a flex column with no padding/gap so
+	 * the `.ff-dataviews-container` inside can flex-grow and own its
+	 * own header / scroll / pagination chrome (same approach as the
+	 * starter-plugin Items page). */
+	&--dataviews .ff-page__body {
+		padding: 0;
+		gap: 0;
+		overflow: hidden;
+	}
+
+	&--dataviews .ff-dataviews-container {
+		flex: 1;
+		min-height: 0;
+	}
+}
+
+.ff-admin-toast {
+	position: fixed;
+	left: calc(#{$sidebar-width} + 24px);
+	bottom: 24px;
+	z-index: 100000;
+	pointer-events: none;
+
+	> .components-snackbar {
+		pointer-events: auto;
+	}
+
+	@media (max-width: $mobile-breakpoint) {
+		left: 16px;
+		right: 16px;
+		bottom: 16px;
+	}
+}
+
+/* PAGE HEADER */
+.ff-page > header {
+	flex-shrink: 0;
+}
+
+.ff-page-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: $spacing-lg $spacing-xl;
+	border-bottom: 1px solid $color-border;
+	background: #fff;
+	gap: $spacing-md;
+	flex-shrink: 0;
+
+	@media (max-width: $mobile-breakpoint) {
+		padding: $spacing-md;
+		flex-wrap: wrap;
+	}
+
+	&__main {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex: 1;
+		min-width: 0;
+	}
+	&__text {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		flex: 1;
+		min-width: 0;
+	}
+	&__title-row {
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+		min-width: 0;
+	}
+
+	&__desc {
+		margin: 0 !important;
+		font-size: 14px !important;
+		line-height: 1.35 !important;
+	}
+
+	&__right {
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		gap: $spacing-sm;
+	}
+}
+
+/* DATA VIEWS CONTAINER
+   Keep FormsPress pages full-height, but let @wordpress/dataviews own
+   toolbar, filter chips, views, and footer styling. */
+.ff-dataviews-container {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	.dataviews-wrapper {
+		min-height: 0;
+	}
+}
+
+/* STATS GRID (legacy) */
+.ff-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+	gap: $spacing-md;
+}
+
+/* =====================================================================
+   Dashboard — strict adoption of the socialpress / starter-plugin patterns.
+   Uses Card / CardHeader / CardBody from @wordpress/components.
+   CSS tokens via `--wp-components-*` and `--wp-admin-theme-color`.
+===================================================================== */
+
+.formspress-dashboard {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	--formspress-dashboard-border: var(--wp-components-color-gray-300, #ddd);
+	--formspress-dashboard-text-muted: #50575e;
+}
+
+.formspress-dashboard__loading {
+	display: flex;
+	justify-content: center;
+	padding: 24px 0;
+}
+
+.formspress-dashboard__kpis {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+
+	@media screen and (max-width: 1200px) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	@media screen and (max-width: 782px) {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.formspress-dashboard__kpi {
+	border: 1px solid var(--formspress-dashboard-border) !important;
+	border-radius: var(--wp-components-border-radius-small, 4px) !important;
+	background: var(--wp-components-color-background, #fff) !important;
+	box-shadow: none !important;
+}
+
+.formspress-dashboard__kpi .components-card__body {
+	padding: 12px 16px !important;
+}
+
+.formspress-dashboard__kpi-label {
+	text-transform: uppercase;
+	letter-spacing: 0.02em;
+	font-size: 11px !important;
+	color: var(--formspress-dashboard-text-muted);
+	font-weight: 500;
+}
+
+.formspress-dashboard__kpi-value {
+	margin: 0 !important;
+	font-size: 42px !important;
+	line-height: 1.1;
+}
+
+.formspress-dashboard__kpi-caption {
+	font-size: 12px !important;
+	color: var(--formspress-dashboard-text-muted);
+}
+
+.formspress-dashboard__widgets {
+	display: grid;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.formspress-widget {
+	border: 1px solid var(--formspress-dashboard-border) !important;
+	border-radius: var(--wp-components-border-radius-small, 4px) !important;
+	background: var(--wp-components-color-background, #fff) !important;
+	box-shadow: none !important;
+}
+
+.formspress-widget .components-card__header {
+	border-bottom: 1px solid var(--formspress-dashboard-border);
+}
+
+.formspress-widget--top-forms,
+.formspress-widget--recent {
+	grid-column: span 6;
+}
+
+@media screen and (max-width: 960px) {
+	.formspress-widget--top-forms,
+	.formspress-widget--recent {
+		grid-column: span 12;
+	}
+}
+
+.formspress-dashboard__status-row {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 4px;
+}
+
+.formspress-dashboard__status-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.formspress-dashboard__status-label {
+	color: #1e1e1e;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.formspress-dashboard__status-count {
+	color: var(--formspress-dashboard-text-muted);
+	flex-shrink: 0;
+}
+
+.formspress-dashboard__status-track {
+	height: 6px;
+	border-radius: 999px;
+	background: var(--wp-components-color-gray-100, #f0f0f0);
+	overflow: hidden;
+}
+
+.formspress-dashboard__status-fill {
+	display: block;
+	height: 100%;
+	border-radius: 999px;
+}
+
+.formspress-dashboard__list-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid var(--wp-components-color-gray-100, #f0f0f0);
+}
+
+.formspress-dashboard__list-item:last-child {
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.formspress-dashboard__list-link {
+	background: transparent;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	text-align: left;
+	color: inherit;
+
+	&:hover .formspress-dashboard__list-title {
+		color: var(--wp-admin-theme-color, #3858e9);
+	}
+}
+
+.formspress-dashboard__list-title {
+	color: #1e1e1e;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.formspress-dashboard__summary-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	border: 1px solid var(--formspress-dashboard-border);
+	background: var(--wp-components-color-gray-100, #f0f0f0);
+	border-radius: 999px;
+	padding: 2px 10px;
+	font-size: 11px;
+	text-transform: capitalize;
+}
+
+/* TABLE */
+.ff-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+	margin-top: $spacing-md;
+
+	th {
+		text-align: left;
+		padding: $spacing-xs $spacing-sm;
+		font-weight: 600;
+		color: $color-muted;
+		border-bottom: 1px solid $color-border;
+	}
+
+	td {
+		padding: $spacing-sm;
+		border-bottom: 1px solid $color-border;
+		vertical-align: middle;
+	}
+
+	tr:hover td {
+		background: rgba(0, 0, 0, 0.02);
+	}
+}
+
+/* SEARCH MODAL */
+.ff-search-results {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.ff-search-result-item {
+	display: flex;
+	align-items: center;
+	gap: $spacing-sm;
+	padding: $spacing-sm $spacing-md;
+	border: none;
+	background: none;
+	border-radius: $radius-sm;
+	cursor: pointer;
+	font-size: 14px;
+	color: $color-text;
+	text-align: left;
+	width: 100%;
+
+	&:hover {
+		background: #f0f6ff;
+	}
+
+	.dashicons {
+		color: $color-primary;
+	}
+}
+
+/* ── Template grid preview (Templates page) ─────────────────────── */
+.formspress-template-preview {
+	aspect-ratio: 16 / 10;
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+	background: #fff;
+	border-radius: 6px;
+	isolation: isolate;
+
+	iframe {
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 0;
+		background: #fff;
+	}
+}
+
+.dataviews-view-grid__media:has(.formspress-template-preview) {
+	aspect-ratio: 16 / 10;
+}
+
+/* ── Integrations grid (Integrations hub) ──────────────────────────── */
+/* Integration logos are supplied by their PHP action class. */
+.ff-integrations-dataviews {
+	.dataviews-view-grid-items {
+		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ) !important;
+	}
+
+	@media (max-width: 1100px) {
+		.dataviews-view-grid-items {
+			grid-template-columns: repeat( 2, minmax( 0, 1fr ) ) !important;
+		}
+	}
+
+	@media (max-width: 700px) {
+		.dataviews-view-grid-items {
+			grid-template-columns: 1fr !important;
+		}
+	}
+}
+
+.dataviews-view-grid__media:has(.formspress-integration-media) {
+	background: #fff;
+}
+
+.formspress-integration-media {
+	width: 100%;
+	height: 100%;
+	min-height: 120px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	box-sizing: border-box;
+}
+
+.formspress-integration-logo {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	max-width: 100%;
+	color: #1e1e1e;
+	font-size: 32px;
+	font-weight: 600;
+	line-height: 1;
+	letter-spacing: 0;
+
+	svg {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.formspress-integration-logo--svg {
+	width: min( 260px, 76% );
+	height: 118px;
+}
+
+.dataviews-view-grid__media .formspress-integration-logo--default {
+	display: block;
+	width: 96px;
+	height: 96px;
+	max-width: 96px;
+	max-height: 96px;
+	object-fit: contain;
+}
+
+.formspress-integration-desc {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+
+	p {
+		margin: 0;
+	}
+}
+
+/* ── Integration settings pages ───────────────────────────────────── */
+.ff-integration-settings-page {
+	background: #f6f7f7;
+}
+
+.ff-integration-settings {
+	width: min( 1180px, 100% );
+	display: grid;
+	grid-template-columns: minmax( 0, 1fr ) 320px;
+	align-items: start;
+	gap: 24px;
+}
+
+.ff-integration-settings__panel,
+.ff-integration-settings__aside-card {
+	background: #fff;
+	border: 1px solid $color-border;
+	border-radius: 6px;
+	box-shadow: 0 1px 1px rgba( 0, 0, 0, 0.02 );
+}
+
+.ff-integration-settings__header {
+	display: grid;
+	grid-template-columns: 48px minmax( 0, 1fr ) auto;
+	align-items: center;
+	gap: 16px;
+	padding: 24px;
+	border-bottom: 1px solid $color-border;
+}
+
+.ff-integration-settings__icon {
+	width: 48px;
+	height: 48px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #1e1e1e;
+	border: 1px solid $color-border;
+	border-radius: 6px;
+	background: #fff;
+}
+
+.ff-integration-settings__title {
+	min-width: 0;
+
+	h2 {
+		margin: 0;
+		font-size: 20px;
+		line-height: 1.25;
+		font-weight: 600;
+		color: #1e1e1e;
+	}
+
+	p {
+		margin: 4px 0 0;
+		color: #646970;
+		font-size: 13px;
+		line-height: 1.45;
+	}
+}
+
+.ff-integration-settings__body {
+	padding: 24px;
+}
+
+.ff-integration-settings__toggle {
+	padding: 14px 16px;
+	border: 1px solid $color-border;
+	border-radius: 6px;
+	background: #f6f7f7;
+	margin-bottom: 24px;
+}
+
+.ff-integration-settings__fields {
+	display: grid;
+	grid-template-columns: repeat( 2, minmax( 0, 1fr ) );
+	gap: 20px;
+}
+
+.ff-integration-settings__field-full {
+	grid-column: 1 / -1;
+}
+
+.ff-integration-settings__aside {
+	position: sticky;
+	top: 24px;
+}
+
+.ff-integration-settings__aside-card {
+	padding: 20px;
+
+	h3 {
+		margin: 0;
+		font-size: 15px;
+		line-height: 1.35;
+		font-weight: 600;
+		color: #1e1e1e;
+	}
+
+	p {
+		margin: 8px 0 16px;
+		color: #646970;
+		font-size: 13px;
+		line-height: 1.45;
+	}
+}
+
+.ff-integration-settings__endpoint {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 8px 8px 12px;
+	border: 1px solid $color-border;
+	border-radius: 4px;
+	background: #f6f7f7;
+
+	code {
+		flex: 1;
+		min-width: 0;
+		overflow-wrap: anywhere;
+		background: transparent;
+		padding: 0;
+		font-size: 12px;
+	}
+}
+
+@media (max-width: 1100px) {
+	.ff-integration-settings {
+		grid-template-columns: 1fr;
+	}
+
+	.ff-integration-settings__aside {
+		position: static;
+	}
+}
+
+@media (max-width: 700px) {
+	.ff-integration-settings__header,
+	.ff-integration-settings__fields {
+		grid-template-columns: 1fr;
+	}
+
+	.ff-integration-settings__field-full {
+		grid-column: auto;
+	}
+}
+
+/* ── FormsPress Form block — editor preview ─────────────────────────
+ * The block's `edit()` mounts a `<BlockPreview>` of the form's actual
+ * block tree (root group + headings + fields + submit). The iframe
+ * needs a sensible min-height so the preview area doesn't collapse
+ * to zero before the iframe content reports its size. */
+.ff-form-block__preview {
+	min-height: 200px;
+	background: #f6f7f7;
+	border-radius: 6px;
+	overflow: hidden;
+
+	.block-editor-block-preview__container {
+		min-height: 200px;
+	}
+	.block-editor-block-preview__content {
+		transform-origin: top left;
+	}
+}
+
+/* ── PanelBody children spacing ─────────────────────────────────────
+ * Every control in a settings panel uses `__nextHasNoMarginBottom` to
+ * opt out of the legacy bottom margin (so we can choose our own
+ * spacing rhythm). Without a replacement, controls would stack with
+ * ZERO gap — that's what causes the "Honeypot help text → SPAM
+ * PROVIDER label" crammed look in the screenshot.
+ *
+ * One scoped rule adds a 16 px gap between sibling children of every
+ * PanelBody inside our admin pages and the form-builder right sidebar.
+ * Covers every existing AND future settings panel — no per-component
+ * change needed.
+ *
+ * Scoped to `.ff-page` and `.ff-gb-inspector` so we don't accidentally
+ * restyle native Gutenberg PanelBody usage (inspector controls on
+ * native blocks).
+ *
+ * Note: PanelBody's first child is its title (`<h2>`), so `* + *`
+ * skips it correctly — only content rows get the gap. */
+.ff-page,
+.ff-gb-inspector {
+	.components-panel__body > * + * {
+		margin-top: 16px;
+	}
+
+	/* Same idea inside ToolsPanel — its items already have their own
+	 * spacing, but the standalone controls dropped at the top of a
+	 * panel (e.g. before a list of ToolsPanelItem) still need it. */
+	.components-tools-panel > * + * {
+		margin-top: 12px;
+	}
+}
+
+/* ── Email designer toolbar ─────────────────────────────────────────
+ * Single-row toolbar holding mode toggle, merge-tag picker, helper
+ * buttons, template loader and Preview. Children sit on the same
+ * baseline and the vertical separator visually splits the editing
+ * cluster from the trailing actions. */
+.ff-email-designer__toolbar {
+	.components-select-control,
+	.components-toggle-group-control {
+		margin-bottom: 0;
+	}
+}
+
+.ff-email-designer__sep {
+	display: inline-block;
+	width: 1px;
+	height: 24px;
+	background: #ddd;
+	margin: 0 4px;
+}

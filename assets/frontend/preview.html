@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="forms.css">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+  }
+
+  /* Preview-only: force the form to fill the iframe height with a clean column flex.
+     Overrides the `.ff-form--active` fullscreen rule which would use `position: fixed`
+     (works in real fullscreen but creates layout glitches inside the iframe). */
+  body > #ff-preview.ff-preview-mounted {
+    position: absolute !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    border-radius: 0 !important;
+    z-index: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+</style>
+</head><body>
+  <div id="ff-preview"
+       class="ff-form ff-form--flow ff-form--fullscreen ff-preview-mounted"
+       data-form-id="preview"
+       data-type="flow"
+       data-fields="[]"
+       data-settings="{}"></div>
+  <script>
+    window.ffData = { apiRoot: '/wp-json/flowforms/v1', nonce: '' };
+    var wrapper = document.getElementById('ff-preview');
+
+    function forcePreviewLayout() {
+      // Wrapper fills the iframe via absolute positioning (bypasses position:fixed quirks in iframes).
+      var ws = wrapper.style;
+      ws.setProperty('position',       'absolute', 'important');
+      ws.setProperty('top',            '0',        'important');
+      ws.setProperty('right',          '0',        'important');
+      ws.setProperty('bottom',         '0',        'important');
+      ws.setProperty('left',           '0',        'important');
+      ws.setProperty('width',          'auto',     'important');
+      ws.setProperty('height',         'auto',     'important');
+      ws.setProperty('max-width',      'none',     'important');
+      ws.setProperty('display',        'flex',     'important');
+      ws.setProperty('flex-direction', 'column',   'important');
+      ws.setProperty('border-radius',  '0',        'important');
+      ws.setProperty('z-index',        'auto',     'important');
+      ws.setProperty('overflow',       'hidden',   'important');
+
+      // Stage must take all remaining vertical space and center the question.
+      var stage = wrapper.querySelector('.ff-flow-stage');
+      if (stage) {
+        var ss = stage.style;
+        ss.setProperty('flex',            '1 1 0%', 'important');
+        ss.setProperty('min-height',      '0',      'important');
+        ss.setProperty('display',         'flex',   'important');
+        ss.setProperty('align-items',     'center', 'important');
+        ss.setProperty('justify-content', 'center', 'important');
+      }
+    }
+
+    function applyData(payload) {
+      if (payload.title) wrapper.dataset.formTitle = payload.title;
+      wrapper.dataset.fields   = JSON.stringify(payload.fields   || []);
+      wrapper.dataset.settings = JSON.stringify(payload.settings || {});
+      if (payload.currentStep === undefined || payload.currentStep === null || payload.currentStep === 'welcome') {
+        delete wrapper.dataset.previewStep;
+      } else {
+        wrapper.dataset.previewStep = String(payload.currentStep);
+      }
+      if (window.FlowFormsInit) {
+        if (window.FlowFormsDestroy) window.FlowFormsDestroy(wrapper);
+        window.FlowFormsInit(wrapper);
+        forcePreviewLayout();
+      }
+    }
+
+    window.addEventListener('message', function (e) {
+      if (!e.data || e.data.type !== 'flowforms:update') return;
+      applyData(e.data.payload || {});
+    });
+
+    /* Tell parent we're ready so it can post initial data */
+    window.parent && window.parent.postMessage({ type: 'flowforms:ready' }, '*');
+  </script>
+  <script src="forms.js"></script>
+</body></html>

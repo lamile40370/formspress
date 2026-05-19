@@ -1,0 +1,305 @@
+/* =====================================================================
+   FRONTEND FORM STYLES — inherits theme.json via CSS custom properties
+===================================================================== */
+
+.ff-form {
+	--ff-color-primary: var(--wp--preset--color--primary, #2271b1);
+	--ff-color-text: var(--wp--preset--color--foreground, #1d2327);
+	--ff-color-bg: var(--wp--preset--color--background, #ffffff);
+	--ff-color-border: var(--wp--preset--color--contrast, #c3c4c7);
+	--ff-font-size: var(--wp--preset--font-size--medium, 16px);
+	--ff-font-family: var(--wp--preset--font-family--body, inherit);
+	--ff-border-radius: var(--wp--custom--border-radius, 4px);
+	--ff-spacing: var(--wp--preset--spacing--40, 16px);
+
+	font-size: var(--ff-font-size);
+	font-family: var(--ff-font-family);
+	color: var(--ff-color-text);
+	max-width: 680px;
+}
+
+.ff-form-block-wrapper.alignwide .ff-form,
+.ff-form-block-wrapper.alignfull .ff-form,
+.ff-flow-form-block-wrapper.alignwide .ff-form,
+.ff-flow-form-block-wrapper.alignfull .ff-form {
+	width: 100%;
+	max-width: none;
+}
+
+.ff-form__title {
+	font-size: 1.4em;
+	font-weight: 700;
+	margin-bottom: 0.25em;
+}
+
+.ff-form__description {
+	color: #606060;
+	margin-bottom: 1em;
+}
+
+.ff-form__field {
+	margin-bottom: 1.25em;
+}
+
+.ff-form__label {
+	display: block;
+	font-weight: 600;
+	font-size: 0.875em;
+	margin-bottom: 0.4em;
+
+	.ff-form__required {
+		color: #d63638;
+		margin-left: 2px;
+	}
+}
+
+.ff-form__required {
+	color: #d63638;
+	font-weight: 700;
+	margin-left: 2px;
+}
+
+.ff-form__field-content {
+	margin-bottom: 0.4em;
+
+	> * {
+		margin-top: 0;
+		margin-bottom: 0.35em;
+	}
+
+	> :last-child {
+		margin-bottom: 0;
+	}
+}
+
+.ff-form__field-content .ff-field-label {
+	font-size: 0.875em;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.ff-form__field-content .ff-field-help {
+	font-size: 0.8em;
+	line-height: 1.45;
+	opacity: 0.72;
+}
+
+.ff-form__field.is-required .ff-field-label::after {
+	content: " *";
+	color: #d63638;
+	font-weight: 700;
+}
+
+.ff-form__description-text {
+	font-size: 0.8em;
+	color: #606060;
+	margin-bottom: 0.4em;
+}
+
+.ff-form__input,
+.ff-form__textarea,
+.ff-form__select {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	padding: 10px 14px;
+	border: 1px solid var(--ff-color-border);
+	border-radius: var(--ff-border-radius);
+	font-size: var(--ff-font-size);
+	font-family: var(--ff-font-family);
+	background-color: var(--ff-color-bg);
+	color: var(--ff-color-text);
+	box-sizing: border-box;
+	transition:
+		border-color 0.15s,
+		box-shadow 0.15s;
+
+	&:focus {
+		outline: none;
+		border-color: var(--ff-color-primary);
+		box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.2);
+	}
+
+	&::placeholder {
+		color: currentColor;
+		opacity: 0.65;
+	}
+}
+
+.ff-form__select.is-placeholder {
+	color: color-mix(
+		in srgb,
+		var(--ff-input-text-color, var(--ff-color-text)) 65%,
+		transparent
+	) !important;
+}
+
+.ff-form__textarea {
+	min-height: 120px;
+	resize: vertical;
+}
+
+.ff-form__choices[style] {
+	box-sizing: border-box;
+}
+
+.ff-form__choices {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.ff-form__choice {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-weight: 400;
+	cursor: pointer;
+}
+
+.ff-form__rating {
+	display: flex;
+	gap: 4px;
+}
+
+.ff-form__star {
+	font-size: 28px;
+	cursor: pointer;
+	color: #c3c4c7;
+	transition: color 0.1s;
+
+	&.is-active,
+	&:hover {
+		color: #dba617;
+	}
+}
+
+.ff-form__section-title {
+	font-weight: 700;
+	font-size: 1.1em;
+	margin-bottom: 0.25em;
+	border-bottom: 1px solid var(--ff-color-border);
+	padding-bottom: 0.5em;
+}
+
+.ff-form__page-break {
+	display: none;
+}
+
+.ff-form__footer {
+	margin-top: 1.5em;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+
+	.wp-block-buttons {
+		width: 100%;
+	}
+}
+
+.ff-form__submit {
+	background-color: var(--ff-color-primary);
+	color: #fff;
+	border: none;
+	padding: 12px 28px;
+	border-radius: var(--ff-border-radius);
+	font-size: var(--ff-font-size);
+	font-family: var(--ff-font-family);
+	cursor: pointer;
+	font-weight: 600;
+	transition:
+		background-color 0.2s,
+		opacity 0.2s;
+
+	&:hover {
+		opacity: 0.9;
+	}
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.ff-form__prev-btn {
+	background: transparent;
+	border: 1px solid var(--ff-color-border);
+	padding: 12px 20px;
+	border-radius: var(--ff-border-radius);
+	font-size: var(--ff-font-size);
+	cursor: pointer;
+	transition: background 0.15s;
+
+	&:hover {
+		background: #f0f0f1;
+	}
+}
+
+.ff-form__message {
+	padding: 16px;
+	border-radius: var(--ff-border-radius);
+	margin-top: 1em;
+
+	&--success {
+		background: #edfaef;
+		color: #00a32a;
+		border: 1px solid #00a32a;
+	}
+	&--error {
+		background: #fdecea;
+		color: #d63638;
+		border: 1px solid #d63638;
+	}
+}
+
+.ff-form__field-error {
+	color: #d63638;
+	font-size: 0.8em;
+	margin-top: 4px;
+}
+
+.ff-form__honeypot {
+	display: none !important;
+}
+
+.ff-form__progress {
+	height: 4px;
+	background: var(--ff-color-border);
+	border-radius: 2px;
+	margin-bottom: 2em;
+
+	&-bar {
+		height: 100%;
+		background: var(--ff-color-primary);
+		border-radius: 2px;
+		transition: width 0.4s ease;
+	}
+}
+
+.ff-form__step-counter {
+	font-size: 0.8em;
+	color: #606060;
+	margin-bottom: 1em;
+}
+
+/* Flow form welcome/end screens */
+.ff-form--flow {
+	.ff-form__welcome,
+	.ff-form__end {
+		text-align: center;
+		padding: 48px 32px;
+
+		.ff-form__welcome-title,
+		.ff-form__end-title {
+			font-size: 2em;
+			font-weight: 700;
+			margin-bottom: 0.5em;
+		}
+	}
+
+	.ff-form__start-btn {
+		@extend .ff-form__submit;
+		font-size: 1.1em;
+		padding: 16px 40px;
+		margin-top: 24px;
+	}
+}

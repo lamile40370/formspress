@@ -1,0 +1,16 @@
+{
+	"title": "Soft",
+	"description": "Rounded everything, generous padding, light borders.",
+	"form": {
+		"border_radius": 14,
+		"border_style": "solid",
+		"border_width": 1,
+		"border_color": "#e5e7eb",
+		"input_padding_x": 18,
+		"input_padding_y": 12,
+		"btn_radius": 14,
+		"btn_style": "solid",
+		"field_spacing": 22,
+		"label_weight": "500"
+	}
+}

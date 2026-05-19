@@ -1,0 +1,857 @@
+/* =====================================================================
+   STANDARD FORM BUILDER — Full-screen Gutenberg-like 3-panel editor
+
+   The shell, topbar, title pill, body grid and snackbar are provided
+   by the shared EditorSkeleton component and styled in `_flow-builder.scss`
+   under the `.ff-gb-builder` / `.ff-gb-builder__*` selectors.
+
+   This file only contains rules that are specific to the Standard
+   builder: canvas, field blocks, inspector, sidebar/listview, etc.
+===================================================================== */
+
+/* `.ff-std-builder` is a marker class added to the EditorSkeleton root
+   when rendering the Standard builder. Provided here as a no-op override
+   hook for any Standard-only tweaks. */
+.ff-std-builder {
+	/* All shell rules are inherited from `.ff-gb-builder` (flow-builder.scss). */
+}
+
+/* ── Left sidebar (inserter / list view) ─────────────────────── */
+
+.ff-gb-sidebar {
+	width: 280px;
+	flex-shrink: 0;
+	background: #fff;
+	border-right: 1px solid #e0e0e0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	&__tabs {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+
+		/* Layout-only — let TabPanel content fill remaining height. */
+		> .components-tab-panel {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-height: 0;
+		}
+		> .components-tab-panel > .components-tab-panel__tab-content {
+			flex: 1;
+			min-height: 0;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	&__search { padding: 12px; flex-shrink: 0; }
+
+	&__body { flex: 1; overflow-y: auto; padding: 4px 0 16px; }
+
+	&__empty {
+		padding: 16px;
+		font-size: 13px;
+		color: $color-muted;
+		text-align: center;
+	}
+
+	&__placeholder {
+		padding: 24px 16px;
+		text-align: center;
+		color: $color-muted;
+		font-size: 13px;
+
+		&--code {
+			text-align: left;
+			pre { font-size: 11px; white-space: pre-wrap; word-break: break-all; }
+		}
+	}
+}
+
+/* Sidebar inserter — block grid */
+.ff-gb-inserter {
+	&__group { margin-bottom: 8px; }
+
+	&__group-title {
+		font-size: 11px;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: #757575;
+		padding: 12px 16px 6px;
+		margin: 0;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat( 3, 1fr );
+		gap: 4px;
+		padding: 0 12px;
+	}
+
+	&__item-icon.dashicons {
+		font-size: 20px;
+		width: 20px;
+		height: 20px;
+	}
+
+	&__item-label {
+		font-size: 11px;
+		line-height: 1.3;
+		word-break: break-word;
+	}
+}
+
+/* ── Field Tree View (left panel) ────────────────────────────────── */
+
+.ff-std-tree {
+	background: #fff;
+	border-right: 1px solid #e0e0e0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 12px 16px;
+		border-bottom: 1px solid #e0e0e0;
+		flex-shrink: 0;
+	}
+
+	&__title {
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: $color-muted;
+	}
+
+	&__count {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 20px;
+		height: 20px;
+		padding: 0 6px;
+		border-radius: 10px;
+		background: #f0f0f1;
+		color: $color-muted;
+		font-size: 11px;
+		font-weight: 600;
+	}
+
+	&__list {
+		flex: 1;
+		overflow-y: auto;
+		padding: $spacing-xs 0;
+	}
+
+	&__empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 8px;
+		padding: $spacing-xl $spacing-md;
+		text-align: center;
+		color: $color-muted;
+
+		.dashicons { font-size: 32px; width: 32px; height: 32px; opacity: 0.4; }
+		p { font-size: 12px; margin: 0; }
+	}
+
+	&__item {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 9px 16px;
+		cursor: pointer;
+		transition: background 0.1s;
+		position: relative;
+
+		&:hover { background: #f6f7f7; }
+		&:hover .ff-std-tree__item-del { opacity: 1; }
+
+		&.is-selected {
+			background: #e8f0fb;
+			&::before {
+				content: '';
+				position: absolute;
+				left: 0;
+				top: 4px;
+				bottom: 4px;
+				width: 3px;
+				background: $color-primary;
+				border-radius: 0 2px 2px 0;
+			}
+		}
+	}
+
+	&__item-icon {
+		font-size: 14px;
+		width: 14px;
+		height: 14px;
+		color: $color-primary;
+		flex-shrink: 0;
+	}
+
+	&__item-label {
+		flex: 1;
+		font-size: 13px;
+		font-weight: 500;
+		color: $color-text;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		em { color: $color-muted; font-style: italic; }
+	}
+
+	&__required {
+		color: #d63638;
+		margin-left: 2px;
+	}
+
+	&__item-del {
+		flex-shrink: 0;
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+
+	&__item:hover &__item-del { opacity: 1; }
+}
+
+/* ── Standard Block Appender — inline Gutenberg-style ────────────── */
+
+.ff-std-appender {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 28px;
+	gap: 8px;
+	opacity: 0;
+	transition: opacity 0.15s;
+
+	&::before,
+	&::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: #e0e0e0;
+		transition: background 0.15s;
+	}
+
+	&:hover,
+	&:focus-within,
+	&.is-always-visible { opacity: 1; }
+
+	&:hover::before,
+	&:hover::after { background: $color-primary; }
+
+	/* When inside an empty column, hide the lines — just show the centered button */
+	.ff-std-col__inner > &.is-always-visible:only-child {
+		height: 100%;
+		min-height: 56px;
+
+		&::before, &::after { display: none; }
+	}
+
+	/* Labeled variant — used in canvas empty state. Drop the lines, let the button render naturally. */
+	&.is-labeled {
+		height: auto;
+		opacity: 1;
+
+		&::before, &::after { display: none; }
+	}
+
+	&__btn { flex-shrink: 0; }
+}
+
+/* ── Canvas (center) ─────────────────────────────────────────────── */
+
+.ff-std-canvas {
+	flex: 1;
+	min-width: 0;
+	overflow-y: auto;
+	background: #f6f7f7;
+
+	&__inner {
+		max-width: none;
+		width: 100%;
+		margin: 0;
+		padding: 32px;
+		box-sizing: border-box;
+	}
+
+	/* White "document" form container — fills the canvas width. */
+	&__form {
+		background: #fff;
+		border-radius: 8px;
+		box-shadow: 0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
+		overflow: hidden;
+		padding: 40px 48px 32px;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	&__form-header {
+		margin-bottom: 32px;
+		padding-bottom: 24px;
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	&__form-title {
+		font-size: 24px;
+		font-weight: 700;
+		line-height: 1.25;
+		margin: 0 0 8px;
+	}
+
+	&__form-desc {
+		font-size: 14px;
+		opacity: 0.65;
+		margin: 0;
+		line-height: 1.5;
+	}
+
+	&__fields {
+		display: flex;
+		flex-wrap: wrap;
+		column-gap: 16px;
+	}
+
+	&__empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+		padding: 48px 24px;
+		border: 1px dashed #c3c4c7;
+		border-radius: 6px;
+		text-align: center;
+		background: #fafafa;
+	}
+
+	&__empty-icon {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: #fff;
+		border: 1px solid #e0e0e0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 4px;
+
+		.dashicons {
+			font-size: 26px;
+			width: 26px;
+			height: 26px;
+			color: #1e1e1e;
+			opacity: 0.6;
+		}
+	}
+
+	&__empty-title { margin: 0; }
+	&__empty-desc  { max-width: 360px; margin: 0; }
+
+	&__footer {
+		margin-top: 32px;
+		padding-top: 24px;
+		border-top: 1px solid #e0e0e0;
+	}
+
+	&__submit {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 12px 32px;
+		font-size: 15px;
+		font-weight: 600;
+		border: none;
+		cursor: default;
+		opacity: 0.9;
+		transition: none;
+	}
+}
+
+/* ── Column-width wrappers ───────────────────────────────────────── */
+
+.ff-std-field-wrap {
+	position: relative;
+	&[data-width="full"]  { width: 100%; }
+	&[data-width="1/2"]   { width: calc(50% - 8px); }
+	&[data-width="1/3"]   { width: calc(33.33% - 11px); }
+}
+
+/* ── Standard Field Block ────────────────────────────────────────── */
+
+.ff-std-block {
+	position: relative;
+	padding: 16px 0;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.1s;
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+
+	&:hover { background: rgba(34,113,177,0.03); }
+
+	&.is-selected {
+		background: rgba(34,113,177,0.04);
+		outline-color: $color-primary;
+	}
+
+	/* Layout fields (section, page_break) */
+	&--layout {
+		padding: 12px 0;
+	}
+
+	/* Block toolbar — WP Toolbar component handles visuals */
+	&__toolbar-wrap {
+		position: absolute;
+		top: -48px;
+		left: -2px;
+		z-index: 10;
+		.dashicons { font-size: 16px; width: 16px; height: 16px; }
+	}
+
+	&__inner {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	&__label-row {
+		display: flex;
+		align-items: flex-start;
+		gap: 4px;
+	}
+
+	&__label {
+		flex: 1;
+		background: transparent;
+		border: none;
+		outline: none;
+		font-size: 14px;
+		font-weight: 600;
+		color: $color-text;
+		padding: 0;
+		cursor: text;
+		width: 100%;
+		line-height: 1.4;
+
+		&::placeholder { color: rgba(0,0,0,0.2); font-weight: 400; }
+	}
+
+	&__required {
+		color: #d63638;
+		font-size: 14px;
+		font-weight: 600;
+		flex-shrink: 0;
+	}
+
+	&__description {
+		font-size: 12px;
+		color: $color-muted;
+		margin: 0;
+		line-height: 1.5;
+	}
+
+	&__preview {
+		pointer-events: none;
+	}
+}
+
+/* ── Row block (canvas) ──────────────────────────────────────────── */
+
+.ff-std-row-block {
+	position: relative;
+	padding: 0;
+	border-radius: 2px;
+	cursor: pointer;
+	box-sizing: border-box;
+	outline: 1px solid transparent;
+	outline-offset: 1px;
+	transition: outline-color 0.1s;
+
+	*, *::before, *::after { box-sizing: border-box; }
+
+	&:hover { outline-color: rgba(34,113,177,0.35); }
+
+	&.is-selected {
+		outline: 2px solid $color-primary;
+		outline-offset: 1px;
+	}
+}
+
+.ff-std-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.ff-std-col {
+	position: relative;
+	min-width: 0;
+	box-sizing: border-box;
+	border: 1px dashed transparent;
+	border-radius: 2px;
+	padding: 8px;
+	transition: border-color 0.1s, background 0.1s;
+
+	&[data-width="1/4"]  { flex: 0 0 calc(25%     - 9px); max-width: calc(25%     - 9px); }
+	&[data-width="1/3"]  { flex: 0 0 calc(33.333% - 8px); max-width: calc(33.333% - 8px); }
+	&[data-width="1/2"]  { flex: 0 0 calc(50%     - 6px); max-width: calc(50%     - 6px); }
+	&[data-width="2/3"]  { flex: 0 0 calc(66.666% - 4px); max-width: calc(66.666% - 4px); }
+	&[data-width="3/4"]  { flex: 0 0 calc(75%     - 3px); max-width: calc(75%     - 3px); }
+	&[data-width="full"] { flex: 1 1 100%; max-width: 100%; }
+
+	.ff-std-row-block:hover &,
+	.ff-std-row-block.is-selected & {
+		border-color: rgba(34,113,177,0.3);
+	}
+
+	&__inner {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		min-height: 56px;
+	}
+
+	&__remove {
+		position: absolute;
+		top: 4px;
+		right: 4px;
+		width: 20px;
+		height: 20px;
+		border-radius: 2px;
+		background: #fff;
+		color: $color-muted;
+		border: 1px solid #e0e0e0;
+		cursor: pointer;
+		font-size: 14px;
+		line-height: 1;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		transition: opacity 0.15s, color 0.1s, border-color 0.1s;
+
+		&:hover { color: #d63638; border-color: #d63638; }
+	}
+
+	&:hover &__remove,
+	.ff-std-row-block.is-selected &__remove { opacity: 1; }
+}
+
+/* ── Layout preset grid (inspector) ──────────────────────────────── */
+
+.ff-std-layout-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.ff-std-layout-preset {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 6px;
+	padding: 8px;
+	background: #fff;
+	border: 1.5px solid #e0e0e0;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: border-color 0.1s, background 0.1s;
+
+	&:hover { border-color: $color-primary; background: #f0f6ff; }
+
+	&.is-active {
+		border-color: $color-primary;
+		background: #e8f0fb;
+	}
+
+	&__viz {
+		display: flex;
+		gap: 3px;
+		height: 22px;
+
+		span {
+			background: $color-primary;
+			border-radius: 2px;
+			opacity: 0.5;
+		}
+	}
+
+	&__label {
+		font-size: 11px;
+		font-weight: 600;
+		color: $color-text;
+		text-align: center;
+	}
+}
+
+/* ── Tree col label ──────────────────────────────────────────────── */
+
+.ff-std-tree__col-label {
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: $color-muted;
+	padding: 6px 16px 2px;
+}
+
+.ff-std-tree__item.is-row {
+	font-weight: 600;
+}
+
+/* ── Inspector (right panel) ─────────────────────────────────────── */
+
+.ff-std-inspector {
+	border-left: 1px solid #e0e0e0;
+	background: #fff;
+	align-self: stretch;
+	height: 100%;
+	min-height: 0;
+	/* The WHOLE inspector scrolls; tabs become sticky at the top.
+	   Simpler & more reliable than constraining nested TabPanel children. */
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	.components-tab-panel__tabs {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+		background: #fff;
+	}
+}
+
+/* Empty state when no field selected */
+.ff-std-inspector-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	padding: 40px 24px;
+	text-align: center;
+	color: $color-muted;
+
+	.dashicons { font-size: 36px; width: 36px; height: 36px; opacity: 0.35; }
+	p { font-size: 13px; margin: 0; line-height: 1.5; }
+}
+
+/* ── Color swatch control ─────────────────────────────────────────── */
+
+.ff-std-color-control {
+	&__dot {
+		width: 16px;
+		height: 16px;
+		border-radius: 50%;
+		border: 1px solid rgba(0,0,0,0.12);
+		flex-shrink: 0;
+		display: inline-block;
+		margin-right: 8px;
+		vertical-align: middle;
+	}
+
+	&__hex {
+		font-size: 11px;
+		font-family: monospace;
+	}
+}
+
+/* ── Field inserter popover ───────────────────────────────────────── */
+
+.ff-std-inserter-popover {
+	&__content        { display: flex; flex-direction: column; min-width: 260px; max-height: 400px; }
+	&__search-wrap    { padding: 8px 12px; border-bottom: 1px solid $color-border; }
+	&__body           { flex: 1; overflow-y: auto; padding: 8px 0 12px; }
+	&__section        { margin-bottom: 4px; }
+	&__group          { padding: 6px 16px; font-size: 11px; font-weight: 600; color: $color-muted; }
+	&__grid           { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px 8px 8px; }
+	&__item-icon.dashicons { font-size: 20px; width: 20px; height: 20px; }
+	&__item-label     { font-size: 11px; line-height: 1.3; word-break: break-word; }
+	&__empty          { padding: 16px; text-align: center; color: $color-muted; font-size: 13px; }
+}
+
+/* ── Field picker (legacy, kept for compatibility) ───────────────── */
+
+.ff-field-picker {
+	display: flex;
+	flex-direction: column;
+	gap: $spacing-md;
+
+	&__group-label {
+		font-size: 11px;
+		font-weight: 600;
+		color: $color-muted;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: 0 0 $spacing-xs;
+	}
+
+}
+
+/* =====================================================================
+   Gutenberg-parity additions — canvas, breadcrumb, inspector tabs,
+   floating block toolbar
+===================================================================== */
+
+/* Canvas re-skin (light gray Gutenberg background).
+   The form's inner / form sizing is handled by the base `.ff-std-canvas` rules
+   so the standard builder gets the full canvas width. */
+.ff-gb-canvas {
+	flex: 1;
+	min-width: 0;
+	background: #f0f0f0;
+	overflow-y: auto;
+}
+
+/* Right inspector — sized container only, native @wordpress/components inside */
+.ff-gb-inspector {
+	width: 280px;
+	flex-shrink: 0;
+}
+
+/* Block inspector header (icon + name + description) */
+.ff-gb-block-inspector {
+	&__header {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 16px;
+		border-bottom: 1px solid #e0e0e0;
+		min-height: 70px;
+	}
+
+	&__icon {
+		width: 40px;
+		height: 40px;
+		border-radius: 6px;
+		background: #2271b1;
+		color: #fff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+
+		.dashicons {
+			color: #fff;
+			font-size: 20px;
+			width: 20px;
+			height: 20px;
+		}
+	}
+
+	&__meta { min-width: 0; }
+
+	&__name {
+		font-size: 13px;
+		font-weight: 600;
+		color: #1e1e1e;
+		line-height: 1.3;
+	}
+
+	&__desc {
+		font-size: 12px;
+		color: $color-muted;
+		margin-top: 2px;
+		line-height: 1.4;
+	}
+}
+
+/* Bottom breadcrumb */
+.ff-gb-breadcrumb {
+	height: 24px;
+	background: #fff;
+	border-top: 1px solid #e0e0e0;
+	padding: 0 16px;
+	font-size: 11px;
+	display: flex;
+	align-items: center;
+	color: $color-muted;
+	flex-shrink: 0;
+
+	&__seg {
+		display: inline-flex;
+		align-items: center;
+	}
+
+	&__sep {
+		margin: 0 4px;
+		color: #ccc;
+	}
+
+	&__btn {
+		background: transparent;
+		border: none;
+		padding: 2px 4px;
+		font-size: 11px;
+		color: $color-muted;
+		cursor: pointer;
+		border-radius: 2px;
+
+		&:hover { color: #1e1e1e; background: #f0f0f0; }
+	}
+}
+
+/* Floating block toolbar popover — stacking only */
+.ff-gb-block-toolbar-popover { z-index: 50; }
+
+/* ── Standard builder: theme variations grid (Style → Theme panel) ── */
+.ff-std-theme-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	padding: 4px 0 8px;
+}
+
+.ff-std-theme-card {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: transform .1s, box-shadow .15s;
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+
+	&:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+	&.is-active { outline-color: var(--wp-admin-theme-color, #2271b1); }
+
+	&__chip {
+		display: flex;
+		height: 36px;
+		border-radius: 4px;
+		overflow: hidden;
+		border: 1px solid rgba(0,0,0,0.06);
+	}
+	&__chip-bg     { flex: 2; }
+	&__chip-text   { flex: 1; }
+	&__chip-primary{ flex: 1; }
+
+	&__label {
+		font-size: 11px;
+		font-weight: 500;
+		color: #1e1e1e;
+		line-height: 1.3;
+		text-align: center;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}

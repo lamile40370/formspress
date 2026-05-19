@@ -1,0 +1,507 @@
+/* FlowForms — Frontend Styles */
+
+/* ── CSS custom properties (injected by PHP/JS per theme) ──────────── */
+/* defaults → classic white theme */
+.ff-form {
+	--ff-bg:           #ffffff;
+	--ff-text:         #1d2327;
+	--ff-primary:      #2271b1;
+	--ff-btn-text:     #ffffff;
+	--ff-label-color:  var(--ff-text);
+	--ff-label-weight: 600;
+	--ff-field-spacing: 20px;
+	--ff-border-width:  1px;
+	--ff-input-px:     14px;
+	--ff-input-py:     10px;
+	--ff-btn-radius:   4px;
+	--ff-btn-width:    auto;
+	--ff-border-style: solid;
+	--ff-btn-bg-actual:     var(--ff-primary);
+	--ff-btn-color-actual:  var(--ff-btn-text, #fff);
+	--ff-btn-border-actual: none;
+	/* legacy compat aliases */
+	--ff-color-primary: var(--ff-primary);
+	--ff-color-text:    var(--ff-text);
+	--ff-color-bg:      var(--ff-bg);
+	--ff-color-border:  #c3c4c7;
+	--ff-font-size:     var(--wp--preset--font-size--medium, 16px);
+	--ff-font-family:   var(--wp--preset--font-family--body, inherit);
+	--ff-border-radius: 4px;
+	font-size:   var(--ff-font-size);
+	font-family: var(--ff-font-family);
+	color:       var(--ff-text);
+	max-width:   680px;
+}
+.ff-form-block-wrapper.alignwide .ff-form,
+.ff-form-block-wrapper.alignfull .ff-form,
+.ff-flow-form-block-wrapper.alignwide .ff-form,
+.ff-flow-form-block-wrapper.alignfull .ff-form {
+	width: 100%;
+	max-width: none;
+}
+
+/* ── Standard form ─────────────────────────────────────────────────── */
+
+.ff-form__title       { font-size: 1.4em; font-weight: 700; margin: 0 0 .25em; }
+.ff-form__description { color: #606060; margin: 0 0 1em; }
+.ff-form__field       { margin-bottom: var(--ff-field-spacing); }
+.ff-form__label       { display: block; font-weight: var(--ff-label-weight); color: var(--ff-label-color); font-size: .875em; margin-bottom: .4em; }
+.ff-form__required    { color: #d63638; margin-left: 2px; }
+.ff-form__field-content { margin-bottom: .4em; }
+.ff-form__field-content > * { margin-top: 0; margin-bottom: .35em; }
+.ff-form__field-content > :last-child { margin-bottom: 0; }
+.ff-form__field-content .ff-field-label { font-size: .875em; font-weight: 700; line-height: 1.25; }
+.ff-form__field-content .ff-field-help { font-size: .8em; line-height: 1.45; opacity: .72; }
+.ff-form__field.is-required .ff-field-label::after { content: " *"; color: #d63638; font-weight: 700; }
+.ff-form__description-text { font-size: .8em; color: #606060; margin: 0 0 .4em; }
+
+.ff-form__input,
+.ff-form__textarea,
+.ff-form__select {
+	display: block; width: 100%;
+	max-width: 100%;
+	padding: var(--ff-input-py) var(--ff-input-px);
+	border: var(--ff-border-width) var(--ff-border-style, solid) var(--ff-color-border);
+	border-radius: var(--ff-border-radius);
+	font-size: var(--ff-font-size); font-family: var(--ff-font-family);
+	background: var(--ff-bg); color: var(--ff-text);
+	box-sizing: border-box; transition: border-color .15s, box-shadow .15s;
+}
+.ff-form__input:focus,
+.ff-form__textarea:focus,
+.ff-form__select:focus {
+	outline: none;
+	border-color: var(--ff-primary);
+	box-shadow: 0 0 0 2px rgba(34,113,177,.2);
+}
+.ff-form__input::placeholder,
+.ff-form__textarea::placeholder { color: currentColor; opacity: .65; }
+.ff-form__select.is-placeholder {
+	color: color-mix(in srgb, var(--ff-input-text-color, var(--ff-text)) 65%, transparent) !important;
+}
+.ff-form__textarea   { min-height: 120px; resize: vertical; }
+.ff-form__choices    { display: flex; flex-direction: column; gap: 8px; }
+.ff-form__choice     { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.ff-form__rating     { display: flex; gap: 4px; }
+.ff-form__star       { font-size: 28px; cursor: pointer; color: #c3c4c7; transition: color .1s; }
+.ff-form__star.is-active { color: #dba617; }
+.ff-form__section-title { font-weight: 700; font-size: 1.1em; margin: 1em 0 .25em; border-bottom: 1px solid var(--ff-color-border); padding-bottom: .5em; }
+.ff-form__footer     { margin-top: 1.5em; display: flex; gap: 12px; align-items: center; }
+.ff-form__footer .wp-block-buttons { width: 100%; }
+.ff-form__submit {
+	background: var(--ff-btn-bg-actual, var(--ff-btn-bg, var(--ff-primary)));
+	color: var(--ff-btn-color-actual, var(--ff-btn-text, #fff));
+	border: var(--ff-btn-border-actual, none);
+	padding: 12px 28px; border-radius: var(--ff-btn-radius);
+	width: var(--ff-btn-width);
+	font-size: var(--ff-font-size); font-family: var(--ff-font-family);
+	cursor: pointer; font-weight: 600; transition: opacity .2s;
+}
+.ff-form__submit:hover    { opacity: .9; }
+.ff-form__submit:disabled { opacity: .6; cursor: not-allowed; }
+.ff-form__prev-btn {
+	background: transparent; border: 1px solid var(--ff-color-border);
+	padding: 12px 20px; border-radius: var(--ff-border-radius);
+	font-size: var(--ff-font-size); cursor: pointer; transition: background .15s;
+}
+.ff-form__prev-btn:hover { background: #f0f0f1; }
+.ff-form__message         { padding: 16px; border-radius: var(--ff-border-radius); margin-top: 1em; }
+.ff-form__message--success { background: #edfaef; color: #00a32a; border: 1px solid #00a32a; }
+.ff-form__message--error   { background: #fdecea; color: #d63638; border: 1px solid #d63638; }
+.ff-form__field-error      { color: #d63638; font-size: .8em; margin-top: 4px; min-height: 1em; }
+.ff-form__honeypot         { display: none !important; }
+
+/* ── Rows / Columns ─────────────────────────────────────────────── */
+
+.ff-form__row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	margin-bottom: var(--ff-field-spacing);
+}
+.ff-form__col {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+}
+.ff-form__col[data-width="1/4"]  { flex: 1 1 calc(25% - 9px);     max-width: calc(25% - 9px); }
+.ff-form__col[data-width="1/3"]  { flex: 1 1 calc(33.333% - 8px); max-width: calc(33.333% - 8px); }
+.ff-form__col[data-width="1/2"]  { flex: 1 1 calc(50% - 6px);     max-width: calc(50% - 6px); }
+.ff-form__col[data-width="2/3"]  { flex: 1 1 calc(66.666% - 4px); max-width: calc(66.666% - 4px); }
+.ff-form__col[data-width="3/4"]  { flex: 1 1 calc(75% - 3px);     max-width: calc(75% - 3px); }
+.ff-form__col[data-width="full"] { flex: 1 1 100%;                 max-width: 100%; }
+.ff-form__col .ff-form__field:last-child { margin-bottom: 0; }
+@media (max-width: 600px) {
+	.ff-form__col { flex: 1 1 100% !important; max-width: 100% !important; }
+}
+
+/* ── Flow form (Typeform-style) ─────────────────────────────────────── */
+
+/* Inactive: contained block */
+.ff-form--flow {
+	background: var(--ff-bg);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+/* Active: fullscreen takeover (also applies to standalone /formspress/{id}/ pages) */
+.ff-form--flow.ff-form--active,
+.ff-form--flow.ff-form--fullscreen.ff-form--active {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	border-radius: 0;
+	max-width: none;
+	display: flex;
+	flex-direction: column;
+}
+
+/* Progress bar */
+.ff-form__progress {
+	height: 4px;
+	background: rgba(0,0,0,0.08);
+	flex-shrink: 0;
+}
+.ff-form__progress-bar {
+	height: 100%;
+	background: var(--ff-primary);
+	transition: width .4s ease;
+}
+
+/* Close button (fullscreen only) */
+.ff-form__close-btn {
+	display: none;
+}
+.ff-form--active .ff-form__close-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: rgba(0,0,0,0.08);
+	border: none;
+	font-size: 16px;
+	cursor: pointer;
+	color: var(--ff-text);
+	z-index: 10;
+	transition: background .15s;
+}
+.ff-form__close-btn:hover { background: rgba(0,0,0,0.15); }
+
+/* Flow stage */
+.ff-flow-stage {
+	flex: 1;
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 48px 24px;
+}
+
+/* Split layout (welcome screen with image on left) */
+.ff-flow-stage--split {
+	padding: 0 !important;
+	align-items: stretch;
+}
+.ff-flow-split {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+}
+.ff-flow-split__image {
+	flex: 1 1 50%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+.ff-flow-split__content {
+	flex: 1 1 50%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding: 48px max(32px, 6vw);
+}
+.ff-flow-split__content .ff-flow-screen {
+	max-width: 520px;
+	width: 100%;
+	text-align: left;
+}
+@media (max-width: 760px) {
+	.ff-flow-split { flex-direction: column; }
+	.ff-flow-split__image   { flex: 0 0 240px; }
+	.ff-flow-split__content { flex: 1; padding: 32px 24px; }
+}
+
+/* Welcome / End screen */
+.ff-flow-screen {
+	text-align: center;
+	max-width: 640px;
+	width: 100%;
+}
+.ff-flow-screen__checkmark {
+	font-size: 64px;
+	color: var(--ff-primary);
+	margin-bottom: 16px;
+}
+.ff-flow-screen__title {
+	font-size: 36px;
+	font-weight: 700;
+	color: var(--ff-text);
+	margin: 0 0 16px;
+	line-height: 1.2;
+}
+.ff-flow-screen__desc {
+	font-size: 18px;
+	color: var(--ff-text);
+	opacity: .65;
+	margin: 0 0 32px;
+}
+.ff-flow-start-btn,
+.ff-flow-restart-btn {
+	display: inline-block;
+	background: var(--ff-btn-bg, var(--ff-primary));
+	color: var(--ff-btn-text, #fff);
+	border: none;
+	padding: 14px 36px;
+	border-radius: var(--ff-btn-radius, 4px);
+	font-size: 18px;
+	font-weight: 600;
+	font-family: var(--ff-font-family, inherit);
+	cursor: pointer;
+	transition: opacity .2s;
+}
+.ff-flow-start-btn:hover,
+.ff-flow-restart-btn:hover { opacity: .9; }
+
+/* Flow question */
+.ff-flow-question {
+	max-width: 680px;
+	width: 100%;
+}
+.ff-flow-question__num {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ff-primary);
+	opacity: .8;
+	margin-bottom: 8px;
+}
+.ff-flow-question__label {
+	font-size: 28px;
+	font-weight: 600;
+	color: var(--ff-text);
+	margin: 0 0 8px;
+	line-height: 1.3;
+}
+.ff-flow-question__desc {
+	font-size: 16px;
+	color: var(--ff-text);
+	opacity: .6;
+	margin: 0 0 16px;
+}
+
+/* Typeform-style inputs: bottom-border only */
+.ff-flow-input {
+	width: 100%;
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid var(--ff-primary);
+	border-radius: 0;
+	color: var(--ff-text);
+	font-size: 20px;
+	font-family: inherit;
+	padding: 10px 0;
+	outline: none;
+	box-sizing: border-box;
+	caret-color: var(--ff-primary);
+}
+.ff-flow-input::placeholder  { color: var(--ff-text); opacity: .35; }
+.ff-flow-input--textarea { resize: none; min-height: 120px; }
+.ff-flow-input--select   { cursor: pointer; appearance: none; }
+
+/* Choices (radio/checkbox) */
+.ff-flow-choices { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+
+.ff-flow-choice {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 12px 20px;
+	border: 2px solid rgba(0,0,0,0.12);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 16px;
+	color: var(--ff-text);
+	transition: border-color .15s, background .15s;
+	user-select: none;
+}
+.ff-flow-choice:hover   { border-color: var(--ff-primary); background: rgba(0,0,0,0.02); }
+.ff-flow-choice.is-selected { border-color: var(--ff-primary); }
+
+.ff-flow-choice__letter {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	border-radius: 4px;
+	border: 1px solid var(--ff-primary);
+	font-size: 11px;
+	font-weight: 700;
+	flex-shrink: 0;
+	color: var(--ff-primary);
+	transition: background .15s, color .15s;
+}
+.ff-flow-choice.is-selected .ff-flow-choice__letter {
+	background: var(--ff-primary);
+	color: var(--ff-btn-text, #fff);
+}
+
+/* Rating */
+.ff-flow-rating  { display: flex; gap: 8px; margin-top: 8px; }
+.ff-flow-star {
+	font-size: 40px;
+	cursor: pointer;
+	color: rgba(0,0,0,0.12);
+	transition: color .1s;
+}
+.ff-flow-star.is-active { color: var(--ff-primary); }
+.ff-flow-star:hover      { color: var(--ff-primary); }
+
+/* Footer buttons */
+.ff-flow-footer { margin-top: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+
+.ff-flow-next-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	background: var(--ff-btn-bg, var(--ff-primary));
+	color: var(--ff-btn-text, #fff);
+	border: none;
+	padding: 12px 28px;
+	border-radius: var(--ff-btn-radius, 4px);
+	font-size: 15px;
+	font-weight: 600;
+	font-family: var(--ff-font-family, inherit);
+	cursor: pointer;
+	transition: opacity .2s;
+}
+.ff-flow-next-btn:hover    { opacity: .9; }
+.ff-flow-next-btn:disabled { opacity: .55; cursor: not-allowed; }
+.ff-flow-next-btn__hint {
+	font-size: 11px;
+	font-weight: 400;
+	opacity: .6;
+}
+
+.ff-flow-back-btn {
+	background: transparent;
+	border: none;
+	font-size: 13px;
+	color: var(--ff-text);
+	opacity: .45;
+	cursor: pointer;
+	padding: 4px 0;
+}
+.ff-flow-back-btn:hover { opacity: .7; }
+
+.ff-flow-error {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	color: #d63638;
+	font-size: 14px;
+	font-weight: 500;
+	margin-top: 10px;
+	min-height: 1em;
+	opacity: 0;
+	transform: translateY(-4px);
+	transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.ff-flow-error.is-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+.ff-flow-error__icon { font-size: 16px; flex-shrink: 0; }
+
+/* Invalid input — red bottom border */
+.ff-flow-input.is-invalid,
+.ff-flow-question__field input.is-invalid,
+.ff-flow-question__field textarea.is-invalid,
+.ff-flow-question__field select.is-invalid {
+	border-bottom-color: #d63638 !important;
+	caret-color: #d63638;
+}
+
+/* Shake animation */
+@keyframes ff-shake {
+	0%, 100% { transform: translateX(0); }
+	20%       { transform: translateX(-6px); }
+	40%       { transform: translateX(6px); }
+	60%       { transform: translateX(-4px); }
+	80%       { transform: translateX(4px); }
+}
+.ff-shake { animation: ff-shake 0.45s ease; }
+
+/* ── Slide-up animation ─────────────────────────────────────────────── */
+
+@keyframes ff-slide-up {
+	from { opacity: 0; transform: translateY(24px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Accessibility helpers ──────────────────────────────────────────── */
+
+/* WordPress-canonical visually-hidden utility — used for "(required)"
+ * suffix and any screen-reader-only labels. Mirrors core's accessibility
+ * helper so it inherits theme-level overrides. */
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	-webkit-clip-path: inset(50%);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+/* Strip the native fieldset border so groups blend with the field layout. */
+.ff-form__fieldset {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	min-width: 0;
+}
+.ff-form__fieldset > legend {
+	padding: 0;
+	margin-bottom: 6px;
+}
+
+/* Aria-invalid styling — red focus ring & border so sighted keyboard
+ * users see the same error state as screen reader users hear. */
+.ff-form [aria-invalid="true"] {
+	border-color: #d63638;
+	box-shadow: 0 0 0 1px #d63638;
+}
+
+/* Keyboard focus ring on rating stars (WCAG 2.4.7). */
+.ff-form__star:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+	border-radius: 2px;
+}
+.ff-form__star {
+	background: none;
+	border: 0;
+	padding: 0 2px;
+	cursor: pointer;
+	color: #c3c4c7;
+}

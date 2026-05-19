@@ -1,0 +1,1214 @@
+/* =====================================================================
+   FLOW FORM BUILDER — Gutenberg-like 3-panel layout
+===================================================================== */
+
+/* ── Builder shell ───────────────────────────────────────────────── */
+
+.ff-gb-builder {
+	position: fixed;
+	inset: 0;
+	z-index: 999998;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background: #f0f0f1;
+
+	/* ── Topbar — Gutenberg site/post-editor header ── */
+	&__topbar {
+		display: flex;
+		align-items: center;
+		height: 60px;
+		background: #fff;
+		flex-shrink: 0;
+		border-bottom: 1px solid #e0e0e0;
+		padding-right: 8px;
+		position: relative;
+		z-index: 10;
+	}
+
+	&__topbar-left {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		min-width: 0;
+	}
+
+	&__topbar-center {
+		flex: 1;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-width: 0;
+		padding: 0 8px;
+	}
+
+	&__topbar-right {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		/* Native Gutenberg header uses 4 px between icon-buttons and
+		 * 8 px before the primary action — `gap: 4px` + a left
+		 * margin on the primary `Button` would be ideal, but a
+		 * single 6 px gap reads close enough across the board. */
+		gap: 6px;
+		justify-content: flex-end;
+		min-width: 0;
+		padding-right: 4px;
+
+		/* The primary button gets a touch more breathing room on its
+		 * left, matching the native header pattern. */
+		.components-button.is-primary { margin-left: 4px; }
+	}
+}
+
+/* "Saved" / "Modifications…" indicator — mirrors the native
+ * `.editor-post-saved-state` pill in the post-editor header. */
+.ff-gb-topbar__saved {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: #757575;
+	font-size: 13px;
+	padding: 0 4px;
+
+	svg { fill: currentColor; }
+}
+
+/* Dark logo box — 60×60 #1e1e1e, full topbar height (matches Gutenberg's WP-mark box). */
+.ff-gb-topbar__logo {
+	width: 60px;
+	height: 60px;
+	margin-right: 4px;
+	background: #1e1e1e;
+	color: #fff;
+	border: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background 0.12s;
+
+	svg, img { color: #fff; fill: #fff; }
+	&:hover { background: #3d3d3d; }
+}
+
+/* Title pill — single flat gray surface, matches Gutenberg post-editor header pill. */
+.ff-gb-title-pill {
+	display: flex;
+	align-items: center;
+	height: 36px;
+	width: 100%;
+	max-width: 520px;
+	padding: 0 14px;
+	background: #f0f0f0;
+	border-radius: 2px;
+	transition: background 0.12s;
+
+	&:hover         { background: #e8e8e8; }
+	&:focus-within  { background: #e0e0e0; }
+
+	&__input,
+	input.ff-gb-title-pill__input {
+		flex: 1;
+		min-width: 0;
+		height: 100%;
+		background: transparent !important;
+		border: none !important;
+		outline: none !important;
+		box-shadow: none !important;
+		text-align: center;
+		font-size: 13px;
+		font-weight: 500;
+		color: #1e1e1e;
+		padding: 0;
+		margin: 0;
+		line-height: 1;
+
+		&::placeholder { color: #757575; font-weight: 400; }
+		&:focus { box-shadow: none !important; outline: none !important; }
+	}
+
+	&__sep { display: none; }
+
+	&__hint {
+		font-size: 12px;
+		color: #757575;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		flex-shrink: 0;
+		margin-left: 12px;
+	}
+}
+
+/* Snackbar — fixed bottom-left, exactly like Gutenberg's "Site updated" toast.
+   Auto-dismiss is handled by WP's Snackbar component (default ~10s). */
+.ff-gb-snackbar-wrap {
+	position: fixed;
+	bottom: 24px;
+	left: 24px;
+	z-index: 100000;
+	pointer-events: none; /* container only — Snackbar itself catches clicks */
+
+	> .components-snackbar { pointer-events: auto; }
+}
+
+.ff-gb-builder__body {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	overflow: hidden;
+}
+
+.ff-gb-builder__content {
+	flex: 1 1 auto;
+	min-width: 0;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	> :not( .ff-gb-notice-area ) {
+		flex: 1 1 auto;
+		min-width: 0;
+		min-height: 0;
+	}
+}
+
+.ff-gb-notice-area {
+	flex: 0 0 auto;
+	background: #fff;
+	border-bottom: 1px solid #e0e0e0;
+
+	.components-notice {
+		margin: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+}
+
+/* ── TreeView (left panel) — white, like Gutenberg list view ─────── */
+
+.ff-gb-treeview {
+	width: 300px;
+	flex-shrink: 0;
+	background: #fff;
+	border-right: 1px solid #e0e0e0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 14px 16px 12px;
+		font-size: 13px;
+		font-weight: 600;
+		color: #1e1e1e;
+		flex-shrink: 0;
+	}
+
+	&__count {
+		background: transparent;
+		color: #757575;
+		font-size: 13px;
+		font-weight: 400;
+	}
+
+	&__list {
+		flex: 1;
+		overflow-y: auto;
+		padding: 0 8px 8px;
+	}
+
+	&__empty {
+		padding: 16px;
+		color: #757575;
+		font-size: 12px;
+		text-align: center;
+	}
+
+	&__footer {
+		flex-shrink: 0;
+		padding: 12px;
+		border-top: 1px solid #e0e0e0;
+		background: #fff;
+	}
+
+	&__add-wrap { width: 100%; }
+
+	&__add-btn { width: 100%; justify-content: center; }
+}
+
+/* ── Question inserter (popover content) ─────────────────────────── */
+
+/* Quick inserter — matches the Gutenberg block-appender quick inserter:
+   search at top, 3-column grid of vertical cards (icon over label). */
+.ff-gb-inserter {
+	width: 360px;
+	max-height: 480px;
+	display: flex;
+	flex-direction: column;
+
+	&__search {
+		flex-shrink: 0;
+		padding: 12px 12px 4px;
+	}
+
+	&__body {
+		flex: 1;
+		overflow-y: auto;
+		padding: 4px 0 12px;
+	}
+
+	&__group + &__group { margin-top: 4px; }
+
+	&__group-label {
+		padding: 10px 16px 6px;
+		font-size: 11px;
+		font-weight: 500;
+		color: #757575;
+		margin: 0;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat( 3, 1fr );
+		gap: 4px;
+		padding: 0 8px;
+	}
+
+	&__item {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 8px;
+		min-height: 88px;
+		padding: 12px 6px;
+		background: transparent;
+		border: 1px solid transparent;
+		border-radius: 2px;
+		font-size: 12px;
+		font-weight: 500;
+		color: #1e1e1e;
+		cursor: pointer;
+		text-align: center;
+		font-family: inherit;
+		line-height: 1.3;
+		transition: color 0.1s, border-color 0.1s, box-shadow 0.1s;
+
+		&:hover {
+			color: $color-primary;
+			border-color: $color-primary;
+		}
+
+		&:focus-visible {
+			outline: none;
+			box-shadow: inset 0 0 0 1.5px $color-primary;
+			border-color: $color-primary;
+		}
+	}
+
+	&__item-icon-wrap {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 36px;
+		height: 36px;
+		color: #1e1e1e;
+
+		.dashicons {
+			font-size: 24px;
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	&__item:hover &__item-icon-wrap { color: $color-primary; }
+
+	&__item-label {
+		display: block;
+		font-size: 11px;
+		font-weight: 500;
+		word-break: break-word;
+		hyphens: auto;
+	}
+
+	&__empty {
+		padding: 24px 16px;
+		text-align: center;
+		color: #757575;
+		font-size: 13px;
+	}
+}
+
+/* Tree item — matches Gutenberg list view: solid blue on selected with white text/icon,
+   3-dot more menu on hover/selected (no inline delete button). */
+.ff-gb-tree-item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 10px;
+	margin: 1px 0;
+	border-radius: 2px;
+	cursor: pointer;
+	color: #1e1e1e;
+	font-size: 13px;
+	line-height: 1.4;
+	transition: background 0.1s, color 0.1s;
+	position: relative;
+
+	&:hover { background: #f0f0f1; }
+
+	&.is-selected {
+		background: $color-primary;
+		color: #fff;
+	}
+
+	&__icon {
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+		color: #757575;
+
+		.is-selected & { color: #fff; }
+	}
+
+	&__label {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-weight: 500;
+	}
+
+	&.is-screen {
+		.ff-gb-tree-item__label { font-weight: 400; color: #757575; }
+		&.is-selected .ff-gb-tree-item__label { color: #fff; }
+	}
+
+	&__menu {
+		flex-shrink: 0;
+		opacity: 0;
+		transition: opacity 0.15s;
+	}
+
+	&:hover &__menu,
+	&.is-selected &__menu { opacity: 1; }
+
+	&.is-selected &__menu .components-button {
+		color: #fff;
+	}
+}
+
+/* ── Actions panel footer (Add another action) ──────────────────── */
+
+.ff-gb-actions__footer {
+	padding: 12px 16px 16px;
+	display: flex;
+	justify-content: center;
+
+	.components-button { width: 100%; justify-content: center; }
+}
+
+/* ── Canvas (center) — live iframe preview ───────────────────────── */
+
+.ff-gb-canvas {
+	flex: 1;
+	min-width: 0;
+	background: #f0f0f1;
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	padding: 24px;
+	overflow: hidden;
+	position: relative;
+}
+
+.ff-gb-canvas-iframe {
+	display: block;
+	flex: 1;
+	width: 100%;
+	height: 100%;
+	max-width: 1200px;
+	border: none;
+	border-radius: 8px;
+	box-shadow: 0 4px 24px rgba(0,0,0,.08);
+	background: #fff;
+}
+
+/* Floating "+" inserter — bottom-center of canvas */
+.ff-gb-canvas-fab {
+	position: absolute;
+	bottom: 32px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 5;
+}
+
+.ff-gb-canvas-fab__btn.components-button {
+	width: 44px;
+	height: 44px;
+	min-width: 44px;
+	border-radius: 50%;
+	padding: 0;
+	box-shadow: 0 4px 14px rgba( 0, 0, 0, 0.15 );
+
+	svg { width: 22px; height: 22px; }
+}
+
+/* ── Inspector (right panel) ─────────────────────────────────────── */
+
+.ff-gb-inspector {
+	border-left: 1px solid #e0e0e0;
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	/* WP admin globally uppercases control labels — reset to match Gutenberg */
+	.components-base-control__label {
+		text-transform: none;
+		letter-spacing: 0;
+		font-size: 12px;
+		font-weight: 500;
+		color: #1d2327;
+	}
+
+	/* TabPanel — correct WP class = __tabs-item, not __tab-item */
+	&__tabpanel {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+
+		/* Tab bar — layout only, let WP's tab styling render natively. */
+		> .components-tab-panel__tabs {
+			flex-shrink: 0;
+		}
+
+		/* Tab content scroll container */
+		> .components-tab-panel__tab-content {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
+			display: flex;
+			flex-direction: column;
+		}
+	}
+
+	/* Panels container */
+	&__panels {
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* Block type info bar — light gray strip at top of Question tab */
+	&__block-header {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		padding: 10px 16px;
+		border-bottom: 1px solid #e0e0e0;
+		background: #f6f7f7;
+		flex-shrink: 0;
+
+	}
+
+	&__block-icon {
+		font-size: 16px;
+		width: 16px;
+		height: 16px;
+		color: #757575;
+		flex-shrink: 0;
+	}
+
+	&__block-name {
+		flex: 1;
+		font-size: 12px;
+		font-weight: 600;
+		color: #1d2327;
+		text-transform: capitalize;
+	}
+
+	/* Empty state when no question selected */
+	&__empty {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: $spacing-xl;
+		color: #757575;
+		font-size: 13px;
+		text-align: center;
+	}
+
+	/* Color label in Design > Colors panel */
+	&__color-label {
+		font-size: 13px;
+		color: #1d2327;
+	}
+
+	&__color-hex {
+		font-size: 11px;
+		color: #757575;
+		font-family: monospace;
+		min-width: 56px;
+		text-align: right;
+	}
+}
+
+/* ── PanelBody inside inspector — defer to WP defaults, minimal overrides ── */
+.ff-gb-inspector__panels > .components-panel__body {
+	/* WP already adds border-top and border-bottom; just reset bottom to avoid doubles */
+	border-bottom: none;
+
+	/* Ensure toggle button text is dark like Gutenberg */
+	.components-panel__body-toggle.components-button {
+		color: #1d2327;
+	}
+}
+
+/* ── Color button (Dropdown trigger) ─────────────────────────────── */
+
+.ff-gb-color-btn {
+	width: 36px;
+	height: 28px;
+	border: 1px solid rgba(0,0,0,0.15);
+	border-radius: $radius-sm;
+	cursor: pointer;
+	padding: 0;
+	flex-shrink: 0;
+	box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+	transition: box-shadow 0.15s;
+	&:hover { box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 0 0 2px $color-primary; }
+}
+
+/* ── Theme preset grid ───────────────────────────────────────────── */
+
+.ff-gb-theme-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: $spacing-sm;
+	padding: $spacing-sm 0;
+}
+
+.ff-gb-theme-swatch {
+	aspect-ratio: 1.6;
+	border-radius: $radius-sm;
+	border: 2px solid $color-border;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	font-size: 12px;
+	transition: border-color 0.15s, transform 0.1s;
+	&:hover { transform: scale(1.04); }
+	&.is-active { box-shadow: 0 0 0 2px #fff, 0 0 0 4px $color-primary; }
+}
+
+/* ── Preview modal — device-responsive ───────────────────────────── */
+
+.ff-preview-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+
+	/* ── Header bar (device toggles) ── */
+	&__header {
+		display: flex;
+		align-items: center;
+		height: 56px;
+		border-bottom: 1px solid #e0e0e0;
+		padding: 0 $spacing-md;
+		flex-shrink: 0;
+		background: #fff;
+	}
+
+	&__devices {
+		display: flex;
+		gap: 4px;
+		flex: 1;
+	}
+
+	&__title {
+		font-size: 11px;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		color: #757575;
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	&__actions {
+		display: flex;
+		gap: 4px;
+		justify-content: flex-end;
+		flex: 1;
+	}
+
+	/* ── Stage (gray bg, centers the frame) ── */
+	&__stage {
+		flex: 1;
+		min-height: 0;
+		overflow: auto;
+		background: #f0f0f1;
+		display: flex;
+		align-items: stretch;
+		justify-content: center;
+		padding: $spacing-lg;
+	}
+
+	/* ── The form "frame" — white card, viewport-sized ── */
+	&__frame {
+		background: var(--ff-bg, #fff);
+		border-radius: $radius-md;
+		box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		flex: 1;
+		max-width: 100%;
+		align-self: flex-start;
+		min-height: 100%;
+	}
+
+	/* ── Progress bar inside frame ── */
+	&__progress {
+		height: 3px;
+		background: rgba(0,0,0,0.06);
+		flex-shrink: 0;
+	}
+
+	&__progress-bar {
+		height: 100%;
+		transition: width 0.4s ease;
+	}
+
+	/* ── Content area inside frame ── */
+	&__content {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		padding: $spacing-xl;
+	}
+
+	/* Full-bleed when rendering an image-left split */
+	&__content:has( > .ff-preview-screen--image-left ) {
+		padding: 0;
+		display: block;
+		position: relative;
+	}
+}
+
+/* ── Preview screens & questions ─────────────────────────────────── */
+
+.ff-preview-screen {
+	max-width: 600px;
+	width: 100%;
+	padding: $spacing-xl;
+
+	&--center { text-align: center; }
+	&--left   { text-align: left; }
+
+	&__checkmark { font-size: 64px; margin-bottom: $spacing-md; display: block; }
+	&__title { font-size: 36px; font-weight: 700; color: var(--ff-text, $color-text); margin: 0 0 $spacing-md; line-height: 1.2; }
+	&__desc { font-size: 18px; color: var(--ff-text, $color-muted); opacity: .7; margin: 0 0 $spacing-xl; }
+
+	/* Split layout: image left, content right (full bleed in preview frame) */
+	&--image-left {
+		position: absolute;
+		inset: 0;
+		max-width: none;
+		width: auto;
+		padding: 0;
+		display: flex;
+		align-items: stretch;
+	}
+
+	&__image {
+		flex: 1 1 50%;
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	&__panel {
+		flex: 1 1 50%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		padding: $spacing-xl max(32px, 6vw);
+		text-align: left;
+	}
+
+	@media (max-width: 760px) {
+		&--image-left { flex-direction: column; }
+		&__image { flex: 1 1 40%; }
+		&__panel { flex: 1 1 60%; padding: $spacing-lg; }
+	}
+}
+
+.ff-preview-question {
+	max-width: 640px;
+	width: 100%;
+	padding: $spacing-xl;
+
+	&__num { font-size: 13px; font-weight: 700; color: var(--ff-primary, $color-primary); opacity: .8; margin-bottom: $spacing-sm; span { opacity: .5; } }
+	&__label { font-size: 28px; font-weight: 600; color: var(--ff-text, $color-text); margin: 0 0 $spacing-sm; line-height: 1.3; }
+	&__desc { font-size: 16px; color: var(--ff-text, $color-muted); opacity: .65; margin: 0 0 $spacing-md; }
+	&__field { margin-top: $spacing-md; }
+	&__footer { margin-top: $spacing-lg; display: flex; flex-direction: column; align-items: flex-start; gap: $spacing-sm; }
+}
+
+.ff-preview-input {
+	width: 100%;
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid var(--ff-primary, $color-primary);
+	border-radius: 0;
+	color: var(--ff-text, $color-text);
+	font-size: 20px;
+	font-family: inherit;
+	padding: $spacing-sm 0;
+	outline: none;
+	box-sizing: border-box;
+	caret-color: var(--ff-primary, $color-primary);
+	&::placeholder { color: var(--ff-text, $color-text); opacity: .35; }
+	&--textarea { resize: none; min-height: 120px; }
+}
+
+.ff-preview-choices { display: flex; flex-direction: column; gap: $spacing-sm; margin-top: $spacing-sm; }
+.ff-preview-choice {
+	display: flex; align-items: center; gap: $spacing-md;
+	padding: 12px $spacing-lg;
+	border: 2px solid rgba(0,0,0,0.12);
+	border-radius: $radius-sm;
+	cursor: pointer; font-size: 16px; color: var(--ff-text, $color-text);
+	transition: border-color 0.15s;
+	&:hover { border-color: var(--ff-primary, $color-primary); }
+	&.is-selected { border-color: var(--ff-primary, $color-primary); }
+	&__letter {
+		display: inline-flex; align-items: center; justify-content: center;
+		width: 26px; height: 26px; border-radius: $radius-sm;
+		border: 1px solid var(--ff-primary, $color-primary);
+		font-size: 11px; font-weight: 700; flex-shrink: 0; color: var(--ff-primary, $color-primary);
+	}
+}
+
+.ff-preview-rating { display: flex; gap: $spacing-sm; margin-top: $spacing-sm; }
+.ff-preview-star { font-size: 40px; cursor: pointer; color: rgba(0,0,0,0.12); transition: color 0.1s; &.is-active { color: var(--ff-primary, $color-primary); } }
+
+.ff-preview-btn {
+	display: inline-flex; align-items: center; gap: $spacing-sm;
+	padding: 12px $spacing-xl; border-radius: $radius-sm; border: none;
+	font-size: 15px; font-weight: 600; cursor: pointer;
+	background: var(--ff-primary, $color-primary); color: var(--ff-btn-text, #fff);
+	transition: opacity 0.15s;
+	&:hover { opacity: .9; }
+	&__hint { font-size: 11px; font-weight: 400; opacity: .6; }
+	&--ghost { background: transparent !important; border: 2px solid var(--ff-primary, $color-primary); }
+}
+
+/* Error message + invalid state */
+.ff-preview-error {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	color: #d63638;
+	font-size: 14px;
+	font-weight: 500;
+	margin-top: 10px;
+	animation: ff-fade-in 0.2s ease both;
+
+	&__icon { font-size: 16px; flex-shrink: 0; }
+}
+
+.ff-preview-input.is-invalid {
+	border-bottom-color: #d63638 !important;
+	caret-color: #d63638;
+}
+
+.ff-preview-choices.is-invalid .ff-preview-choice {
+	border-color: rgba(214, 54, 56, 0.3);
+}
+
+.ff-preview-rating.is-invalid .ff-preview-star {
+	color: rgba(214, 54, 56, 0.2) !important;
+}
+
+.ff-preview-back {
+	background: transparent; border: none; font-size: 13px;
+	opacity: .45; cursor: pointer; padding: 4px 0;
+	&:hover { opacity: .7; }
+}
+
+/* ── Share Panel ─────────────────────────────────────────────────── */
+
+.ff-share-panel {
+	flex: 1;
+	overflow-y: auto;
+	background: #f6f7f7;
+	display: flex;
+	flex-direction: column;
+
+	&__inner {
+		max-width: 720px;
+		margin: 0 auto;
+		padding: 48px 32px 80px;
+		width: 100%;
+	}
+
+	&__title {
+		font-size: 24px;
+		font-weight: 700;
+		color: #1d2327;
+		margin: 0 0 8px;
+	}
+
+	&__subtitle {
+		font-size: 14px;
+		color: #757575;
+		margin: 0 0 40px;
+	}
+}
+
+.ff-share-section {
+	background: #fff;
+	border-radius: 4px;
+	padding: 28px 32px;
+	margin-bottom: 0;
+
+	&__head {
+		margin-bottom: 20px;
+	}
+
+	&__title {
+		font-size: 16px;
+		font-weight: 700;
+		color: #1d2327;
+		margin: 0 0 6px;
+	}
+
+	&__desc {
+		font-size: 13px;
+		color: #757575;
+		margin: 0;
+		line-height: 1.55;
+	}
+}
+
+.ff-share-divider {
+	height: 1px;
+	background: #e0e0e0;
+	margin: 0;
+}
+
+.ff-share {
+	&__label {
+		display: block;
+		font-size: 12px;
+		font-weight: 600;
+		color: #757575;
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		margin-bottom: 8px;
+	}
+
+	&__row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	&__url-field {
+		flex: 1;
+		min-width: 0;
+		border: 1px solid #e0e0e0;
+		border-radius: $radius-sm;
+		padding: 9px 14px;
+		background: #f6f7f7;
+		overflow: hidden;
+
+		&--mono { background: #1d2327; border-color: #1d2327; }
+	}
+
+	&__url-text {
+		font-size: 13px;
+		color: #1d2327;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: block;
+		font-family: inherit;
+
+		.ff-share__url-field--mono & {
+			color: #7dd3fc;
+			font-family: monospace;
+		}
+	}
+
+	&__copy-btn.components-button {
+		flex-shrink: 0;
+		min-width: 84px !important;
+		justify-content: center;
+		transition: background 0.15s, color 0.15s;
+
+		&.is-copied {
+			background: #00a32a !important;
+			color: #fff !important;
+			border-color: #00a32a !important;
+		}
+	}
+
+	&__open-btn.components-button {
+		flex-shrink: 0;
+	}
+
+	/* Gutenberg block steps */
+	&__steps {
+		list-style: none;
+		padding: 0;
+		margin: 0 0 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	&__step {
+		display: flex;
+		align-items: flex-start;
+		gap: 12px;
+		font-size: 14px;
+		color: #1d2327;
+		line-height: 1.55;
+	}
+
+	&__step-num {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: $color-primary;
+		color: #fff;
+		font-size: 11px;
+		font-weight: 700;
+		flex-shrink: 0;
+		margin-top: 1px;
+	}
+
+	&__block-name {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background: #f6f7f7;
+		border: 1px solid #e0e0e0;
+		border-radius: $radius-sm;
+		padding: 8px 14px;
+		margin-top: 4px;
+
+		code {
+			font-size: 13px;
+			color: $color-primary;
+			font-family: monospace;
+		}
+	}
+
+	&__block-icon {
+		.dashicons { font-size: 18px; width: 18px; height: 18px; color: $color-primary; }
+	}
+}
+
+/* ── Entrance animations ─────────────────────────────────────────── */
+
+@keyframes ff-slide-up {
+	from { opacity: 0; transform: translateY(24px); }
+	to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ff-fade-in {
+	from { opacity: 0; }
+	to   { opacity: 1; }
+}
+
+@keyframes ff-scale-up {
+	from { opacity: 0; transform: scale(0.94); }
+	to   { opacity: 1; transform: scale(1); }
+}
+
+.ff-anim--slide-up { animation: ff-slide-up 0.4s cubic-bezier(.22,.68,0,1.2) both; }
+.ff-anim--fade-in  { animation: ff-fade-in  0.35s ease both; }
+.ff-anim--scale-up { animation: ff-scale-up 0.35s cubic-bezier(.22,.68,0,1.2) both; }
+.ff-anim--none     { animation: none; }
+
+/* ─────────────────────────────────────────────────────────────────────
+   TEMPLATE BROWSER
+   ───────────────────────────────────────────────────────────────────── */
+
+.ff-template-browser-modal {
+	width: min(1100px, 92vw);
+}
+
+.ff-template-browser {
+	display: flex;
+	gap: 24px;
+	min-height: 480px;
+
+	&__sidebar {
+		flex: 0 0 240px;
+		border-right: 1px solid #e0e0e0;
+		padding-right: 16px;
+	}
+
+	&__search {
+		margin-bottom: 16px;
+	}
+
+	&__cats {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	&__cat {
+		display: block;
+		width: 100%;
+		text-align: left;
+		padding: 8px 12px;
+		background: transparent;
+		border: 0;
+		border-radius: 4px;
+		font-size: 13px;
+		color: #1e1e1e;
+		cursor: pointer;
+
+		&:hover { background: #f0f0f1; }
+
+		&.is-active {
+			background: #f0f6ff;
+			color: #2271b1;
+			font-weight: 500;
+		}
+	}
+
+	&__main {
+		flex: 1;
+		min-width: 0;
+	}
+
+	&__loading {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		min-height: 320px;
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 16px;
+	}
+
+	&__empty {
+		grid-column: 1 / -1;
+		text-align: center;
+		color: #757575;
+		padding: 48px 24px;
+		font-size: 13px;
+	}
+}
+
+.ff-template-card {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	padding: 16px;
+	min-height: 180px;
+	transition: border-color 120ms ease;
+
+	&:hover { border-color: #c3c4c7; }
+
+	&__head {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 12px;
+	}
+
+	&__icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 32px;
+		height: 32px;
+		border-radius: 4px;
+		background: #f0f6ff;
+		color: #2271b1;
+		flex-shrink: 0;
+	}
+
+	&__type-badge {
+		font-size: 11px;
+		padding: 2px 8px;
+		border-radius: 10px;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		margin-left: auto;
+
+		&--standard {
+			background: #e7f5ea;
+			color: #00a32a;
+		}
+
+		&--flow {
+			background: #f0f6ff;
+			color: #2271b1;
+		}
+	}
+
+	&__menu {
+		display: inline-flex;
+		margin-left: 4px;
+	}
+
+	&__label {
+		margin: 0 0 6px;
+		font-size: 14px;
+		font-weight: 600;
+		color: #1e1e1e;
+	}
+
+	&__desc {
+		margin: 0 0 16px;
+		font-size: 12px;
+		line-height: 1.5;
+		color: #50575e;
+		flex: 1;
+	}
+
+	&__footer {
+		margin-top: auto;
+	}
+
+	&--blank {
+		background: #fafafa;
+		border-style: dashed;
+	}
+}

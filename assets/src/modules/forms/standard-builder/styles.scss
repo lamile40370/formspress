@@ -1,0 +1,1004 @@
+/*
+ * Standard builder — only canvas + sidebars chrome.
+ *
+ * The outer shell comes from <EditorSkeleton> (shared with FlowBuilder).
+ * The block editor primitives inside the canvas inherit their visuals
+ * from the Gutenberg stylesheets we depend on (`wp-edit-post`,
+ * `wp-block-editor`, `wp-block-library`, `wp-edit-blocks`,
+ * `wp-format-library`, `wp-components`).
+ */
+
+// EditorSkeleton's `.ff-gb-builder__body` is `flex: 1; min-height: 0;
+// display: flex` so children are flex items along the row.
+//
+// Canvas root is a non-scrolling flex column: the scroll lives on
+// `.ff-std-canvas__scroll` so the breadcrumb strip stays pinned at the
+// bottom regardless of how long the form gets. Same pattern as the
+// native post editor (where the BlockBreadcrumb sits in a fixed footer).
+.ff-std-builder .ff-std-canvas {
+	flex: 1 1 auto;
+	min-width: 0;
+	min-height: 0;
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	.editor-styles-wrapper {
+		width: 100%;
+		min-height: 100%;
+		padding: 32px 48px;
+		box-sizing: border-box;
+	}
+}
+
+.ff-std-canvas__scroll {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+.ff-std-canvas--tablet,
+.ff-std-canvas--mobile {
+	background: #ddd;
+
+	.ff-std-canvas__scroll {
+		padding: 32px 0;
+	}
+
+	.editor-styles-wrapper {
+		background: #fff;
+		min-height: calc(100% - 64px);
+		margin: 0 auto;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+	}
+}
+
+.ff-std-canvas--tablet .editor-styles-wrapper {
+	width: min(768px, calc(100% - 64px));
+}
+
+.ff-std-canvas--mobile .editor-styles-wrapper {
+	width: min(390px, calc(100% - 32px));
+	padding-left: 24px;
+	padding-right: 24px;
+}
+
+.ff-std-canvas__breadcrumb {
+	flex: 0 0 28px;
+	display: flex;
+	align-items: center;
+	padding: 0 16px;
+	background: #fff;
+	border-top: 1px solid #e0e0e0;
+	font-size: 12px;
+	color: #757575;
+}
+
+.ff-gb-topbar__actions-button.components-button {
+	position: relative;
+}
+
+.ff-gb-topbar__actions-badge {
+	position: absolute;
+	top: -6px;
+	right: -7px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border: 2px solid #fff;
+	border-radius: 999px;
+	background: #007cba;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 14px;
+	text-align: center;
+	box-sizing: border-box;
+	pointer-events: none;
+}
+
+// ── Form actions modal ───────────────────────────────────────────────
+
+.ff-form-actions-modal.components-modal__frame {
+	width: calc(100vw - 48px);
+	max-width: none;
+	height: calc(100vh - 48px);
+	max-height: calc(100vh - 48px);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.ff-form-actions-modal.components-modal__frame.is-full-screen {
+	width: calc(100vw - 48px);
+	height: calc(100vh - 48px);
+	max-width: none;
+	max-height: calc(100vh - 48px);
+	margin: auto;
+	border-radius: 8px;
+}
+
+.ff-form-actions-modal {
+	.components-modal__content {
+		flex: 1 1 auto;
+		height: calc(100vh - 120px) !important;
+		max-height: calc(100vh - 120px) !important;
+		min-height: 0 !important;
+		margin-top: 72px !important;
+		margin-bottom: 0 !important;
+		display: grid !important;
+		grid-template-rows: minmax(0, 1fr);
+		padding: 0 !important;
+		overflow: hidden !important;
+		box-sizing: border-box;
+		overscroll-behavior: contain;
+	}
+
+	.components-modal__header {
+		border-bottom: 1px solid #e0e0e0;
+	}
+}
+
+.ff-form-actions-modal__shell {
+	height: 100% !important;
+	max-height: 100% !important;
+	min-height: 0 !important;
+	display: grid;
+	grid-template-rows: auto minmax(0, 1fr) auto;
+	background: #fff;
+	overflow: hidden !important;
+}
+
+.ff-form-actions-modal__summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 16px 24px;
+	border-bottom: 1px solid #e0e0e0;
+
+	strong {
+		display: block;
+		margin: 0;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+
+	p {
+		margin: 2px 0 0;
+		color: #757575;
+		font-size: 13px;
+		line-height: 1.4;
+	}
+}
+
+.ff-form-actions-modal__stats {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 16px;
+}
+
+.ff-form-actions-modal__stat {
+	min-width: 56px;
+	text-align: center;
+
+	strong {
+		display: block;
+		font-size: 18px;
+		line-height: 1;
+	}
+
+	span {
+		display: block;
+		margin-top: 4px;
+		color: #757575;
+		font-size: 12px;
+	}
+}
+
+.ff-form-actions-modal__footer {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 12px 24px;
+	border-top: 1px solid #e0e0e0;
+	background: #f6f7f7;
+
+	p {
+		margin: 0;
+		color: #757575;
+		font-size: 12px;
+	}
+}
+
+.ff-actions-workspace {
+	align-self: stretch;
+	height: 100% !important;
+	min-height: 0 !important;
+	max-height: 100% !important;
+	overflow-x: hidden;
+	overflow-y: auto !important;
+	display: grid;
+	grid-template-columns: 280px minmax(0, 1fr);
+	background: #fff;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+.ff-actions-workspace__list {
+	position: sticky;
+	top: 0;
+	height: 100%;
+	max-height: 100%;
+	min-height: 0;
+	overflow: hidden;
+	border-right: 1px solid #e0e0e0;
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+}
+
+.ff-actions-workspace__list-header {
+	flex: 0 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 16px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.ff-actions-inserter__popover {
+	z-index: 100000;
+
+	.components-popover__content {
+		width: min(360px, calc(100vw - 48px));
+		padding: 0;
+	}
+}
+
+.ff-actions-inserter__content {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	max-height: min(520px, calc(100vh - 160px));
+	min-height: 0;
+	padding: 12px;
+}
+
+.ff-actions-inserter__results {
+	flex: 1 1 auto;
+	max-height: min(380px, calc(100vh - 260px));
+	min-height: 0;
+	overflow-y: auto;
+	margin: 0 -12px -12px;
+	padding: 4px 0 8px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.ff-actions-inserter__item {
+	width: 100%;
+	display: block;
+	padding: 12px 16px;
+	border: 0;
+	background: transparent;
+	color: #1e1e1e;
+	text-align: left;
+	cursor: pointer;
+
+	&:hover,
+	&:focus {
+		background: #f0f6fc;
+	}
+}
+
+.ff-actions-inserter__item-title,
+.ff-actions-inserter__item-description {
+	display: block;
+}
+
+.ff-actions-inserter__item-title {
+	font-weight: 600;
+}
+
+.ff-actions-inserter__item-description {
+	margin-top: 2px;
+	color: #757575;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.ff-actions-inserter__empty {
+	margin: 0;
+	padding: 16px;
+	color: #757575;
+	font-size: 13px;
+}
+
+.ff-actions-list {
+	flex: 1;
+	height: 100%;
+	min-height: 0;
+	max-height: 100%;
+	overflow-x: hidden;
+	overflow-y: auto;
+	padding: 0;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+.ff-actions-list--empty {
+	padding: 16px;
+
+	p {
+		margin: 0;
+		color: #757575;
+		font-size: 13px;
+		line-height: 1.5;
+	}
+}
+
+.ff-actions-list__item {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0;
+	border: 0;
+	border-left: 4px solid transparent;
+	border-radius: 0;
+	border-bottom: 1px solid #f0f0f0;
+	background: transparent;
+	color: #1e1e1e;
+	text-align: left;
+	cursor: grab;
+
+	&:hover {
+		background: #f6f7f7;
+	}
+
+	&.is-selected {
+		border-left-color: #3858e9;
+		background: #f0f6fc;
+		color: #1e1e1e;
+	}
+
+	&.is-dragging {
+		opacity: 0.55;
+	}
+}
+
+.ff-actions-list__drag {
+	flex: 0 0 28px;
+	width: 28px;
+	min-height: 64px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: #757575;
+	cursor: grab;
+}
+
+.ff-actions-list__select {
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 0;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	text-align: left;
+	cursor: pointer;
+
+	&:focus {
+		position: relative;
+		z-index: 1;
+		outline: 1.5px solid #3858e9;
+		outline-offset: -1.5px;
+	}
+}
+
+.ff-actions-list__menu {
+	flex: 0 0 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	.components-button {
+		width: 32px;
+		height: 32px;
+		min-width: 32px;
+		padding: 0;
+	}
+}
+
+.ff-actions-list__icon {
+	flex: 0 0 28px;
+	width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	background: #f0f0f0;
+	color: #1e1e1e;
+
+	.is-selected & {
+		background: #fff;
+		color: #3858e9;
+	}
+}
+
+.ff-actions-list__content {
+	min-width: 0;
+	display: block;
+}
+
+.ff-actions-list__title,
+.ff-actions-list__meta {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ff-actions-list__title {
+	font-weight: 600;
+}
+
+.ff-actions-list__meta {
+	margin-top: 2px;
+	color: #757575;
+	font-size: 12px;
+
+	.is-selected & {
+		color: #757575;
+	}
+}
+
+.ff-actions-workspace__detail {
+	min-width: 0;
+	min-height: 0;
+	overflow: visible;
+	background: #fff;
+}
+
+.ff-actions-workspace__detail-scroll {
+	height: auto;
+	min-height: 0;
+	max-height: none;
+	overflow-x: hidden;
+	overflow-y: visible !important;
+	padding: 24px 32px 48px;
+	box-sizing: border-box;
+
+	.components-notice {
+		margin: 0 0 16px;
+	}
+}
+
+.ff-actions-detail__header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+	margin-bottom: 16px;
+
+	h2 {
+		margin: 0;
+		font-size: 20px;
+		line-height: 1.25;
+		letter-spacing: 0;
+	}
+}
+
+.ff-actions-detail__header-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.ff-actions-detail__eyebrow {
+	margin: 0 0 6px;
+	color: #757575;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.ff-actions-detail__description {
+	max-width: 720px;
+	margin: 6px 0 0;
+	color: #757575;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.ff-actions-settings {
+	border-top: 1px solid #e0e0e0;
+}
+
+.ff-actions-settings__section {
+	padding: 20px 0 24px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.ff-actions-settings__section-header {
+	margin-bottom: 16px;
+
+	h3 {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.4;
+	}
+}
+
+.ff-actions-settings__row {
+	display: grid;
+	grid-template-columns: minmax(220px, 1fr) minmax(240px, 360px);
+	gap: 24px;
+	align-items: start;
+}
+
+.ff-actions-settings__fields {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 20px 24px;
+
+	> .components-base-control,
+	> .components-text-control,
+	> .components-textarea-control,
+	> .components-select-control,
+	> .components-toggle-control,
+	> .ff-email-designer,
+	> .ff-field-mapping-repeater {
+		min-width: 0;
+	}
+
+	> .ff-email-designer,
+	> .components-textarea-control,
+	> .ff-field-mapping-repeater {
+		grid-column: 1 / -1;
+	}
+
+	.components-base-control,
+	.components-text-control__input,
+	.components-textarea-control__input,
+	.components-select-control__input {
+		max-width: none;
+	}
+}
+
+.ff-field-mapping-repeater__rows {
+	display: grid;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.ff-field-mapping-repeater__row {
+	display: grid;
+	grid-template-columns: minmax(160px, 1fr) minmax(220px, 1fr) 32px;
+	gap: 12px;
+	align-items: end;
+}
+
+.ff-actions-empty-panel {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 24px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background: #fff;
+
+	.components-icon {
+		margin-bottom: 16px;
+		color: #757575;
+	}
+
+	h2 {
+		margin: 0;
+		font-size: 20px;
+		line-height: 1.25;
+	}
+
+	> p:not(.ff-actions-detail__eyebrow) {
+		max-width: 560px;
+		margin: 8px 0 0;
+		color: #757575;
+		font-size: 13px;
+		line-height: 1.5;
+	}
+}
+
+.ff-actions-empty-panel__actions {
+	margin-top: 20px;
+}
+
+.ff-actions-type-summary {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-height: 40px;
+	padding-top: 2px;
+}
+
+.ff-actions-type-summary__label {
+	color: #1e1e1e;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-transform: uppercase;
+}
+
+.ff-actions-type-summary__description {
+	color: #757575;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.ff-actions-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+@media (max-width: 960px) {
+	.ff-form-actions-modal.components-modal__frame {
+		width: 100vw;
+		height: 100vh;
+	}
+
+	.ff-form-actions-modal__summary,
+	.ff-actions-detail__header {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.ff-form-actions-modal__stats,
+	.ff-actions-detail__header-actions {
+		justify-content: flex-start;
+	}
+
+	.ff-actions-workspace,
+	.ff-actions-settings__row,
+	.ff-actions-settings__fields {
+		grid-template-columns: 1fr;
+	}
+
+	.ff-actions-workspace__list {
+		max-height: 260px;
+		border-right: 0;
+		border-bottom: 1px solid #e0e0e0;
+	}
+}
+
+// ── Field rendering live preview ─────────────────────────────────────
+//
+// The "Fields rendering" panel (Form tab) writes CSS variables onto the
+// `.editor-styles-wrapper` div via inline style. These rules consume
+// those variables so every field block preview reflects the user's
+// settings live in the canvas — without each block having to know.
+//
+// `!important` because the field blocks render inline `style={...}` on
+// their inputs which would otherwise win the cascade.
+.editor-styles-wrapper {
+	// Spacing between top-level blocks inside the form group.
+	.wp-block-formspress-field-text,
+	.wp-block-formspress-field-email,
+	.wp-block-formspress-field-textarea,
+	.wp-block-formspress-field-number,
+	.wp-block-formspress-field-select,
+	.wp-block-formspress-field-radio,
+	.wp-block-formspress-field-checkbox,
+	.wp-block-formspress-field-submit {
+		// Apply field spacing as the margin-bottom of every field block.
+		margin-bottom: var(--ff-field-spacing, inherit) !important;
+	}
+
+	.wp-block-formspress-field-text,
+	.wp-block-formspress-field-email,
+	.wp-block-formspress-field-textarea,
+	.wp-block-formspress-field-number,
+	.wp-block-formspress-field-select,
+	.wp-block-formspress-field-radio,
+	.wp-block-formspress-field-checkbox {
+		position: relative;
+
+		.formspress-field__content {
+			margin-bottom: 0.5em;
+
+			> * {
+				margin-top: 0;
+				margin-bottom: 0.35em;
+			}
+
+			> :last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		&.is-required .ff-field-label::after {
+			content: " *";
+			color: #d63638;
+			font-weight: 700;
+		}
+	}
+
+	.wp-block-formspress-field-submit,
+	.wp-block-formspress-field-submit > .wp-block-buttons {
+		width: 100%;
+	}
+
+	// Input / textarea / select previews. Block-level inputStyle
+	// attributes can override any of these values inline.
+	.wp-block-formspress-field-text input,
+	.wp-block-formspress-field-email input,
+	.wp-block-formspress-field-number input,
+	.wp-block-formspress-field-textarea textarea,
+	.wp-block-formspress-field-select select {
+		display: block;
+		width: var(--ff-input-width, 100%) !important;
+		max-width: 100%;
+		box-sizing: border-box;
+		padding-top: var(--ff-input-padding-top, var(--ff-input-py, 8px));
+		padding-right: var(--ff-input-padding-right, var(--ff-input-px, 10px));
+		padding-bottom: var(--ff-input-padding-bottom, var(--ff-input-py, 8px));
+		padding-left: var(--ff-input-padding-left, var(--ff-input-px, 10px));
+		border-color: var(--ff-color-border, #ccc);
+		border-style: solid;
+		border-width: 1px;
+		border-radius: var(--ff-border-radius, 3px);
+		font-size: var(--ff-font-size, 14px);
+		color: inherit;
+		background-color: #fff;
+	}
+
+	.wp-block-formspress-field-text input::placeholder,
+	.wp-block-formspress-field-email input::placeholder,
+	.wp-block-formspress-field-number input::placeholder,
+	.wp-block-formspress-field-textarea textarea::placeholder {
+		color: currentColor;
+		opacity: 0.65;
+	}
+
+	.wp-block-formspress-field-select select.ff-form__control--placeholder {
+		color: color-mix(
+			in srgb,
+			var(--ff-input-text-color, currentColor) 65%,
+			transparent
+		) !important;
+	}
+
+	.wp-block-formspress-field-radio .ff-form__control--choices,
+	.wp-block-formspress-field-checkbox .ff-form__control--choices {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		width: var(--ff-input-width, 100%);
+		max-width: 100%;
+		box-sizing: border-box;
+		padding-top: var(--ff-input-padding-top, var(--ff-input-py, 8px));
+		padding-right: var(--ff-input-padding-right, var(--ff-input-px, 10px));
+		padding-bottom: var(--ff-input-padding-bottom, var(--ff-input-py, 8px));
+		padding-left: var(--ff-input-padding-left, var(--ff-input-px, 10px));
+		color: inherit;
+	}
+
+	.wp-block-formspress-field-radio .ff-form__control-choice,
+	.wp-block-formspress-field-checkbox .ff-form__control-choice {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: inherit;
+		font-weight: 400;
+	}
+
+	// Disabled previews are visual only. Let pointer events reach the
+	// Gutenberg block wrapper so canvas click-selection keeps working.
+	.wp-block-formspress-field-text input:disabled,
+	.wp-block-formspress-field-email input:disabled,
+	.wp-block-formspress-field-number input:disabled,
+	.wp-block-formspress-field-textarea textarea:disabled,
+	.wp-block-formspress-field-select select:disabled,
+	.wp-block-formspress-field-radio input:disabled,
+	.wp-block-formspress-field-checkbox input:disabled {
+		color: inherit;
+		background-color: #fff;
+		opacity: 1;
+		pointer-events: none;
+		-webkit-text-fill-color: currentColor;
+	}
+
+	// Labels/content — only override color when the user actually set one.
+	.wp-block-formspress-field-text .formspress-field__content,
+	.wp-block-formspress-field-email .formspress-field__content,
+	.wp-block-formspress-field-textarea .formspress-field__content,
+	.wp-block-formspress-field-number .formspress-field__content,
+	.wp-block-formspress-field-select .formspress-field__content,
+	.wp-block-formspress-field-radio .formspress-field__content,
+	.wp-block-formspress-field-checkbox .formspress-field__content,
+	.wp-block-formspress-field-radio label,
+	.wp-block-formspress-field-checkbox label {
+		color: var(--ff-label-color, inherit);
+	}
+}
+
+// Right inspector — primary path uses Gutenberg's native
+// `TabbedSidebar`, which brings its own tablist border + animated
+// underline + hover/focus states from `wp-block-editor` + `wp-components`
+// stylesheets. We only own outer layout glue.
+//
+// Fallback path (old WordPress where the private opt-in fails) uses
+// the public `<TabPanel>`, which we lay out to fill the column with a
+// sticky tab row and a scrolling content area.
+.ff-gb-inspector {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+	background: #fff;
+
+	// Native TabbedSidebar — let it fill the inspector.
+	.block-editor-tabbed-sidebar {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	// Public-API fallback — only applies when `<TabPanel>` is rendered.
+	&__tabs {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-height: 0;
+
+		.components-tab-panel__tabs {
+			position: sticky;
+			top: 0;
+			background: #fff;
+			z-index: 1;
+			border-bottom: 1px solid #e0e0e0;
+		}
+
+		.components-tab-panel__tabs-item {
+			flex: 1 1 0;
+		}
+
+		.components-tab-panel__tab-content {
+			flex: 1 1 auto;
+			min-height: 0;
+			overflow-y: auto;
+		}
+	}
+}
+
+// Left rail — widen the .ff-gb-treeview width when in library mode
+// because the native Library uses a 3-column grid that needs ~350px
+// to render correctly. The list-view mode can stay at 300px.
+.ff-std-builder .ff-gb-treeview.ff-std-treeview {
+	width: 350px;
+	flex-shrink: 0;
+
+	&--narrow {
+		width: 300px;
+	}
+}
+
+.ff-std-treeview {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+	background: #fff;
+}
+
+// Header — used only by ListViewPanel. The block-Library panel has no
+// custom chrome above the native tabs.
+.ff-std-treeview__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px 12px;
+	border-bottom: 1px solid #e0e0e0;
+	flex: 0 0 auto;
+}
+
+.ff-std-treeview__title {
+	font-size: 13px;
+	font-weight: 500;
+	margin: 0;
+}
+
+.ff-std-treeview__library,
+.ff-std-treeview__listview {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+
+	> div {
+		height: 100%;
+	}
+}
+
+// ── Style variations browser (Form sidebar) ──────────────────────────
+.ff-std-variations__grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.ff-std-variation-card {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 0;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: 6px;
+	cursor: pointer;
+	text-align: left;
+
+	&:hover {
+		border-color: #d0d0d0;
+	}
+	&:focus-visible {
+		outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+		outline-offset: 1px;
+	}
+	&.is-selected {
+		border-color: var(--wp-admin-theme-color, #2271b1);
+	}
+
+	&__preview {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 18px 14px;
+		border-radius: 6px;
+		border: 1px solid #e0e0e0;
+		min-height: 72px;
+		overflow: hidden;
+	}
+
+	&__aa {
+		font-size: 28px;
+		line-height: 1;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+	}
+
+	&__dots {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+
+		> span {
+			display: block;
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			border: 1px solid rgba(0, 0, 0, 0.08);
+		}
+	}
+
+	&__label {
+		display: block;
+		padding: 0 4px;
+		text-align: center;
+		color: #1e1e1e;
+	}
+}

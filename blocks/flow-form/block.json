@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "formspress/flow-form",
+	"title": "FormsPress Flow Form",
+	"category": "widgets",
+	"icon": "media-interactive",
+	"description": "Embed a conversational FormsPress flow form.",
+	"keywords": [ "form", "flow", "typeform", "conversational", "formspress" ],
+	"textdomain": "flowforms",
+	"attributes": {
+		"formId": { "type": "number", "default": 0 },
+		"displayTitle": { "type": "boolean", "default": false }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"color": { "background": true, "text": true },
+		"spacing": { "padding": true, "margin": true },
+		"typography": { "fontSize": true, "fontFamily": true }
+	},
+	"render": "file:./render.php",
+	"editorScript": "file:./index.js",
+	"style": "formspress-frontend"
+}

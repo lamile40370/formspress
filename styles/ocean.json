@@ -1,0 +1,21 @@
+{
+	"title": "Ocean",
+	"description": "Deep blue background, white inputs.",
+	"form": {
+		"bg_color": "#0b3a66",
+		"text_color": "#eaf2fb",
+		"label_color": "#cfe3f7",
+		"primary_color": "#5cc0ff",
+		"btn_text_color": "#0b3a66",
+		"border_color": "#1a4a7a",
+		"border_radius": 8,
+		"border_style": "solid",
+		"border_width": 1,
+		"input_padding_x": 14,
+		"input_padding_y": 12,
+		"btn_radius": 8,
+		"btn_style": "solid",
+		"field_spacing": 20,
+		"label_weight": "600"
+	}
+}

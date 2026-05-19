@@ -1,0 +1,17 @@
+{
+	"title": "Bold",
+	"description": "Heavy borders, large radius, oversize buttons.",
+	"form": {
+		"border_radius": 10,
+		"border_style": "solid",
+		"border_width": 3,
+		"input_padding_x": 18,
+		"input_padding_y": 14,
+		"btn_radius": 10,
+		"btn_style": "solid",
+		"btn_width": "full",
+		"field_spacing": 24,
+		"label_weight": "700",
+		"font_size": 17
+	}
+}

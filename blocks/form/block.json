@@ -1,0 +1,28 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "formspress/form",
+	"title": "FormsPress Form",
+	"category": "widgets",
+	"icon": "feedback",
+	"description": "Embed a FormsPress form.",
+	"keywords": [ "form", "contact", "newsletter", "formspress" ],
+	"textdomain": "flowforms",
+	"attributes": {
+		"formId": { "type": "number", "default": 0 },
+		"displayTitle": { "type": "boolean", "default": false },
+		"displayDescription": { "type": "boolean", "default": false }
+	},
+	"supports": {
+		"html": false,
+		"align": [ "wide", "full" ],
+		"color": { "background": true, "text": true, "link": true },
+		"spacing": { "padding": true, "margin": true },
+		"typography": { "fontSize": true, "fontFamily": true, "lineHeight": true },
+		"__experimentalBorder": { "color": true, "radius": true, "width": true, "style": true }
+	},
+	"render": "file:./render.php",
+	"editorScript": "file:./index.js",
+	"viewScriptModule": "file:./view.js",
+	"style": "formspress-frontend"
+}

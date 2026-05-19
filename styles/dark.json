@@ -1,0 +1,21 @@
+{
+	"title": "Dark",
+	"description": "Dark mode feel with cyan accent.",
+	"form": {
+		"bg_color": "#1a1a1a",
+		"text_color": "#f5f5f5",
+		"label_color": "#e5e5e5",
+		"primary_color": "#22d3ee",
+		"btn_text_color": "#0a0a0a",
+		"border_color": "#3a3a3a",
+		"border_radius": 6,
+		"border_style": "solid",
+		"border_width": 1,
+		"input_padding_x": 14,
+		"input_padding_y": 10,
+		"btn_radius": 6,
+		"btn_style": "solid",
+		"field_spacing": 20,
+		"label_weight": "600"
+	}
+}
