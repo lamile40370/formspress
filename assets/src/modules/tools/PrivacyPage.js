@@ -22,10 +22,10 @@ const PrivacyPage = () => {
 
 	return (
 		<PageHeader
-			title={ __( 'Data privacy', 'flowforms' ) }
+			title={ __( 'Data privacy', 'formspress' ) }
 			description={ __(
 				"FormsPress is wired into WordPress's native GDPR tools — exports and erasure requests work out of the box.",
-				'flowforms'
+				'formspress'
 			) }
 		>
 			<div className="ff-page__body">
@@ -36,13 +36,13 @@ const PrivacyPage = () => {
 								<Heading level={ 3 }>
 									{ __(
 										'Export personal data',
-										'flowforms'
+										'formspress'
 									) }
 								</Heading>
 								<Text size="small">
 									{ __(
 										'Generates a downloadable ZIP containing every form submission tied to a given email address. Submitter data is included with field labels and original values.',
-										'flowforms'
+										'formspress'
 									) }
 								</Text>
 								<ExternalLink
@@ -50,7 +50,7 @@ const PrivacyPage = () => {
 								>
 									{ __(
 										'Open WordPress export tool',
-										'flowforms'
+										'formspress'
 									) }
 								</ExternalLink>
 							</VStack>
@@ -61,12 +61,12 @@ const PrivacyPage = () => {
 						<CardBody>
 							<VStack spacing={ 2 }>
 								<Heading level={ 3 }>
-									{ __( 'Erase personal data', 'flowforms' ) }
+									{ __( 'Erase personal data', 'formspress' ) }
 								</Heading>
 								<Text size="small">
 									{ __(
 										'By default we anonymise instead of hard-deleting so analytics keep working: IP, user agent and personal field values are scrubbed. Set the filter "flowforms_privacy_erase_strategy" to "delete" if you need full row deletion.',
-										'flowforms'
+										'formspress'
 									) }
 								</Text>
 								<ExternalLink
@@ -74,7 +74,7 @@ const PrivacyPage = () => {
 								>
 									{ __(
 										'Open WordPress erase tool',
-										'flowforms'
+										'formspress'
 									) }
 								</ExternalLink>
 							</VStack>
@@ -87,13 +87,13 @@ const PrivacyPage = () => {
 								<Heading level={ 3 }>
 									{ __(
 										'Suggested privacy policy text',
-										'flowforms'
+										'formspress'
 									) }
 								</Heading>
 								<Text size="small">
 									{ __(
 										'FormsPress also contributes a ready-made section to the WordPress Privacy Policy editor explaining what data we collect on submissions. You can copy it into your own policy from there.',
-										'flowforms'
+										'formspress'
 									) }
 								</Text>
 								<ExternalLink
@@ -101,7 +101,7 @@ const PrivacyPage = () => {
 								>
 									{ __(
 										'Open privacy policy guide',
-										'flowforms'
+										'formspress'
 									) }
 								</ExternalLink>
 							</VStack>

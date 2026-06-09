@@ -19,94 +19,125 @@ class Routes extends AbstractRoutes {
 	}
 
 	/**
-	 * Returns the catalog of integrations FormsPress knows about, plus
-	 * whether each one is currently active (its PHP class exists and its
-	 * settings option indicates wiring).
+	 * Returns the catalog of submission actions FormsPress knows about.
 	 */
 	public function list_integrations(): \WP_REST_Response {
 		$catalog = [
 			[
-				'id'          => 'mailchimp',
-				'label'       => 'Mailchimp',
-				'category'    => 'email-marketing',
-				'description' => __( 'Add submitters to a Mailchimp audience as an action.', 'flowforms' ),
-				'docs'        => 'https://mailchimp.com/developer/marketing/api/lists/',
-				'icon'        => 'mailchimp',
-				'class'       => 'FlowForms\\Modules\\Actions\\Services\\Actions\\Integrations\\MailchimpAction',
+				'id'          => 'email',
+				'label'       => __( 'Send Email Notification', 'formspress' ),
+				'category'    => 'notification',
+				'description' => __( 'Send a notification email after a successful form submission.', 'formspress' ),
+				'docs'        => 'https://wordpress.org/documentation/article/settings-general-screen/#email-address',
+				'icon'        => 'email',
+				'action_id'   => 'email',
+				'plan'        => 'free',
+				'available'   => true,
 			],
 			[
-				'id'          => 'convertkit',
-				'label'       => 'ConvertKit',
-				'category'    => 'email-marketing',
-				'description' => __( 'Subscribe form submitters to a ConvertKit form / sequence.', 'flowforms' ),
-				'docs'        => 'https://developers.convertkit.com/',
-				'icon'        => 'convertkit',
-				'class'       => 'FlowForms\\Modules\\Actions\\Services\\Actions\\Integrations\\ConvertKitAction',
+				'id'          => 'redirect',
+				'label'       => __( 'Redirect to URL', 'formspress' ),
+				'category'    => 'workflow',
+				'description' => __( 'Send visitors to a custom URL after submission.', 'formspress' ),
+				'icon'        => 'redo',
+				'action_id'   => 'redirect',
+				'pro_feature' => 'redirect',
 			],
 			[
-				'id'          => 'activecampaign',
-				'label'       => 'ActiveCampaign',
-				'category'    => 'crm',
-				'description' => __( 'Push contacts to ActiveCampaign with custom field mapping.', 'flowforms' ),
-				'docs'        => 'https://developers.activecampaign.com/',
-				'icon'        => 'activecampaign',
-				'class'       => 'FlowForms\\Modules\\Actions\\Services\\Actions\\Integrations\\ActiveCampaignAction',
-			],
-			[
-				'id'          => 'hubspot',
-				'label'       => 'HubSpot',
-				'category'    => 'crm',
-				'description' => __( 'Create or update HubSpot contacts from form submissions.', 'flowforms' ),
-				'docs'        => 'https://developers.hubspot.com/',
-				'icon'        => 'hubspot',
-				'class'       => 'FlowForms\\Modules\\Actions\\Services\\Actions\\Integrations\\HubSpotAction',
-			],
-			[
-				'id'          => 'brevo',
-				'label'       => 'Brevo (Sendinblue)',
-				'category'    => 'email-marketing',
-				'description' => __( 'Add submitters to a Brevo list and trigger transactional emails.', 'flowforms' ),
-				'docs'        => 'https://developers.brevo.com/',
-				'icon'        => 'brevo',
-				'class'       => 'FlowForms\\Modules\\Actions\\Services\\Actions\\Integrations\\BrevoAction',
-			],
-			[
-				'id'          => 'mailerpress',
-				'label'       => 'MailerPress',
-				'category'    => 'email-marketing',
-				'description' => __( 'Add or update local MailerPress contacts from form submissions.', 'flowforms' ),
-				'docs'        => 'https://mailerpress.com/docs/',
-				'icon'        => 'mailerpress',
-				'class'       => 'FlowForms\\Modules\\Actions\\Services\\Actions\\Integrations\\MailerPressAction',
+				'id'          => 'webhooks',
+				'label'       => __( 'Webhooks', 'formspress' ),
+				'category'    => 'workflow',
+				'description' => __( 'Send signed submission payloads to Zapier, Make, n8n, CRMs, or any HTTP endpoint.', 'formspress' ),
+				'docs'        => 'https://flowforms.test/docs/webhooks',
+				'icon'        => 'link',
+				'action_id'   => 'webhook',
+				'settings'    => '/integrations/webhooks',
+				'pro_feature' => 'webhooks',
 			],
 			[
 				'id'          => 'stripe',
 				'label'       => 'Stripe',
 				'category'    => 'payment',
-				'description' => __( 'Accept one-off or recurring payments via Stripe Checkout.', 'flowforms' ),
+				'description' => __( 'Accept one-off or recurring payments via Stripe Checkout.', 'formspress' ),
 				'docs'        => 'https://stripe.com/docs/payments/checkout',
-				'icon'        => 'stripe',
-				'class'       => 'FlowForms\\Modules\\Stripe\\StripeModule',
+				'icon'        => 'payment',
+				'action_id'   => 'stripe_payment',
 				'settings'    => '/integrations/stripe',
+				'pro_feature' => 'stripe',
 			],
 			[
-				'id'          => 'webhooks',
-				'label'       => __( 'Webhooks', 'flowforms' ),
-				'category'    => 'developer',
-				'description' => __( 'Send events to Zapier, Make, n8n or any HTTP endpoint with HMAC signing.', 'flowforms' ),
-				'docs'        => 'https://flowforms.test/docs/webhooks',
-				'icon'        => 'webhook',
-				'class'       => 'FlowForms\\Modules\\Webhooks\\WebhooksModule',
-				'settings'    => '/integrations/webhooks',
+				'id'          => 'mailchimp',
+				'label'       => 'Mailchimp',
+				'category'    => 'email-marketing',
+				'description' => __( 'Add submitters to a Mailchimp audience as an action.', 'formspress' ),
+				'docs'        => 'https://mailchimp.com/developer/marketing/api/lists/',
+				'icon'        => 'megaphone',
+				'action_id'   => 'mailchimp',
+				'pro_feature' => 'mailchimp',
+			],
+			[
+				'id'          => 'convertkit',
+				'label'       => 'ConvertKit',
+				'category'    => 'email-marketing',
+				'description' => __( 'Subscribe form submitters to a ConvertKit form or sequence.', 'formspress' ),
+				'docs'        => 'https://developers.convertkit.com/',
+				'icon'        => 'megaphone',
+				'action_id'   => 'convertkit',
+				'pro_feature' => 'convertkit',
+			],
+			[
+				'id'          => 'activecampaign',
+				'label'       => 'ActiveCampaign',
+				'category'    => 'crm',
+				'description' => __( 'Push contacts to ActiveCampaign with custom field mapping.', 'formspress' ),
+				'docs'        => 'https://developers.activecampaign.com/',
+				'icon'        => 'institution',
+				'action_id'   => 'activecampaign',
+				'pro_feature' => 'activecampaign',
+			],
+			[
+				'id'          => 'hubspot',
+				'label'       => 'HubSpot',
+				'category'    => 'crm',
+				'description' => __( 'Create or update HubSpot contacts from form submissions.', 'formspress' ),
+				'docs'        => 'https://developers.hubspot.com/',
+				'icon'        => 'institution',
+				'action_id'   => 'hubspot',
+				'pro_feature' => 'hubspot',
+			],
+			[
+				'id'          => 'brevo',
+				'label'       => 'Brevo (Sendinblue)',
+				'category'    => 'email-marketing',
+				'description' => __( 'Add submitters to a Brevo list and trigger transactional emails.', 'formspress' ),
+				'docs'        => 'https://developers.brevo.com/',
+				'icon'        => 'megaphone',
+				'action_id'   => 'brevo',
+				'pro_feature' => 'brevo',
+			],
+			[
+				'id'          => 'mailerpress',
+				'label'       => 'MailerPress',
+				'category'    => 'email-marketing',
+				'description' => __( 'Add or update local MailerPress contacts from form submissions.', 'formspress' ),
+				'docs'        => 'https://mailerpress.com/docs/',
+				'icon'        => 'megaphone',
+				'action_id'   => 'mailerpress',
+				'pro_feature' => 'mailerpress',
 			],
 		];
 
-		// Add live "active" flag — true if the PHP class is loaded (built-ins
-		// or addons), false otherwise.
 		foreach ( $catalog as &$row ) {
-			$row['active'] = class_exists( $row['class'] );
+			$is_pro           = ! empty( $row['pro_feature'] );
+			$row['plan']      = $is_pro ? 'pro' : ( $row['plan'] ?? 'free' );
+			$row['available'] = ! $is_pro || (bool) apply_filters( 'flowforms_integration_active', false, $row['pro_feature'], $row );
+			$row['locked']    = $is_pro && ! $row['available'];
+			$row['active']    = $row['available'];
 			if ( empty( $row['icon_svg'] ) ) {
 				$row['icon_svg'] = $this->get_integration_icon_svg( $row );
+			}
+			if ( empty( $row['icon_svg'] ) ) {
+				$row['icon_svg'] = (string) apply_filters( 'flowforms_integration_icon_svg', '', $row );
 			}
 		}
 		unset( $row );
@@ -120,6 +151,12 @@ class Routes extends AbstractRoutes {
 		$catalog = apply_filters( 'flowforms_integrations_catalog', $catalog );
 
 		foreach ( $catalog as &$row ) {
+			if ( empty( $row['icon_svg'] ) ) {
+				$row['icon_svg'] = $this->get_integration_icon_svg( $row );
+			}
+			if ( empty( $row['icon_svg'] ) ) {
+				$row['icon_svg'] = (string) apply_filters( 'flowforms_integration_icon_svg', '', $row );
+			}
 			if ( ! empty( $row['icon_svg'] ) ) {
 				$row['icon_svg'] = $this->sanitize_icon_svg( (string) $row['icon_svg'] );
 			}

@@ -14,7 +14,7 @@ class FieldTypesModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Field Types', 'flowforms' );
+		return __( 'Field Types', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {

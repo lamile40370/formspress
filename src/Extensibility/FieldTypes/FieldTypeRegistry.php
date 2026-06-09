@@ -2,28 +2,23 @@
 
 namespace FlowForms\Extensibility\FieldTypes;
 
-use FlowForms\Extensibility\FieldTypes\Types\AddressFieldType;
-use FlowForms\Extensibility\FieldTypes\Types\CalculationFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\CheckboxFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\DateFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\EmailFieldType;
-use FlowForms\Extensibility\FieldTypes\Types\FileFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\HiddenFieldType;
-use FlowForms\Extensibility\FieldTypes\Types\NpsFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\NumberFieldType;
-use FlowForms\Extensibility\FieldTypes\Types\OpinionScaleFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\PageBreakFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\PhoneFieldType;
+use FlowForms\Extensibility\FieldTypes\Types\ProductFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\RadioFieldType;
-use FlowForms\Extensibility\FieldTypes\Types\RatingFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\RowFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\SectionFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\SelectFieldType;
-use FlowForms\Extensibility\FieldTypes\Types\SignatureFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\StatementFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\TextFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\TextareaFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\TimeFieldType;
+use FlowForms\Extensibility\FieldTypes\Types\TotalFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\UrlFieldType;
 use FlowForms\Extensibility\FieldTypes\Types\YesNoFieldType;
 
@@ -50,14 +45,11 @@ class FieldTypeRegistry {
 		/* Advanced */
 		$this->register( new DateFieldType() );
 		$this->register( new TimeFieldType() );
-		$this->register( new FileFieldType() );
-		$this->register( new RatingFieldType() );
-		$this->register( new OpinionScaleFieldType() );
-		$this->register( new NpsFieldType() );
 		$this->register( new HiddenFieldType() );
-		$this->register( new SignatureFieldType() );
-		$this->register( new AddressFieldType() );
-		$this->register( new CalculationFieldType() );
+
+		/* Payment */
+		$this->register( new ProductFieldType() );
+		$this->register( new TotalFieldType() );
 
 		/* Layout */
 		$this->register( new RowFieldType() );

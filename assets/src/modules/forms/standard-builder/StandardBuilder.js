@@ -6,7 +6,14 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, KeyboardShortcuts, Spinner } from '@wordpress/components';
+import {
+	Button,
+	KeyboardShortcuts,
+	PanelBody,
+	Spinner,
+	TextControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import {
 	BlockEditorProvider,
@@ -16,6 +23,7 @@ import {
 	ObserveTyping,
 	BlockBreadcrumb,
 	BlockEditorKeyboardShortcuts,
+	InspectorControls,
 	__unstableEditorStyles as EditorStyles,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -40,7 +48,6 @@ import { get, put } from '../../../api/client';
 import { form as formEndpoint } from '../../../api/endpoints';
 
 import registerBlocks from './blocks/register';
-import { PATTERNS, PATTERN_CATEGORY } from './patterns/register';
 import LeftSidebar from './LeftSidebar';
 import ListViewPanel from './ListViewPanel';
 import RightInspector from './RightInspector';
@@ -49,8 +56,286 @@ import FormActionsModal from '../components/FormActionsModal';
 
 import './styles.scss';
 
-/* ── One-shot registration ──────────────────────────────────────────── */
+const STICKY_BLOCKS = new Set( [
+	'core/group',
+	'core/column',
+	'core/columns',
+	'core/media-text',
+	'core/cover',
+] );
+
+const supportsStickyControls = ( blockName ) => STICKY_BLOCKS.has( blockName );
+
+const classNames = ( ...names ) => names.filter( Boolean ).join( ' ' );
+
+const stickyStyle = ( attributes = {} ) => ( {
+	'--ff-sticky-top': attributes.formspressStickyOffset || '24px',
+} );
+
+const cssLength = ( v ) => {
+	if ( null == v || '' === v ) return '';
+	if ( 'number' === typeof v ) return `${ v }px`;
+
+	const value = String( v ).trim();
+	const preset = value.match( /^var:preset\|spacing\|([a-zA-Z0-9_-]+)$/ );
+
+	if ( preset ) {
+		return `var(--wp--preset--spacing--${ preset[ 1 ] })`;
+	}
+
+	if ( /^[\d.]+$/.test( value ) ) return `${ value }px`;
+	return value;
+};
+
+const getColumnsGapStyle = ( attributes = {} ) => {
+	const blockGap = attributes?.style?.spacing?.blockGap;
+
+	if ( ! blockGap ) {
+		return null;
+	}
+
+	if ( 'string' === typeof blockGap ) {
+		const gap = cssLength( blockGap );
+
+		return {
+			'--ff-columns-row-gap': gap,
+			'--ff-columns-column-gap': gap,
+		};
+	}
+
+	const top = cssLength( blockGap.top || blockGap.left || '' );
+	const left = cssLength( blockGap.left || blockGap.top || '' );
+
+	if ( ! top && ! left ) {
+		return null;
+	}
+
+	return {
+		'--ff-columns-row-gap': top || left,
+		'--ff-columns-column-gap': left || top,
+	};
+};
+
+const getColumnsGapValue = ( gapStyle ) => {
+	if ( ! gapStyle ) {
+		return null;
+	}
+
+	const rowGap = gapStyle[ '--ff-columns-row-gap' ];
+	const columnGap = gapStyle[ '--ff-columns-column-gap' ];
+
+	if ( ! rowGap && ! columnGap ) {
+		return null;
+	}
+
+	return `${ rowGap || columnGap } ${ columnGap || rowGap }`;
+};
+
+const registerStickyControls = () => {
+	if ( window.__flowFormsStickyControlsRegistered ) {
+		return;
+	}
+	window.__flowFormsStickyControlsRegistered = true;
+
+	addFilter(
+		'blocks.registerBlockType',
+		'formspress/sticky-attributes',
+		( settings, name ) => {
+			if ( ! supportsStickyControls( name ) ) {
+				return settings;
+			}
+
+			return {
+				...settings,
+				attributes: {
+					...( settings.attributes || {} ),
+					formspressSticky: {
+						type: 'boolean',
+						default: false,
+					},
+					formspressStickyOffset: {
+						type: 'string',
+						default: '24px',
+					},
+				},
+			};
+		}
+	);
+
+	addFilter(
+		'editor.BlockEdit',
+		'formspress/sticky-inspector',
+		( BlockEdit ) => ( props ) => {
+			if ( ! supportsStickyControls( props.name ) ) {
+				return <BlockEdit { ...props } />;
+			}
+
+			const { attributes, setAttributes } = props;
+			const isSticky = !! attributes.formspressSticky;
+
+			return (
+				<>
+					<BlockEdit { ...props } />
+					<InspectorControls group="settings">
+						<PanelBody
+							title={ __( 'Sticky position', 'formspress' ) }
+							initialOpen={ false }
+						>
+							<ToggleControl
+								label={ __(
+									'Stick while scrolling',
+									'formspress'
+								) }
+								checked={ isSticky }
+								onChange={ ( value ) =>
+									setAttributes( {
+										formspressSticky: value,
+									} )
+								}
+								__nextHasNoMarginBottom
+							/>
+							{ isSticky && (
+								<TextControl
+									label={ __(
+										'Top offset',
+										'formspress'
+									) }
+									value={
+										attributes.formspressStickyOffset ||
+										'24px'
+									}
+									onChange={ ( value ) =>
+										setAttributes( {
+											formspressStickyOffset: value,
+										} )
+									}
+									placeholder="24px"
+									help={ __(
+										'Use any CSS length, for example 24px, 2rem, or var(--wp-admin--admin-bar--height).',
+										'formspress'
+									) }
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
+								/>
+							) }
+						</PanelBody>
+					</InspectorControls>
+				</>
+			);
+		}
+	);
+
+	addFilter(
+		'editor.BlockListBlock',
+		'formspress/sticky-editor-class',
+		( BlockListBlock ) => ( props ) => {
+			if (
+				! supportsStickyControls( props.name ) ||
+				! props.attributes?.formspressSticky
+			) {
+				return <BlockListBlock { ...props } />;
+			}
+
+			return (
+				<BlockListBlock
+					{ ...props }
+					className={ classNames( props.className, 'ff-has-sticky' ) }
+					wrapperProps={ {
+						...( props.wrapperProps || {} ),
+						style: {
+							...( props.wrapperProps?.style || {} ),
+							...stickyStyle( props.attributes ),
+						},
+					} }
+				/>
+			);
+		}
+	);
+
+	addFilter(
+		'blocks.getSaveContent.extraProps',
+		'formspress/sticky-save-props',
+		( extraProps, blockType, attributes ) => {
+			if (
+				! supportsStickyControls( blockType.name ) ||
+				! attributes?.formspressSticky
+			) {
+				return extraProps;
+			}
+
+			return {
+				...extraProps,
+				className: classNames( extraProps.className, 'ff-has-sticky' ),
+				style: {
+					...( extraProps.style || {} ),
+					...stickyStyle( attributes ),
+				},
+			};
+		}
+	);
+};
+
+registerStickyControls();
 registerBlocks();
+
+addFilter(
+	'editor.BlockListBlock',
+	'formspress/columns-gap-editor-style',
+	( BlockListBlock ) => ( props ) => {
+		if ( 'core/columns' !== props.name ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const gapStyle = getColumnsGapStyle( props.attributes );
+
+		if ( ! gapStyle ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		return (
+			<BlockListBlock
+				{ ...props }
+				className={ classNames(
+					props.className,
+					'ff-columns-has-custom-gap'
+				) }
+				wrapperProps={ {
+					...( props.wrapperProps || {} ),
+					style: {
+						...( props.wrapperProps?.style || {} ),
+						...gapStyle,
+					},
+				} }
+			/>
+		);
+	}
+);
+
+addFilter(
+	'blocks.getSaveContent.extraProps',
+	'formspress/columns-gap-save-style',
+	( extraProps, blockType, attributes ) => {
+		if ( 'core/columns' !== blockType.name ) {
+			return extraProps;
+		}
+
+		const gapStyle = getColumnsGapStyle( attributes );
+
+		if ( ! gapStyle ) {
+			return extraProps;
+		}
+
+		return {
+			...extraProps,
+			style: {
+				...( extraProps.style || {} ),
+				gap: getColumnsGapValue( gapStyle ),
+				columnGap: gapStyle[ '--ff-columns-column-gap' ],
+				rowGap: gapStyle[ '--ff-columns-row-gap' ],
+			},
+		};
+	}
+);
 
 addFilter(
 	'editor.MediaUpload',
@@ -173,6 +458,7 @@ const legacyToBlocks = ( fields ) => {
 				help: f.help || f.description || '',
 				placeholder: f.placeholder || '',
 				defaultValue: f.defaultValue || f.default || '',
+				conditions: f.conditions || undefined,
 			};
 			if ( f.type === 'textarea' && f.rows )
 				attrs.rows = Number( f.rows );
@@ -267,7 +553,7 @@ const validateBeforeSave = ( list ) => {
 	if ( ! hasSubmitBlock( list ) ) {
 		return __(
 			'Add a Submit button block before saving this form.',
-			'flowforms'
+			'formspress'
 		);
 	}
 
@@ -308,17 +594,6 @@ const loadBlocksFromForm = ( form ) => {
 /* ── BlockEditorProvider settings sourced from theme.json ───────────── */
 
 /**
- * Convert a numeric/preset spacing value into a valid CSS length.
- * Accepts `12`, `"12"`, `"1rem"`, `"var(--wp--preset--spacing--20)"` …
- */
-const cssLength = ( v ) => {
-	if ( null == v || '' === v ) return '';
-	if ( 'number' === typeof v ) return `${ v }px`;
-	if ( /^[\d.]+$/.test( String( v ) ) ) return `${ v }px`;
-	return String( v );
-};
-
-/**
  * Build the inline `style` object that maps `form.settings.style.*` →
  * CSS variables on the `.editor-styles-wrapper`. The companion CSS rules
  * (see styles.scss) then style every field block preview from those
@@ -346,6 +621,19 @@ const buildFormStyleVars = ( style ) => {
 	if ( style.border_color ) out[ '--ff-color-border' ] = style.border_color;
 	if ( style.primary_color ) out[ '--ff-primary' ] = style.primary_color;
 	if ( style.btn_text_color ) out[ '--ff-btn-text' ] = style.btn_text_color;
+	if ( style.progress_fill_color )
+		out[ '--ff-progress-fill' ] = style.progress_fill_color;
+	if ( style.progress_track_color )
+		out[ '--ff-progress-track' ] = style.progress_track_color;
+	if ( style.step_text_color ) out[ '--ff-step-text' ] = style.step_text_color;
+	if ( style.next_bg_color ) out[ '--ff-next-bg' ] = style.next_bg_color;
+	if ( style.next_text_color ) out[ '--ff-next-text' ] = style.next_text_color;
+	if ( style.next_border_color )
+		out[ '--ff-next-border-color' ] = style.next_border_color;
+	if ( style.prev_bg_color ) out[ '--ff-prev-bg' ] = style.prev_bg_color;
+	if ( style.prev_text_color ) out[ '--ff-prev-text' ] = style.prev_text_color;
+	if ( style.prev_border_color )
+		out[ '--ff-prev-border-color' ] = style.prev_border_color;
 	return out;
 };
 
@@ -373,6 +661,236 @@ const getVariationCss = ( slug ) => {
 	const found = list.find( ( v ) => v.slug === slug );
 	return found?.css || '';
 };
+
+const FORM_FIELD_PREVIEW_CSS = `
+.wp-block-formspress-field-text,
+.wp-block-formspress-field-email,
+.wp-block-formspress-field-textarea,
+.wp-block-formspress-field-number,
+.wp-block-formspress-field-select,
+.wp-block-formspress-field-radio,
+.wp-block-formspress-field-checkbox,
+.wp-block-formspress-field-product,
+.wp-block-formspress-field-total,
+.wp-block-formspress-field-page-break,
+.wp-block-formspress-field-submit {
+	margin-bottom: var(--ff-field-spacing, 1.25em) !important;
+}
+
+.wp-block-formspress-field-text,
+.wp-block-formspress-field-email,
+.wp-block-formspress-field-textarea,
+.wp-block-formspress-field-number,
+.wp-block-formspress-field-select,
+.wp-block-formspress-field-radio,
+.wp-block-formspress-field-checkbox,
+.wp-block-formspress-field-product,
+.wp-block-formspress-field-total {
+	position: relative;
+}
+
+.wp-block-formspress-field-page-break .formspress-page-break {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	color: #646970;
+	font-size: 14px;
+	font-weight: 600;
+	letter-spacing: 0;
+}
+
+.wp-block-formspress-field-page-break .formspress-page-break__line {
+	flex: 1;
+	border-top: 1px dashed #c3c4c7;
+}
+
+.wp-block-formspress-field-text .formspress-field__content,
+.wp-block-formspress-field-email .formspress-field__content,
+.wp-block-formspress-field-textarea .formspress-field__content,
+.wp-block-formspress-field-number .formspress-field__content,
+.wp-block-formspress-field-select .formspress-field__content,
+.wp-block-formspress-field-radio .formspress-field__content,
+.wp-block-formspress-field-checkbox .formspress-field__content,
+.wp-block-formspress-field-product .formspress-field__content,
+.wp-block-formspress-field-total .formspress-field__content {
+	margin-bottom: 0.5em;
+}
+
+.wp-block-formspress-field-text .formspress-field__content > *,
+.wp-block-formspress-field-email .formspress-field__content > *,
+.wp-block-formspress-field-textarea .formspress-field__content > *,
+.wp-block-formspress-field-number .formspress-field__content > *,
+.wp-block-formspress-field-select .formspress-field__content > *,
+.wp-block-formspress-field-radio .formspress-field__content > *,
+.wp-block-formspress-field-checkbox .formspress-field__content > *,
+.wp-block-formspress-field-product .formspress-field__content > *,
+.wp-block-formspress-field-total .formspress-field__content > * {
+	margin-top: 0;
+	margin-bottom: 0.35em;
+}
+
+.wp-block-formspress-field-text .formspress-field__content > :last-child,
+.wp-block-formspress-field-email .formspress-field__content > :last-child,
+.wp-block-formspress-field-textarea .formspress-field__content > :last-child,
+.wp-block-formspress-field-number .formspress-field__content > :last-child,
+.wp-block-formspress-field-select .formspress-field__content > :last-child,
+.wp-block-formspress-field-radio .formspress-field__content > :last-child,
+.wp-block-formspress-field-checkbox .formspress-field__content > :last-child,
+.wp-block-formspress-field-product .formspress-field__content > :last-child,
+.wp-block-formspress-field-total .formspress-field__content > :last-child {
+	margin-bottom: 0;
+}
+
+.wp-block-formspress-field-text.is-required .ff-field-label::after,
+.wp-block-formspress-field-email.is-required .ff-field-label::after,
+.wp-block-formspress-field-textarea.is-required .ff-field-label::after,
+.wp-block-formspress-field-number.is-required .ff-field-label::after,
+.wp-block-formspress-field-select.is-required .ff-field-label::after,
+.wp-block-formspress-field-radio.is-required .ff-field-label::after,
+.wp-block-formspress-field-checkbox.is-required .ff-field-label::after,
+.wp-block-formspress-field-product.is-required .ff-field-label::after {
+	content: " *";
+	color: #d63638;
+	font-weight: 700;
+}
+
+.wp-block-formspress-field-text input,
+.wp-block-formspress-field-email input,
+.wp-block-formspress-field-number input,
+.wp-block-formspress-field-textarea textarea,
+.wp-block-formspress-field-select select {
+	display: block;
+	width: var(--ff-input-width, 100%) !important;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding-top: var(--ff-input-padding-top, var(--ff-input-py, 10px));
+	padding-right: var(--ff-input-padding-right, var(--ff-input-px, 14px));
+	padding-bottom: var(--ff-input-padding-bottom, var(--ff-input-py, 10px));
+	padding-left: var(--ff-input-padding-left, var(--ff-input-px, 14px));
+	border-color: var(--ff-color-border, #c3c4c7);
+	border-style: solid;
+	border-width: 1px;
+	border-radius: var(--ff-border-radius, 4px);
+	font-size: var(--ff-font-size, 16px);
+	color: inherit;
+	background-color: #fff;
+}
+
+.wp-block-formspress-field-radio .ff-form__control--choices,
+.wp-block-formspress-field-checkbox .ff-form__control--choices {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: var(--ff-input-width, 100%);
+	max-width: 100%;
+	box-sizing: border-box;
+	padding-top: var(--ff-input-padding-top, var(--ff-input-py, 10px));
+	padding-right: var(--ff-input-padding-right, var(--ff-input-px, 14px));
+	padding-bottom: var(--ff-input-padding-bottom, var(--ff-input-py, 10px));
+	padding-left: var(--ff-input-padding-left, var(--ff-input-px, 14px));
+	color: inherit;
+}
+
+.wp-block-formspress-field-radio .ff-form__control-choice,
+.wp-block-formspress-field-checkbox .ff-form__control-choice {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: inherit;
+	font-weight: 400;
+}
+
+.ff-form__product-preview,
+.ff-form__total-preview {
+	display: block;
+}
+
+.ff-form__product-price,
+.ff-form__product-line-total {
+	color: #646970;
+	font-size: 13px;
+	margin-top: 4px;
+}
+
+.ff-form__product-preview .ff-form__product-row {
+	align-items: flex-start;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.ff-form__product-preview--inline .ff-form__product-row,
+.ff-form__product-preview--split .ff-form__product-row {
+	align-items: flex-end;
+	flex-direction: row;
+}
+
+.ff-form__product-preview--inline .ff-form__product-row {
+	justify-content: flex-start;
+}
+
+.ff-form__product-preview--split .ff-form__product-row {
+	justify-content: space-between;
+}
+
+.ff-form__product-quantity-control {
+	display: grid;
+	gap: 6px;
+}
+
+.ff-form__product-quantity-label {
+	font-weight: 600;
+}
+
+.ff-form__total-preview {
+	display: flex;
+	align-items: baseline;
+	justify-content: flex-start;
+	gap: 16px;
+	font-weight: 600;
+}
+
+.ff-form__total-preview--split {
+	justify-content: space-between;
+}
+
+.ff-form__total-preview--stacked {
+	align-items: flex-start;
+	flex-direction: column;
+}
+
+.wp-block-formspress-field-text input:disabled,
+.wp-block-formspress-field-email input:disabled,
+.wp-block-formspress-field-number input:disabled,
+.wp-block-formspress-field-textarea textarea:disabled,
+.wp-block-formspress-field-select select:disabled,
+.wp-block-formspress-field-radio input:disabled,
+.wp-block-formspress-field-checkbox input:disabled,
+.wp-block-formspress-field-product input:disabled {
+	color: inherit;
+	background-color: #fff;
+	opacity: 1;
+	pointer-events: none;
+	-webkit-text-fill-color: currentColor;
+}
+
+.editor-styles-wrapper .ff-has-sticky {
+	position: sticky !important;
+	top: var(--ff-sticky-top, 24px);
+	align-self: flex-start;
+	z-index: 1;
+}
+
+.ff-columns-has-custom-gap,
+.ff-columns-has-custom-gap.wp-block-columns,
+.ff-columns-has-custom-gap > .wp-block-columns,
+.ff-columns-has-custom-gap .wp-block-columns {
+	gap: var(--ff-columns-row-gap) var(--ff-columns-column-gap) !important;
+	column-gap: var(--ff-columns-column-gap) !important;
+	row-gap: var(--ff-columns-row-gap) !important;
+}
+
+`;
 
 const buildEditorSettings = ( variationSlug = '' ) => {
 	const d = window.flowFormsData || {};
@@ -402,6 +920,9 @@ const buildEditorSettings = ( variationSlug = '' ) => {
 			'formspress/field-select',
 			'formspress/field-radio',
 			'formspress/field-checkbox',
+			'formspress/field-product',
+			'formspress/field-total',
+			'formspress/field-page-break',
 			'formspress/field-submit',
 			'core/paragraph',
 			'core/heading',
@@ -425,7 +946,6 @@ const buildEditorSettings = ( variationSlug = '' ) => {
 			'core/buttons',
 			'core/button',
 			'core/quote',
-			'core/html',
 		],
 		// Theme tokens — populated server-side from the active FSE theme's
 		// theme.json (root + variations). Pre-existing helpers in Assets.php.
@@ -454,10 +974,8 @@ const buildEditorSettings = ( variationSlug = '' ) => {
 			variationsCss
 				? { css: variationsCss, __unstableType: 'theme' }
 				: null,
+			{ css: FORM_FIELD_PREVIEW_CSS, __unstableType: 'theme' },
 		].filter( Boolean ),
-		// Block patterns + their category.
-		__experimentalBlockPatterns: PATTERNS,
-		__experimentalBlockPatternCategories: [ PATTERN_CATEGORY ],
 		// Media upload + library. Without `mediaUpload` the native blocks
 		// (Image, Group background image, etc.) silently no-op when you
 		// click "Add image" because BlockEditor has no callback to handle
@@ -720,16 +1238,16 @@ const StandardBuilder = () => {
 				setNotice( {
 					type: 'success',
 					message: isDraft
-						? __( 'Draft saved.', 'flowforms' )
+						? __( 'Draft saved.', 'formspress' )
 						: 'active' === form.status
-						? __( 'Form updated.', 'flowforms' )
-						: __( 'Form published.', 'flowforms' ),
+						? __( 'Form updated.', 'formspress' )
+						: __( 'Form published.', 'formspress' ),
 				} );
 				return true;
 			} catch ( e ) {
 				setNotice( {
 					type: 'error',
-					message: e?.message || __( 'Save failed.', 'flowforms' ),
+					message: e?.message || __( 'Save failed.', 'formspress' ),
 				} );
 				return false;
 			} finally {
@@ -753,9 +1271,21 @@ const StandardBuilder = () => {
 			setActionsOpen( false );
 		}
 	}, [ performSave ] );
-	const handlePreviewInNewTab = useCallback( () => {
+	const handlePreviewInNewTab = useCallback( async () => {
+		if ( saving || draftSaving ) {
+			return;
+		}
+
+		if ( isDirty ) {
+			const saved = await performSave( null );
+
+			if ( ! saved ) {
+				return;
+			}
+		}
+
 		window.open( `/formspress/${ id }/`, '_blank', 'noopener,noreferrer' );
-	}, [ id ] );
+	}, [ draftSaving, id, isDirty, performSave, saving ] );
 
 	const handleUndoShortcut = useCallback(
 		( event ) => {
@@ -898,9 +1428,9 @@ const StandardBuilder = () => {
 	}
 	if ( ! form ) {
 		return (
-			<PageHeader title={ __( 'Form not found', 'flowforms' ) }>
+			<PageHeader title={ __( 'Form not found', 'formspress' ) }>
 				<div className="ff-page__body">
-					<p>{ __( 'Form not found.', 'flowforms' ) }</p>
+					<p>{ __( 'Form not found.', 'formspress' ) }</p>
 				</div>
 			</PageHeader>
 		);
@@ -931,8 +1461,8 @@ const StandardBuilder = () => {
 					isSaving={ saving }
 					saveLabel={
 						'active' === form.status
-							? __( 'Update', 'flowforms' )
-							: __( 'Publish', 'flowforms' )
+							? __( 'Update', 'formspress' )
+							: __( 'Publish', 'formspress' )
 					}
 					saveDisabled={ 'active' === form.status && ! isDirty }
 					saveShortcut={ saveShortcut }
@@ -946,7 +1476,7 @@ const StandardBuilder = () => {
 					canRedo={ canRedo }
 					onUndo={ handleUndo }
 					onRedo={ handleRedo }
-					titlePlaceholder={ __( 'Untitled form', 'flowforms' ) }
+					titlePlaceholder={ __( 'Untitled form', 'formspress' ) }
 					/* We render BOTH left toggles ourselves via
 						   `topbarLeftExtras` so each button reflects its own
 						   mode (library or listview). EditorSkeleton's
@@ -968,13 +1498,13 @@ const StandardBuilder = () => {
 						<>
 							<Button
 								icon={ plusIcon }
-								label={ __( 'Block library', 'flowforms' ) }
+								label={ __( 'Block library', 'formspress' ) }
 								isPressed={ 'library' === leftMode }
 								onClick={ () => toggleMode( 'library' ) }
 							/>
 							<Button
 								icon={ listViewIcon }
-								label={ __( 'List view', 'flowforms' ) }
+								label={ __( 'List view', 'formspress' ) }
 								isPressed={ 'listview' === leftMode }
 								onClick={ () => toggleMode( 'listview' ) }
 							/>
@@ -991,13 +1521,13 @@ const StandardBuilder = () => {
 								actions.length
 									? `${ __(
 											'Form actions',
-											'flowforms'
+											'formspress'
 									  ) } (${ actions.length })`
-									: __( 'Form actions', 'flowforms' )
+									: __( 'Form actions', 'formspress' )
 							}
 							onClick={ () => setActionsOpen( true ) }
 						>
-							{ __( 'Actions', 'flowforms' ) }
+							{ __( 'Actions', 'formspress' ) }
 							{ actions.length > 0 && (
 								<span className="ff-gb-topbar__actions-badge">
 									{ actions.length }
@@ -1008,7 +1538,7 @@ const StandardBuilder = () => {
 					previewViewport={ previewViewport }
 					onPreviewViewportChange={ setPreviewViewport }
 					onTogglePreview={ handlePreviewInNewTab }
-					previewTooltip={ __( 'Preview in new tab', 'flowforms' ) }
+					previewTooltip={ __( 'Preview in new tab', 'formspress' ) }
 					rightSidebar={
 						<RightInspector
 							activeTab={ rightTab }
@@ -1024,7 +1554,7 @@ const StandardBuilder = () => {
 					 * (Gutenberg, classic editor, page builders). */
 					onToggleShare={ () => setShareOpen( ( v ) => ! v ) }
 					isShareActive={ shareOpen }
-					shareTooltip={ __( 'Embed / share', 'flowforms' ) }
+					shareTooltip={ __( 'Embed / share', 'formspress' ) }
 					overlays={
 						<>
 							{ shareOpen && (
@@ -1067,28 +1597,30 @@ const StandardBuilder = () => {
 								 below is pinned at the bottom regardless of
 								 how long the form is. */ }
 						<div className="ff-std-canvas__scroll">
-							<BlockTools>
-								{ /* Registers Cmd+Z/Y, slash command, Cmd+A,
+							<div
+								className="ff-std-canvas__viewport editor-styles-wrapper"
+								style={ buildFormStyleVars(
+									form?.settings?.style
+								) }
+							>
+								<BlockTools>
+									{ /* Registers Cmd+Z/Y, slash command, Cmd+A,
 										 Enter to break, arrow nav between blocks
 										 — without this the canvas is mostly inert. */ }
-								<BlockEditorKeyboardShortcuts.Register />
-								<WritingFlow>
-									<ObserveTyping>
-										<CanvasSelectionBoundary
-											className="editor-styles-wrapper"
-											style={ buildFormStyleVars(
-												form?.settings?.style
-											) }
-										>
-											<BlockList />
-										</CanvasSelectionBoundary>
-									</ObserveTyping>
-								</WritingFlow>
-							</BlockTools>
+									<BlockEditorKeyboardShortcuts.Register />
+									<WritingFlow>
+										<ObserveTyping>
+											<CanvasSelectionBoundary className="ff-std-canvas__selection">
+												<BlockList />
+											</CanvasSelectionBoundary>
+										</ObserveTyping>
+									</WritingFlow>
+								</BlockTools>
+							</div>
 						</div>
 						<div className="ff-std-canvas__breadcrumb">
 							<BlockBreadcrumb
-								rootLabelText={ __( 'Form', 'flowforms' ) }
+								rootLabelText={ __( 'Form', 'formspress' ) }
 							/>
 						</div>
 					</div>

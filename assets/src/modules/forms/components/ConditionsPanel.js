@@ -1,3 +1,4 @@
+/* eslint-disable @wordpress/no-unsafe-wp-apis */
 import {
 	Button,
 	PanelBody,
@@ -70,34 +71,39 @@ const OPERATORS_BY_TYPE = {
 };
 
 const OPERATOR_LABELS = {
-	equals: __( 'is', 'flowforms' ),
-	not_equals: __( 'is not', 'flowforms' ),
-	contains: __( 'contains', 'flowforms' ),
-	not_contains: __( 'does not contain', 'flowforms' ),
-	is_empty: __( 'is empty', 'flowforms' ),
-	is_not_empty: __( 'is not empty', 'flowforms' ),
-	is_truthy: __( 'is true', 'flowforms' ),
-	is_falsy: __( 'is false', 'flowforms' ),
-	greater_than: __( 'is greater than', 'flowforms' ),
-	less_than: __( 'is less than', 'flowforms' ),
+	equals: __( 'is', 'formspress' ),
+	not_equals: __( 'is not', 'formspress' ),
+	contains: __( 'contains', 'formspress' ),
+	not_contains: __( 'does not contain', 'formspress' ),
+	is_empty: __( 'is empty', 'formspress' ),
+	is_not_empty: __( 'is not empty', 'formspress' ),
+	is_truthy: __( 'is true', 'formspress' ),
+	is_falsy: __( 'is false', 'formspress' ),
+	greater_than: __( 'is greater than', 'formspress' ),
+	less_than: __( 'is less than', 'formspress' ),
 };
 
 const NO_VALUE_OPS = [ 'is_empty', 'is_not_empty', 'is_truthy', 'is_falsy' ];
 
 /**
- * Returns sibling field candidates that come BEFORE the current field — we
- * disallow forward references so the runtime is always deterministic.
+ * Returns field candidates that can drive this field's display. The current
+ * field is excluded to avoid self-referential rules.
  *
- * @param {Array}  allFields  Flat list of all fields in the form.
- * @param {string} currentId  Field ID we are configuring conditions for.
+ * @param {Array}  allFields Flat list of all fields in the form.
+ * @param {string} currentId Field ID we are configuring conditions for.
  */
 const getCandidateSources = ( allFields, currentId ) => {
 	const out = [];
 	for ( const f of allFields ) {
-		if ( ! f || ! f.id ) continue;
-		if ( f.id === currentId ) break;
-		if ( [ 'section', 'page_break', 'row', 'hidden' ].includes( f.type ) )
+		if ( ! f || ! f.id ) {
 			continue;
+		}
+		if ( [ 'section', 'page_break', 'row', 'hidden' ].includes( f.type ) ) {
+			continue;
+		}
+		if ( currentId && f.id === currentId ) {
+			continue;
+		}
 		out.push( f );
 	}
 	return out;
@@ -109,7 +115,9 @@ const ConditionsPanel = ( {
 	onChange,
 	allowSkip = false,
 	title,
+	displayMode = 'panel',
 } ) => {
+	const isModal = 'modal' === displayMode;
 	const conditions = field.conditions || null;
 	const enabled = !! (
 		conditions &&
@@ -123,6 +131,14 @@ const ConditionsPanel = ( {
 
 	const toggle = ( on ) => {
 		if ( on ) {
+			if ( candidates.length === 0 ) {
+				update( {
+					action: allowSkip ? 'skip' : 'show',
+					logic: 'all',
+					rules: [],
+				} );
+				return;
+			}
 			update( {
 				action: allowSkip ? 'skip' : 'show',
 				logic: 'all',
@@ -151,6 +167,9 @@ const ConditionsPanel = ( {
 	};
 
 	const addRule = () => {
+		if ( candidates.length === 0 ) {
+			return;
+		}
 		const rules = [
 			...( conditions?.rules || [] ),
 			{ field: candidates[ 0 ]?.id || '', op: 'equals', value: '' },
@@ -170,50 +189,79 @@ const ConditionsPanel = ( {
 	};
 
 	const actionOptions = [
-		{ value: 'show', label: __( 'Show this field when…', 'flowforms' ) },
-		{ value: 'hide', label: __( 'Hide this field when…', 'flowforms' ) },
+		{ value: 'show', label: __( 'Show this field when…', 'formspress' ) },
+		{ value: 'hide', label: __( 'Hide this field when…', 'formspress' ) },
 		...( allowSkip
 			? [
 					{
 						value: 'skip',
-						label: __( 'Skip this step when…', 'flowforms' ),
+						label: __( 'Skip this step when…', 'formspress' ),
 					},
 			  ]
 			: [] ),
 	];
 
-	return (
-		<PanelBody
-			title={ title || __( 'Conditional logic', 'flowforms' ) }
-			initialOpen={ false }
+	const body = (
+		<VStack
+			spacing={ isModal ? 5 : 4 }
+			className={ isModal ? 'ff-conditions-modal-content' : undefined }
 		>
-			<VStack spacing={ 4 }>
+			<div
+				className={
+					isModal ? 'ff-conditions-modal-content__toggle' : undefined
+				}
+			>
 				<ToggleControl
-					label={ __( 'Enable conditional logic', 'flowforms' ) }
+					label={ __( 'Enable conditional display', 'formspress' ) }
+					help={
+						isModal
+							? __(
+									'Control whether this field appears based on answers from another field in this form.',
+									'formspress'
+							  )
+							: undefined
+					}
 					checked={ enabled }
 					onChange={ toggle }
 					__nextHasNoMarginBottom
 				/>
+			</div>
 
-				{ enabled && (
-					<>
-						{ candidates.length === 0 && (
-							<p
-								style={ {
-									fontSize: 12,
-									color: '#cc1818',
-									margin: 0,
-								} }
-							>
-								{ __(
-									'Add a field before this one to reference in a condition.',
-									'flowforms'
-								) }
-							</p>
-						) }
+			{ enabled && (
+				<>
+					{ candidates.length === 0 && (
+						<p
+							className={
+								isModal
+									? 'ff-conditions-modal-content__warning'
+									: undefined
+							}
+							style={
+								isModal
+									? undefined
+									: {
+											fontSize: 12,
+											color: '#cc1818',
+											margin: 0,
+									  }
+							}
+						>
+							{ __(
+								'Add another field to this form to reference it in a condition.',
+								'formspress'
+							) }
+						</p>
+					) }
 
+					<div
+						className={
+							isModal
+								? 'ff-conditions-modal-content__settings'
+								: undefined
+						}
+					>
 						<SelectControl
-							label={ __( 'Action', 'flowforms' ) }
+							label={ __( 'Action', 'formspress' ) }
 							value={ conditions.action || 'show' }
 							options={ actionOptions }
 							onChange={ setKey( 'action' ) }
@@ -222,21 +270,21 @@ const ConditionsPanel = ( {
 						/>
 
 						<SelectControl
-							label={ __( 'Logic', 'flowforms' ) }
+							label={ __( 'Logic', 'formspress' ) }
 							value={ conditions.logic || 'all' }
 							options={ [
 								{
 									value: 'all',
 									label: __(
 										'Match all rules (AND)',
-										'flowforms'
+										'formspress'
 									),
 								},
 								{
 									value: 'any',
 									label: __(
 										'Match any rule (OR)',
-										'flowforms'
+										'formspress'
 									),
 								},
 							] }
@@ -244,12 +292,15 @@ const ConditionsPanel = ( {
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 						/>
+					</div>
 
-						<VStack spacing={ 3 }>
-							{ ( conditions.rules || [] ).map( ( rule, i ) => {
-								const sourceField = candidates.find(
-									( c ) => c.id === rule.field
-								);
+					<VStack spacing={ 3 }>
+						{ candidates.length > 0 &&
+							( conditions.rules || [] ).map( ( rule, i ) => {
+								const sourceField =
+									candidates.find(
+										( c ) => c.id === rule.field
+									) || candidates[ 0 ];
 								const ops =
 									OPERATORS_BY_TYPE[ sourceField?.type ] ||
 									OPERATORS_BY_TYPE.text;
@@ -267,37 +318,71 @@ const ConditionsPanel = ( {
 								].includes( sourceField?.type );
 								const valueOptions = isChoice
 									? ( sourceField.options || [] ).map(
-											( o ) => ( { value: o, label: o } )
+											( o ) => {
+												if ( 'string' === typeof o ) {
+													return {
+														value: o,
+														label: o,
+													};
+												}
+
+												const value =
+													o?.value ?? o?.label ?? '';
+												return {
+													value,
+													label: o?.label || value,
+												};
+											}
 									  )
 									: null;
 
 								return (
 									<div
 										key={ i }
-										style={ {
-											border: '1px solid #e0e0e0',
-											borderRadius: 4,
-											padding: 8,
-										} }
+										className={
+											isModal
+												? 'ff-conditions-modal-content__rule'
+												: undefined
+										}
+										style={
+											isModal
+												? undefined
+												: {
+														border: '1px solid #e0e0e0',
+														borderRadius: 4,
+														padding: 8,
+												  }
+										}
 									>
 										<HStack spacing={ 2 } align="flex-end">
 											<FlexBlock>
 												<SelectControl
 													label={ sprintf(
+														/* translators: %d: condition rule number. */
 														__(
 															'Rule %d — Field',
-															'flowforms'
+															'formspress'
 														),
 														i + 1
 													) }
 													value={ rule.field || '' }
-													options={ candidates.map(
-														( c ) => ( {
-															value: c.id,
-															label:
-																c.label || c.id,
-														} )
-													) }
+													options={ [
+														{
+															value: '',
+															label: __(
+																'Select a field',
+																'formspress'
+															),
+														},
+														...candidates.map(
+															( c ) => ( {
+																value: c.id,
+																label:
+																	c.label ||
+																	c.id,
+															} )
+														),
+													] }
 													onChange={ ( v ) =>
 														updateRule( i, {
 															field: v,
@@ -316,14 +401,14 @@ const ConditionsPanel = ( {
 												}
 												label={ __(
 													'Remove rule',
-													'flowforms'
+													'formspress'
 												) }
 											/>
 										</HStack>
 										<SelectControl
 											label={ __(
 												'Operator',
-												'flowforms'
+												'formspress'
 											) }
 											value={ rule.op || 'equals' }
 											options={ opOptions }
@@ -338,7 +423,7 @@ const ConditionsPanel = ( {
 												<SelectControl
 													label={ __(
 														'Value',
-														'flowforms'
+														'formspress'
 													) }
 													value={ rule.value || '' }
 													options={ [
@@ -346,7 +431,7 @@ const ConditionsPanel = ( {
 															value: '',
 															label: __(
 																'— Select —',
-																'flowforms'
+																'formspress'
 															),
 														},
 														...valueOptions,
@@ -363,7 +448,7 @@ const ConditionsPanel = ( {
 												<TextControl
 													label={ __(
 														'Value',
-														'flowforms'
+														'formspress'
 													) }
 													value={ rule.value ?? '' }
 													onChange={ ( v ) =>
@@ -378,19 +463,31 @@ const ConditionsPanel = ( {
 									</div>
 								);
 							} ) }
-							<Button
-								variant="secondary"
-								icon={ plus }
-								onClick={ addRule }
-								disabled={ candidates.length === 0 }
-								__next40pxDefaultSize
-							>
-								{ __( 'Add rule', 'flowforms' ) }
-							</Button>
-						</VStack>
-					</>
-				) }
-			</VStack>
+						<Button
+							variant="secondary"
+							icon={ plus }
+							onClick={ addRule }
+							disabled={ candidates.length === 0 }
+							__next40pxDefaultSize
+						>
+							{ __( 'Add rule', 'formspress' ) }
+						</Button>
+					</VStack>
+				</>
+			) }
+		</VStack>
+	);
+
+	if ( isModal ) {
+		return body;
+	}
+
+	return (
+		<PanelBody
+			title={ title || __( 'Conditional logic', 'formspress' ) }
+			initialOpen={ false }
+		>
+			{ body }
 		</PanelBody>
 	);
 };

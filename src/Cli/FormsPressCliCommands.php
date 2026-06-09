@@ -2,7 +2,6 @@
 
 namespace FlowForms\Cli;
 
-use FlowForms\Modules\EmailTemplates\Services\EmailTemplateRepository;
 use FlowForms\Modules\Entries\Services\EntryRepository;
 use FlowForms\Modules\Forms\Services\FormRepository;
 use FlowForms\Modules\Templates\Services\TemplateRegistry;
@@ -28,7 +27,6 @@ class FormsPressCliCommands {
 	public function __construct(
 		private readonly FormRepository $forms,
 		private readonly EntryRepository $entries,
-		private readonly EmailTemplateRepository $email_templates,
 		private readonly ?TemplateRegistry $template_registry = null,
 	) {}
 
@@ -150,7 +148,7 @@ class FormsPressCliCommands {
 		}
 
 		$payload = [
-			'title'       => $data['title']       ?? __( 'Imported form', 'flowforms' ),
+			'title'       => $data['title']       ?? __( 'Imported form', 'formspress' ),
 			'description' => $data['description'] ?? '',
 			'type'        => $data['type']        ?? 'standard',
 			'fields'      => $data['fields']      ?? [],
@@ -370,15 +368,6 @@ class FormsPressCliCommands {
 			}
 		}
 
-		$email_templates = $this->email_templates->get_all();
-		foreach ( $email_templates as $row ) {
-			$form_templates[] = [
-				'id'    => (string) $row['id'],
-				'label' => $row['name'],
-				'kind'  => 'email',
-			];
-		}
-
 		\WP_CLI\Utils\format_items( $format, $form_templates, [ 'id', 'label', 'kind' ] );
 	}
 
@@ -392,20 +381,6 @@ class FormsPressCliCommands {
 
 		$tpl = null;
 
-		// Email template (numeric ID) first.
-		if ( is_numeric( $id ) ) {
-			$row = $this->email_templates->get( (int) $id );
-			if ( $row ) {
-				$tpl = [
-					'_flowforms_export' => 'email-template',
-					'name'              => $row['name'],
-					'subject'           => $row['subject'],
-					'body'              => $row['body'],
-				];
-			}
-		}
-
-		// Otherwise form template via registry.
 		if ( ! $tpl && $this->template_registry && method_exists( $this->template_registry, 'get' ) ) {
 			$registry_tpl = $this->template_registry->get( $id );
 			if ( $registry_tpl ) {

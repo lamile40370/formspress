@@ -13,10 +13,10 @@ import {
  * High contrast — designed to live above the fold.
  */
 export default {
-	title: __( 'Newsletter signup', 'flowforms' ),
+	title: __( 'Newsletter signup', 'formspress' ),
 	description: __(
 		'Bold dark hero card, centered, single email field.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [ 'newsletter', 'subscribe', 'optin', 'email', 'list' ],
 	content: styledGroup( {
@@ -29,7 +29,7 @@ export default {
 		textAlign: 'center',
 		inner: [
 			heading( {
-				text: __( 'Join our newsletter', 'flowforms' ),
+				text: __( 'Join our newsletter', 'formspress' ),
 				size: '32px',
 				weight: '700',
 				align: 'center',
@@ -38,7 +38,7 @@ export default {
 			description( {
 				text: __(
 					'One email a week. No spam — unsubscribe anytime.',
-					'flowforms'
+					'formspress'
 				),
 				size: '15px',
 				color: '#cbd5e1',
@@ -46,12 +46,12 @@ export default {
 				marginBottom: '24px',
 			} ),
 			fieldEmail( {
-				label: __( 'Email address', 'flowforms' ),
+				label: __( 'Email address', 'formspress' ),
 				required: true,
 				placeholder: 'you@example.com',
 			} ),
 			submitButton( {
-				text: __( 'Subscribe', 'flowforms' ),
+				text: __( 'Subscribe', 'formspress' ),
 				bg: '#ffffff',
 				fg: '#0f172a',
 				full: true,

@@ -11,12 +11,12 @@ class MinValueValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Minimum value', 'flowforms' );
+		return __( 'Minimum value', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'min', 'type' => 'number', 'label' => __( 'Minimum value', 'flowforms' ), 'default' => 0 ],
+			[ 'key' => 'min', 'type' => 'number', 'label' => __( 'Minimum value', 'formspress' ), 'default' => 0 ],
 		];
 	}
 
@@ -25,13 +25,13 @@ class MinValueValidator extends AbstractValidator {
 			return true;
 		}
 		if ( ! is_numeric( $value ) ) {
-			return __( 'Please enter a valid number.', 'flowforms' );
+			return __( 'Please enter a valid number.', 'formspress' );
 		}
 		$min = (float) ( $config['min'] ?? 0 );
 		if ( (float) $value < $min ) {
 			return sprintf(
 				/* translators: %s is minimum value */
-				__( 'Value must be at least %s.', 'flowforms' ),
+				__( 'Value must be at least %s.', 'formspress' ),
 				$min
 			);
 		}

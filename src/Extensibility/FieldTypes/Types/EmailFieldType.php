@@ -11,7 +11,7 @@ class EmailFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Email', 'flowforms' );
+		return __( 'Email', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,7 +24,7 @@ class EmailFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'placeholder', 'type' => 'text', 'label' => __( 'Placeholder', 'flowforms' ) ],
+			[ 'key' => 'placeholder', 'type' => 'text', 'label' => __( 'Placeholder', 'formspress' ) ],
 		];
 	}
 
@@ -40,7 +40,7 @@ class EmailFieldType extends AbstractFieldType {
 			return true;
 		}
 		if ( ! is_email( $value ) ) {
-			return __( 'Please enter a valid email address.', 'flowforms' );
+			return __( 'Please enter a valid email address.', 'formspress' );
 		}
 		return true;
 	}

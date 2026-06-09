@@ -20,7 +20,7 @@ class ExportEntries extends AbstractEndpoint {
 		$form    = $this->form_repo->get( $form_id );
 
 		if ( ! $form ) {
-			return $this->error( __( 'Form not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Form not found.', 'formspress' ), 404 );
 		}
 
 		$entries = $this->entry_repo->export_csv( $form_id );

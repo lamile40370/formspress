@@ -17,9 +17,24 @@ import * as number from './number';
 import * as select from './select';
 import * as radio from './radio';
 import * as checkbox from './checkbox';
+import * as product from './product';
+import * as total from './total';
+import * as pageBreak from './page-break';
 import * as submit from './submit';
 
-const ALL = [ text, email, textarea, number, select, radio, checkbox, submit ];
+const ALL = [
+	text,
+	email,
+	textarea,
+	number,
+	select,
+	radio,
+	checkbox,
+	product,
+	total,
+	pageBreak,
+	submit,
+];
 
 let done = false;
 
@@ -81,7 +96,7 @@ export default function registerBlocks() {
 		setCategories( [
 			{
 				slug: 'formspress-fields',
-				title: __( 'Form fields', 'flowforms' ),
+				title: __( 'Form fields', 'formspress' ),
 			},
 			...cats,
 		] );

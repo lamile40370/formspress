@@ -11,7 +11,7 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-const { state, actions } = store( 'formspress', {
+const { state } = store( 'formspress', {
 	state: {
 		get isSuccess() {
 			return getContext().messageType === 'success';
@@ -30,6 +30,12 @@ const { state, actions } = store( 'formspress', {
 			if ( ctx.isSubmitting ) {
 				return;
 			}
+			if (
+				window.ffAnalytics &&
+				typeof window.ffAnalytics.initForm === 'function'
+			) {
+				window.ffAnalytics.initForm( form );
+			}
 
 			ctx.isSubmitting = true;
 			ctx.message = '';
@@ -40,12 +46,12 @@ const { state, actions } = store( 'formspress', {
 
 			/* Clear inline error nodes that the server rendered, and reset
 			 * aria-invalid on every interactive control. */
-			form
-				.querySelectorAll( '.ff-form__field-error' )
-				.forEach( ( n ) => ( n.textContent = '' ) );
-			form
-				.querySelectorAll( '[aria-invalid="true"]' )
-				.forEach( ( n ) => n.setAttribute( 'aria-invalid', 'false' ) );
+			form.querySelectorAll( '.ff-form__field-error' ).forEach(
+				( n ) => ( n.textContent = '' )
+			);
+			form.querySelectorAll( '[aria-invalid="true"]' ).forEach( ( n ) =>
+				n.setAttribute( 'aria-invalid', 'false' )
+			);
 
 			/* Build flat payload — checkbox arrays collapse to a comma string,
 			 * matching the legacy `forms.js` runtime + REST handler. */
@@ -54,11 +60,14 @@ const { state, actions } = store( 'formspress', {
 			for ( const [ key, value ] of fd.entries() ) {
 				if ( key.endsWith( '[]' ) ) {
 					const k = key.slice( 0, -2 );
-					data[ k ] = data[ k ] ? `${ data[ k ] }, ${ value }` : value;
+					data[ k ] = data[ k ]
+						? `${ data[ k ] }, ${ value }`
+						: value;
 				} else {
 					data[ key ] = value;
 				}
 			}
+			removeConditionallyHiddenValues( form, data );
 
 			const apiRoot =
 				state.apiRoot ||
@@ -83,6 +92,12 @@ const { state, actions } = store( 'formspress', {
 				const result = yield res.json();
 
 				if ( result.success ) {
+					form.dispatchEvent(
+						new CustomEvent( 'flowforms:submit-success', {
+							bubbles: true,
+							detail: result || {},
+						} )
+					);
 					if ( result.action === 'redirect' && result.redirect ) {
 						window.location.href = result.redirect;
 						return;
@@ -90,6 +105,7 @@ const { state, actions } = store( 'formspress', {
 					ctx.message = result.message || '';
 					ctx.messageType = 'success';
 					form.reset();
+					evaluateConditionalDisplay( form );
 				} else if ( result.errors ) {
 					ctx.errors = result.errors;
 					ctx.messageType = 'error';
@@ -114,7 +130,10 @@ const { state, actions } = store( 'formspress', {
 					const firstInvalid = form.querySelector(
 						'[aria-invalid="true"]'
 					);
-					if ( firstInvalid && typeof firstInvalid.focus === 'function' ) {
+					if (
+						firstInvalid &&
+						typeof firstInvalid.focus === 'function'
+					) {
 						firstInvalid.focus();
 					}
 				} else {
@@ -132,9 +151,11 @@ const { state, actions } = store( 'formspress', {
 		/* Star-rating click + keyboard handler. Preserves the legacy DOM
 		 * contract (`.is-active`) so existing CSS keeps working, while
 		 * tracking aria-checked on each radio button. */
-		rateStar( event ) {
+		rateStar() {
 			const { ref } = getElement();
-			if ( ! ref ) return;
+			if ( ! ref ) {
+				return;
+			}
 			const value = parseInt( ref.dataset.value, 10 );
 			setRating( ref, value );
 		},
@@ -144,34 +165,215 @@ const { state, actions } = store( 'formspress', {
 		 * desired, but most browsers already deliver Space/Enter as click. */
 		rateStarKey( event ) {
 			const key = event.key;
-			if ( ! [ 'ArrowLeft', 'ArrowRight', 'Home', 'End' ].includes( key ) ) {
+			if (
+				! [ 'ArrowLeft', 'ArrowRight', 'Home', 'End' ].includes( key )
+			) {
 				return;
 			}
 			event.preventDefault();
 			const { ref } = getElement();
-			if ( ! ref ) return;
+			if ( ! ref ) {
+				return;
+			}
 			const rating = ref.closest( '.ff-form__rating' );
-			if ( ! rating ) return;
+			if ( ! rating ) {
+				return;
+			}
 			const stars = Array.from(
 				rating.querySelectorAll( '.ff-form__star' )
 			);
 			const current = parseInt( ref.dataset.value, 10 );
 			let next = current;
-			if ( key === 'ArrowRight' ) next = Math.min( stars.length, current + 1 );
-			if ( key === 'ArrowLeft' ) next = Math.max( 1, current - 1 );
-			if ( key === 'Home' ) next = 1;
-			if ( key === 'End' ) next = stars.length;
+			if ( key === 'ArrowRight' ) {
+				next = Math.min( stars.length, current + 1 );
+			}
+			if ( key === 'ArrowLeft' ) {
+				next = Math.max( 1, current - 1 );
+			}
+			if ( key === 'Home' ) {
+				next = 1;
+			}
+			if ( key === 'End' ) {
+				next = stars.length;
+			}
 			setRating( stars[ next - 1 ], next );
 			stars[ next - 1 ].focus();
 		},
 	},
 } );
 
+function bindConditionalDisplay() {
+	document.querySelectorAll( '.ff-form--standard' ).forEach( ( form ) => {
+		if ( form.dataset.ffConditionsBound === '1' ) {
+			return;
+		}
+		form.dataset.ffConditionsBound = '1';
+		form.addEventListener( 'input', () =>
+			evaluateConditionalDisplay( form )
+		);
+		form.addEventListener( 'change', () =>
+			evaluateConditionalDisplay( form )
+		);
+		evaluateConditionalDisplay( form );
+	} );
+}
+
+function evaluateConditionalDisplay( form ) {
+	const values = collectValues( form );
+	form.querySelectorAll( '[data-conditions]' ).forEach( ( el ) => {
+		const conditions = safeJSON( el.dataset.conditions, null );
+		if ( ! conditions ) {
+			return;
+		}
+		const visible = evaluateConditions( conditions, values );
+		if ( visible ) {
+			el.removeAttribute( 'hidden' );
+			el.style.display = '';
+			el.setAttribute( 'aria-hidden', 'false' );
+		} else {
+			el.setAttribute( 'hidden', '' );
+			el.style.display = 'none';
+			el.setAttribute( 'aria-hidden', 'true' );
+		}
+	} );
+}
+
+function collectValues( form ) {
+	const data = {};
+	const fd = new FormData( form );
+	for ( const [ key, value ] of fd.entries() ) {
+		if ( key.charAt( 0 ) === '_' ) {
+			continue;
+		}
+		if ( key.endsWith( '[]' ) ) {
+			const k = key.slice( 0, -2 );
+			data[ k ] = data[ k ] ? `${ data[ k ] }, ${ value }` : value;
+		} else {
+			data[ key ] = value;
+		}
+	}
+	return data;
+}
+
+function removeConditionallyHiddenValues( form, data ) {
+	form.querySelectorAll(
+		'[data-conditions][hidden] [data-field-id], [data-conditions][hidden][data-field-id]'
+	).forEach( ( wrap ) => {
+		const fieldId = wrap.dataset && wrap.dataset.fieldId;
+		if ( fieldId ) {
+			delete data[ fieldId ];
+			delete data[ `${ fieldId }[]` ];
+		}
+	} );
+}
+
+function safeJSON( value, fallback ) {
+	try {
+		return value ? JSON.parse( value ) : fallback;
+	} catch ( e ) {
+		return fallback;
+	}
+}
+
+function evaluateConditions( conditions, values ) {
+	if ( ! conditions || ! conditions.rules || conditions.rules.length === 0 ) {
+		return true;
+	}
+	const action = conditions.action || 'show';
+	const logic = conditions.logic || 'all';
+	const matched = evaluateRules( conditions.rules, logic, values );
+	return action === 'show' ? matched : ! matched;
+}
+
+function evaluateRules( rules, logic, values ) {
+	const results = rules.map( ( rule ) => evaluateRule( rule, values ) );
+	if ( logic === 'any' ) {
+		return results.indexOf( true ) > -1;
+	}
+	return results.indexOf( false ) === -1;
+}
+
+function evaluateRule( rule, values ) {
+	const op = rule.op || 'equals';
+	const expected =
+		rule.value === null || rule.value === undefined
+			? ''
+			: String( rule.value );
+	const actual = values[ rule.field ];
+	let actualStr = '';
+	if ( Array.isArray( actual ) ) {
+		actualStr = actual.join( ', ' );
+	} else if ( actual !== null && actual !== undefined ) {
+		actualStr = String( actual );
+	}
+
+	switch ( op ) {
+		case 'equals':
+			return actualStr === expected;
+		case 'not_equals':
+			return actualStr !== expected;
+		case 'contains':
+			return (
+				actualStr !== '' &&
+				expected !== '' &&
+				actualStr.toLowerCase().indexOf( expected.toLowerCase() ) > -1
+			);
+		case 'not_contains':
+			return (
+				expected === '' ||
+				actualStr.toLowerCase().indexOf( expected.toLowerCase() ) === -1
+			);
+		case 'is_empty':
+			return actualStr.trim() === '';
+		case 'is_not_empty':
+			return actualStr.trim() !== '';
+		case 'is_truthy':
+			return (
+				[ '1', 'true', 'yes', 'on' ].indexOf(
+					actualStr.toLowerCase()
+				) > -1 ||
+				( actualStr.trim() !== '' &&
+					actualStr !== '0' &&
+					actualStr.toLowerCase() !== 'false' )
+			);
+		case 'is_falsy':
+			return (
+				[ '', '0', 'false', 'no', 'off' ].indexOf(
+					actualStr.toLowerCase()
+				) > -1
+			);
+		case 'greater_than':
+			return (
+				! Number.isNaN( parseFloat( actualStr ) ) &&
+				! Number.isNaN( parseFloat( expected ) ) &&
+				parseFloat( actualStr ) > parseFloat( expected )
+			);
+		case 'less_than':
+			return (
+				! Number.isNaN( parseFloat( actualStr ) ) &&
+				! Number.isNaN( parseFloat( expected ) ) &&
+				parseFloat( actualStr ) < parseFloat( expected )
+			);
+		default:
+			return false;
+	}
+}
+
+if ( document.readyState === 'loading' ) {
+	document.addEventListener( 'DOMContentLoaded', bindConditionalDisplay );
+} else {
+	bindConditionalDisplay();
+}
+
 function setRating( ref, value ) {
 	const rating = ref.closest( '.ff-form__rating' );
-	if ( ! rating ) return;
+	if ( ! rating ) {
+		return;
+	}
 	const hidden = rating.querySelector( '.ff-rating-value' );
-	if ( hidden ) hidden.value = String( value );
+	if ( hidden ) {
+		hidden.value = String( value );
+	}
 	rating.querySelectorAll( '.ff-form__star' ).forEach( ( s ) => {
 		const v = parseInt( s.dataset.value, 10 );
 		s.classList.toggle( 'is-active', v <= value );
@@ -184,11 +386,12 @@ function acquireSpamToken( form ) {
 	const provider = form.dataset.spamProvider;
 	const siteKey = form.dataset.spamSiteKey || '';
 	const tokenField = form.dataset.spamTokenField || '_ff_spam_token';
-	const hidden = form.querySelector( `input[name="${ tokenField }"]` );
 
 	if ( ! provider || ! siteKey ) {
 		return Promise.resolve();
 	}
+
+	const hidden = form.querySelector( `input[name="${ tokenField }"]` );
 
 	if (
 		provider === 'recaptcha_v3' &&

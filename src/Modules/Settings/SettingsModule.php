@@ -13,7 +13,7 @@ class SettingsModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Settings', 'flowforms' );
+		return __( 'Settings', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {
@@ -27,34 +27,34 @@ class SettingsModule extends AbstractModule {
 	public function get_nav_items(): array {
 		return [
 			[
-				'label'       => __( 'Settings', 'flowforms' ),
+				'label'       => __( 'Settings', 'formspress' ),
 				'path'        => '/settings',
 				'icon'        => 'admin-generic',
 				'position'    => 90,
-				'description' => __( 'Configure FormsPress global settings.', 'flowforms' ),
+				'description' => __( 'Configure FormsPress global settings.', 'formspress' ),
 				'children'    => [
 					[
-						'label' => __( 'General', 'flowforms' ),
-						'path'  => '/settings',
-						'icon'  => 'admin-generic',
-					],
-					[
-						'label' => __( 'Forms defaults', 'flowforms' ),
+						'label' => __( 'Forms defaults', 'formspress' ),
 						'path'  => '/settings/forms',
 						'icon'  => 'feedback',
 					],
 					[
-						'label' => __( 'Spam & security', 'flowforms' ),
+						'label' => __( 'Spam & security', 'formspress' ),
 						'path'  => '/settings/spam',
 						'icon'  => 'admin-generic',
 					],
 					[
-						'label' => __( 'Email', 'flowforms' ),
+						'label' => __( 'Email', 'formspress' ),
 						'path'  => '/settings/email',
 						'icon'  => 'email-alt',
 					],
 					[
-						'label' => __( 'Headless API', 'flowforms' ),
+						'label' => __( 'AI', 'formspress' ),
+						'path'  => '/settings/ai',
+						'icon'  => 'superhero',
+					],
+					[
+						'label' => __( 'Headless API', 'formspress' ),
 						'path'  => '/settings/headless',
 						'icon'  => 'rest-api',
 					],

@@ -18,30 +18,27 @@ class FormRepository {
 		$per_page = min( 100, max( 1, (int) ( $args['per_page'] ?? 20 ) ) );
 		$offset   = ( $page - 1 ) * $per_page;
 		$search   = sanitize_text_field( $args['search'] ?? '' );
-		$status   = sanitize_text_field( $args['status'] ?? '' );
-		$type     = sanitize_text_field( $args['type'] ?? '' );
+		$statuses = $this->sanitize_list( $args['status'] ?? '', [ 'active', 'inactive', 'draft', 'trash' ] );
+		$types    = $this->sanitize_list( $args['type'] ?? '', [ 'standard', 'flow' ] );
 		$sort     = in_array( $args['sort'] ?? '', [ 'title', 'status', 'type', 'created_at', 'updated_at' ], true ) ? $args['sort'] : 'created_at';
 		$order    = strtoupper( $args['order'] ?? 'DESC' ) === 'ASC' ? 'ASC' : 'DESC';
 
-		// Default hides trashed forms; explicit `status=trash` flips it
-		// to show ONLY trashed (so the listing's Status filter works
-		// regardless of the user's selection — Active / Inactive / Draft / Trash).
-		$where  = 'trash' === $status ? "status = 'trash'" : "status != 'trash'";
+		$where  = '1=1';
 		$params = [];
+
+		if ( $statuses ) {
+			$this->append_in_condition( $where, $params, 'status', $statuses );
+		} else {
+			$where .= " AND status != 'trash'";
+		}
 
 		if ( $search !== '' ) {
 			$where   .= ' AND title LIKE %s';
 			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
 		}
 
-		if ( $status !== '' && 'trash' !== $status ) {
-			$where   .= ' AND status = %s';
-			$params[] = $status;
-		}
-
-		if ( $type !== '' ) {
-			$where   .= ' AND type = %s';
-			$params[] = $type;
+		if ( $types ) {
+			$this->append_in_condition( $where, $params, 'type', $types );
 		}
 
 		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
@@ -99,6 +96,7 @@ class FormRepository {
 
 		$form['settings'] = json_decode( $form['settings'] ?? '{}', true ) ?: [];
 		$form['actions']  = json_decode( $form['actions'] ?? '[]', true ) ?: [];
+		$form['variants'] = json_decode( $form['variants'] ?? '[]', true ) ?: [];
 
 		$form['entries_count'] = $this->get_entries_count( $id );
 
@@ -119,19 +117,23 @@ class FormRepository {
 		$status     = $data['status'] ?? 'active';
 		$status     = in_array( $status, [ 'active', 'inactive', 'draft' ], true ) ? $status : 'active';
 
-		$result = $wpdb->insert(
-			$this->table,
-			[
-				'title'       => sanitize_text_field( $data['title'] ?? __( 'Untitled Form', 'flowforms' ) ),
-				'description' => sanitize_textarea_field( $data['description'] ?? '' ),
-				'type'        => in_array( $data['type'] ?? 'standard', [ 'standard', 'flow' ], true ) ? $data['type'] : 'standard',
-				'fields'      => $fields_col,
-				'settings'    => wp_json_encode( $data['settings'] ?? $this->default_settings() ),
-				'actions'     => wp_json_encode( $data['actions'] ?? [] ),
-				'status'      => $status,
-			],
-			[ '%s', '%s', '%s', '%s', '%s', '%s', '%s' ]
-		);
+		$row = [
+			'title'       => sanitize_text_field( $data['title'] ?? __( 'Untitled Form', 'formspress' ) ),
+			'description' => sanitize_textarea_field( $data['description'] ?? '' ),
+			'type'        => in_array( $data['type'] ?? 'standard', [ 'standard', 'flow' ], true ) ? $data['type'] : 'standard',
+			'fields'      => $fields_col,
+			'settings'    => wp_json_encode( $data['settings'] ?? $this->default_settings() ),
+			'actions'     => wp_json_encode( $data['actions'] ?? [] ),
+			'status'      => $status,
+		];
+		$formats = [ '%s', '%s', '%s', '%s', '%s', '%s', '%s' ];
+
+		if ( isset( $data['variants'] ) && $this->column_exists( 'variants' ) ) {
+			$row['variants'] = wp_json_encode( is_array( $data['variants'] ) ? $data['variants'] : [] );
+			$formats[]       = '%s';
+		}
+
+		$result = $wpdb->insert( $this->table, $row, $formats );
 
 		if ( $result && $wpdb->insert_id ) {
 			/**
@@ -191,6 +193,11 @@ class FormRepository {
 			$format[]          = '%s';
 		}
 
+		if ( isset( $data['variants'] ) && $this->column_exists( 'variants' ) ) {
+			$update['variants'] = wp_json_encode( is_array( $data['variants'] ) ? $data['variants'] : [] );
+			$format[]           = '%s';
+		}
+
 		if ( isset( $data['status'] ) && in_array( $data['status'], [ 'active', 'inactive', 'draft' ], true ) ) {
 			$update['status'] = $data['status'];
 			$format[]         = '%s';
@@ -235,13 +242,28 @@ class FormRepository {
 		}
 
 		return $this->create( [
-			'title'       => sprintf( __( '%s (Copy)', 'flowforms' ), $original['title'] ),
+			'title'       => sprintf( __( '%s (Copy)', 'formspress' ), $original['title'] ),
 			'description' => $original['description'],
 			'type'        => $original['type'],
 			'fields'      => $original['fields'],
 			'settings'    => $original['settings'],
 			'actions'     => $original['actions'],
+			'variants'    => $original['variants'] ?? [],
 		] );
+	}
+
+	private function column_exists( string $column ): bool {
+		global $wpdb;
+		static $cache = [];
+
+		$key = $this->table . '.' . $column;
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
+		}
+
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$result = $wpdb->get_results( "SHOW COLUMNS FROM {$this->table} LIKE '" . esc_sql( $column ) . "'" );
+		return $cache[ $key ] = ! empty( $result );
 	}
 
 	private function get_entries_count( int $form_id ): int {
@@ -252,16 +274,54 @@ class FormRepository {
 		);
 	}
 
+	private function sanitize_list( mixed $value, array $allowed ): array {
+		$raw = is_array( $value ) ? $value : explode( ',', (string) $value );
+		$sanitized = array_map(
+			static fn( $item ) => sanitize_text_field( (string) $item ),
+			$raw
+		);
+		$sanitized = array_filter( array_unique( $sanitized ) );
+
+		return array_values( array_intersect( $sanitized, $allowed ) );
+	}
+
+	private function append_in_condition( string &$where, array &$params, string $column, array $values ): void {
+		$placeholders = implode( ', ', array_fill( 0, count( $values ), '%s' ) );
+		$where .= " AND {$column} IN ({$placeholders})";
+		array_push( $params, ...$values );
+	}
+
 	public function default_settings(): array {
+		$global         = get_option( 'flowforms_settings', [] );
+		$success_action = $global['default_success_action'] ?? 'message';
+		$success_action = in_array( $success_action, [ 'message', 'redirect' ], true ) ? $success_action : 'message';
+
 		return [
-			'submit_label'    => __( 'Submit', 'flowforms' ),
-			'success_message' => __( 'Thank you! Your submission has been received.', 'flowforms' ),
-			'success_action'  => 'message',
-			'redirect_url'    => '',
-			'honeypot'        => true,
-			'show_title'      => false,
-			'show_description' => false,
-			'layout'          => 'stacked',
+			'submit_label'              => $this->setting_text( $global, 'default_submit_label', __( 'Submit', 'formspress' ) ),
+			'success_message'           => $this->setting_textarea( $global, 'default_success_message', __( 'Thank you! Your submission has been received.', 'formspress' ) ),
+			'success_action'            => $success_action,
+			'redirect_url'              => $this->setting_url( $global, 'default_redirect_url' ),
+			'honeypot'                  => true,
+			'show_title'                => false,
+			'show_description'          => false,
+			'layout'                    => 'stacked',
+			'prev_label'                => $this->setting_text( $global, 'default_prev_label', __( 'Back', 'formspress' ) ),
+			'next_label'                => $this->setting_text( $global, 'default_next_label', __( 'Next', 'formspress' ) ),
 		];
+	}
+
+	private function setting_text( array $settings, string $key, string $fallback ): string {
+		$value = isset( $settings[ $key ] ) ? trim( (string) $settings[ $key ] ) : '';
+		return '' === $value ? $fallback : sanitize_text_field( $value );
+	}
+
+	private function setting_textarea( array $settings, string $key, string $fallback ): string {
+		$value = isset( $settings[ $key ] ) ? trim( (string) $settings[ $key ] ) : '';
+		return '' === $value ? $fallback : sanitize_textarea_field( $value );
+	}
+
+	private function setting_url( array $settings, string $key ): string {
+		$value = isset( $settings[ $key ] ) ? trim( (string) $settings[ $key ] ) : '';
+		return '' === $value ? '' : esc_url_raw( $value );
 	}
 }

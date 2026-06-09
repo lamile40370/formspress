@@ -23,7 +23,7 @@ import {
  */
 const inner = [
 	heading( {
-		text: __( 'Start your free trial', 'flowforms' ),
+		text: __( 'Start your free trial', 'formspress' ),
 		size: '36px',
 		weight: '800',
 		align: 'center',
@@ -33,7 +33,7 @@ const inner = [
 	description( {
 		text: __(
 			'No credit card required. 14 days, full access, cancel anytime.',
-			'flowforms'
+			'formspress'
 		),
 		color: '#e2e8f0',
 		size: '16px',
@@ -41,17 +41,17 @@ const inner = [
 		marginBottom: '28px',
 	} ),
 	fieldText( {
-		label: __( 'Work email', 'flowforms' ),
+		label: __( 'Work email', 'formspress' ),
 		required: true,
 		placeholder: 'jane@company.com',
 	} ),
 	fieldEmail( {
-		label: __( 'Confirm email', 'flowforms' ),
+		label: __( 'Confirm email', 'formspress' ),
 		required: true,
 		placeholder: 'jane@company.com',
 	} ),
 	submitButton( {
-		text: __( "Get started — it's free", 'flowforms' ),
+		text: __( "Get started — it's free", 'formspress' ),
 		bg: '#ffffff',
 		fg: '#0f172a',
 		full: true,
@@ -84,10 +84,10 @@ const coverInlineStyle =
 const overlayInlineStyle = 'background-color:#0f172a';
 
 export default {
-	title: __( 'Cover hero', 'flowforms' ),
+	title: __( 'Cover hero', 'formspress' ),
 	description: __(
 		'Full-bleed cover block as the form root — hero headline + email capture.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [
 		'cover',

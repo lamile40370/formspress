@@ -26,7 +26,7 @@ class PatternRegistry {
 
 		register_block_pattern_category(
 			self::CATEGORY,
-			[ 'label' => __( 'FormsPress', 'flowforms' ) ]
+			[ 'label' => __( 'FormsPress', 'formspress' ) ]
 		);
 
 		$dir = FLOWFORMS_DIR . 'patterns/';

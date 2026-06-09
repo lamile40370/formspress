@@ -90,13 +90,13 @@ const SettingsPage = () => {
 			await put( SETTINGS, settings );
 			setNotice( {
 				type: 'success',
-				message: __( 'Settings saved.', 'flowforms' ),
+				message: __( 'Settings saved.', 'formspress' ),
 			} );
 		} catch ( e ) {
 			setNotice( {
 				type: 'error',
 				message:
-					e.message || __( 'Failed to save settings.', 'flowforms' ),
+					e.message || __( 'Failed to save settings.', 'formspress' ),
 			} );
 		} finally {
 			setSaving( false );
@@ -137,8 +137,8 @@ const SettingsPage = () => {
 
 	return (
 		<PageHeader
-			title={ __( 'Settings', 'flowforms' ) }
-			description={ __( 'Configure FormsPress global settings.', 'flowforms' ) }
+			title={ __( 'Settings', 'formspress' ) }
+			description={ __( 'Configure FormsPress global settings.', 'formspress' ) }
 			hideBack
 			right={
 				<Button
@@ -147,7 +147,7 @@ const SettingsPage = () => {
 					isBusy={ isSaving }
 					disabled={ isSaving }
 				>
-					{ __( 'Save Settings', 'flowforms' ) }
+					{ __( 'Save Settings', 'formspress' ) }
 				</Button>
 			}
 		>
@@ -159,12 +159,12 @@ const SettingsPage = () => {
 						<CardBody>
 							<VStack spacing={ 4 }>
 								<Heading level={ 4 }>
-									{ __( 'Email Defaults', 'flowforms' ) }
+									{ __( 'Email Defaults', 'formspress' ) }
 								</Heading>
 								<TextControl
 									label={ __(
 										'Default "From" Name',
-										'flowforms'
+										'formspress'
 									) }
 									value={ settings?.default_from_name || '' }
 									onChange={ set( 'default_from_name' ) }
@@ -174,7 +174,7 @@ const SettingsPage = () => {
 								<TextControl
 									label={ __(
 										'Default "From" Email',
-										'flowforms'
+										'formspress'
 									) }
 									type="email"
 									value={ settings?.default_from_email || '' }
@@ -190,16 +190,16 @@ const SettingsPage = () => {
 						<CardBody>
 							<VStack spacing={ 4 }>
 								<Heading level={ 4 }>
-									{ __( 'Privacy & Data', 'flowforms' ) }
+									{ __( 'Privacy & Data', 'formspress' ) }
 								</Heading>
 								<ToggleControl
 									label={ __(
 										'Log IP addresses',
-										'flowforms'
+										'formspress'
 									) }
 									help={ __(
 										'Store submitter IP address with each entry.',
-										'flowforms'
+										'formspress'
 									) }
 									checked={ !! settings?.ip_logging }
 									onChange={ set( 'ip_logging' ) }
@@ -208,7 +208,7 @@ const SettingsPage = () => {
 								<TextControl
 									label={ __(
 										'Entry retention (days)',
-										'flowforms'
+										'formspress'
 									) }
 									type="number"
 									value={ settings?.retention_days ?? 0 }
@@ -219,7 +219,7 @@ const SettingsPage = () => {
 									}
 									help={ __(
 										'Automatically delete entries older than this many days. 0 = keep forever.',
-										'flowforms'
+										'formspress'
 									) }
 									__nextHasNoMarginBottom
 									__next40pxDefaultSize
@@ -232,16 +232,16 @@ const SettingsPage = () => {
 						<CardBody>
 							<VStack spacing={ 4 }>
 								<Heading level={ 4 }>
-									{ __( 'Headless API', 'flowforms' ) }
+									{ __( 'Headless API', 'formspress' ) }
 								</Heading>
 								<ToggleControl
 									label={ __(
 										'Enable headless mode',
-										'flowforms'
+										'formspress'
 									) }
 									help={ __(
 										'Adds CORS headers and accepts ff_pub_<token> bearer auth for public form submissions.',
-										'flowforms'
+										'formspress'
 									) }
 									checked={ !! settings?.headless_mode }
 									onChange={ set( 'headless_mode' ) }
@@ -250,11 +250,11 @@ const SettingsPage = () => {
 								<TextareaControl
 									label={ __(
 										'Allowed CORS origins',
-										'flowforms'
+										'formspress'
 									) }
 									help={ __(
 										'One origin per line. Use * for any (dev only).',
-										'flowforms'
+										'formspress'
 									) }
 									value={ settings?.cors_origins ?? '*' }
 									onChange={ set( 'cors_origins' ) }
@@ -271,7 +271,7 @@ const SettingsPage = () => {
 								>
 									{ __(
 										'See docs/HEADLESS.md for the full reference.',
-										'flowforms'
+										'formspress'
 									) }
 								</p>
 							</VStack>
@@ -282,12 +282,12 @@ const SettingsPage = () => {
 						<CardBody>
 							<VStack spacing={ 4 }>
 								<Heading level={ 4 }>
-									{ __( 'Anti-spam', 'flowforms' ) }
+									{ __( 'Anti-spam', 'formspress' ) }
 								</Heading>
 								<SelectControl
 									label={ __(
 										'Active provider',
-										'flowforms'
+										'formspress'
 									) }
 									value={ spamProvider }
 									options={ [
@@ -295,7 +295,7 @@ const SettingsPage = () => {
 											value: 'none',
 											label: __(
 												'None (honeypot only)',
-												'flowforms'
+												'formspress'
 											),
 										},
 										...spamProviders.map( ( p ) => ( {

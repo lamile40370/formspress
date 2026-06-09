@@ -27,9 +27,9 @@ import StyleVariationsBrowser from './StyleVariationsBrowser';
  *   toggle.
  */
 const TABS = [
-	{ name: 'form', title: __( 'Form', 'flowforms' ) },
-	{ name: 'block', title: __( 'Block', 'flowforms' ) },
-	{ name: 'theme', title: __( 'Theme', 'flowforms' ) },
+	{ name: 'form', title: __( 'Form', 'formspress' ) },
+	{ name: 'block', title: __( 'Block', 'formspress' ) },
+	{ name: 'theme', title: __( 'Theme', 'formspress' ) },
 ];
 
 // Attempt the private-API unlock once, at module load.
@@ -102,7 +102,7 @@ const RightInspector = ( {
 					selectedTab={ activeTab }
 					onSelect={ onTabChange }
 					onClose={ onClose || ( () => {} ) }
-					closeButtonLabel={ __( 'Close settings', 'flowforms' ) }
+					closeButtonLabel={ __( 'Close settings', 'formspress' ) }
 				/>
 			</aside>
 		);

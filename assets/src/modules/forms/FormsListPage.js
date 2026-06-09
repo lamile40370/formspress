@@ -4,31 +4,33 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { useNavigate } from 'react-router-dom';
+import { applyFilters } from '@wordpress/hooks';
 import { get, post, del } from '../../api/client';
 import { FORMS, form as formEndpoint, formDup } from '../../api/endpoints';
 import PageHeader from '../../components/PageHeader';
 import EmptyState from '../../components/EmptyState';
 import Toast from '../../components/Toast';
+import { DataViews } from '@wordpress/dataviews';
 import useConfirmDialog from '../../hooks/useConfirmDialog';
 import useDataViewPreferences from '../../hooks/useDataViewPreferences';
 import TemplateBrowser from './TemplateBrowser';
+import { setFilterParam } from '../../utils/dataviewsFilters';
 
 const TYPE_LABELS = {
-	standard: __( 'Standard', 'flowforms' ),
-	flow: __( 'Flow', 'flowforms' ),
+	standard: __( 'Standard', 'formspress' ),
+	flow: __( 'Flow', 'formspress' ),
 };
 const TYPE_STYLES = {
 	standard: { backgroundColor: '#e7f5ea', color: '#00a32a' },
 	flow: { backgroundColor: '#f0f6ff', color: '#2271b1' },
 };
 const STATUS_LABELS = {
-	active: __( 'Active', 'flowforms' ),
-	inactive: __( 'Inactive', 'flowforms' ),
-	draft: __( 'Draft', 'flowforms' ),
-	trash: __( 'Trash', 'flowforms' ),
+	active: __( 'Active', 'formspress' ),
+	inactive: __( 'Inactive', 'formspress' ),
+	draft: __( 'Draft', 'formspress' ),
+	trash: __( 'Trash', 'formspress' ),
 };
 const STATUS_STYLES = {
 	active: { backgroundColor: '#e7f5ea', color: '#00a32a' },
@@ -53,6 +55,7 @@ const Badge = ( { label, style } ) => (
 
 const FormsListPage = () => {
 	const navigate = useNavigate();
+	const isProActive = !! window.flowFormsData?.pro?.active;
 	const [ forms, setForms ] = useState( [] );
 	const [ total, setTotal ] = useState( 0 );
 	const [ isLoading, setLoading ] = useState( true );
@@ -77,8 +80,8 @@ const FormsListPage = () => {
 			const params = { page: view.page, per_page: view.perPage };
 			const statusF = view.filters?.find( ( f ) => f.field === 'status' );
 			const typeF = view.filters?.find( ( f ) => f.field === 'type' );
-			if ( statusF?.value ) params.status = statusF.value;
-			if ( typeF?.value ) params.type = typeF.value;
+			setFilterParam( params, 'status', statusF );
+			setFilterParam( params, 'type', typeF );
 			if ( view.search ) params.search = view.search;
 			if ( view.sort?.field ) {
 				params.sort = view.sort.field;
@@ -90,7 +93,7 @@ const FormsListPage = () => {
 			setTotal( res.total || 0 );
 			setError( null );
 		} catch ( e ) {
-			setError( e.message || __( 'Failed to load forms.', 'flowforms' ) );
+			setError( e.message || __( 'Failed to load forms.', 'formspress' ) );
 		} finally {
 			setLoading( false );
 		}
@@ -108,16 +111,16 @@ const FormsListPage = () => {
 					count === 1
 						? __(
 								'Delete this form and all its entries?',
-								'flowforms'
+								'formspress'
 						  )
 						: sprintf(
 								__(
 									'Delete %d forms and all their entries?',
-									'flowforms'
+									'formspress'
 								),
 								count
 						  ),
-				confirmButtonText: __( 'Delete', 'flowforms' ),
+				confirmButtonText: __( 'Delete', 'formspress' ),
 			} );
 			if ( ! confirmed ) return;
 			try {
@@ -133,15 +136,15 @@ const FormsListPage = () => {
 					type: 'success',
 					message:
 						count === 1
-							? __( 'Form deleted.', 'flowforms' )
+							? __( 'Form deleted.', 'formspress' )
 							: sprintf(
-									__( '%d forms deleted.', 'flowforms' ),
+									__( '%d forms deleted.', 'formspress' ),
 									count
 							  ),
 				} );
 			} catch ( e ) {
 				setError(
-					e.message || __( 'Failed to delete forms.', 'flowforms' )
+					e.message || __( 'Failed to delete forms.', 'formspress' )
 				);
 			}
 		},
@@ -155,11 +158,11 @@ const FormsListPage = () => {
 			setTotal( ( prev ) => prev + 1 );
 			setNotice( {
 				type: 'success',
-				message: __( 'Form duplicated.', 'flowforms' ),
+				message: __( 'Form duplicated.', 'formspress' ),
 			} );
 		} catch ( e ) {
 			setError(
-				e.message || __( 'Failed to duplicate form.', 'flowforms' )
+				e.message || __( 'Failed to duplicate form.', 'formspress' )
 			);
 		}
 	}, [] );
@@ -168,7 +171,7 @@ const FormsListPage = () => {
 		() => [
 			{
 				id: 'title',
-				label: __( 'Title', 'flowforms' ),
+				label: __( 'Title', 'formspress' ),
 				enableGlobalSearch: true,
 				enableSorting: true,
 				render: ( { item } ) => (
@@ -192,12 +195,12 @@ const FormsListPage = () => {
 			},
 			{
 				id: 'type',
-				label: __( 'Type', 'flowforms' ),
+				label: __( 'Type', 'formspress' ),
 				enableSorting: false,
-				filterBy: { operators: [ 'is' ] },
+				filterBy: { operators: [ 'isAny' ] },
 				elements: [
-					{ value: 'standard', label: __( 'Standard', 'flowforms' ) },
-					{ value: 'flow', label: __( 'Flow', 'flowforms' ) },
+					{ value: 'standard', label: __( 'Standard', 'formspress' ) },
+					{ value: 'flow', label: __( 'Flow', 'formspress' ) },
 				],
 				render: ( { item } ) => (
 					<Badge
@@ -208,9 +211,9 @@ const FormsListPage = () => {
 			},
 			{
 				id: 'status',
-				label: __( 'Status', 'flowforms' ),
+				label: __( 'Status', 'formspress' ),
 				enableSorting: true,
-				filterBy: { operators: [ 'is' ] },
+				filterBy: { operators: [ 'isAny' ] },
 				elements: Object.entries( STATUS_LABELS ).map(
 					( [ value, label ] ) => ( { value, label } )
 				),
@@ -223,7 +226,7 @@ const FormsListPage = () => {
 			},
 			{
 				id: 'entries_count',
-				label: __( 'Entries', 'flowforms' ),
+				label: __( 'Entries', 'formspress' ),
 				enableSorting: false,
 				render: ( { item } ) => (
 					<Button
@@ -238,7 +241,7 @@ const FormsListPage = () => {
 			},
 			{
 				id: 'created_at',
-				label: __( 'Created', 'flowforms' ),
+				label: __( 'Created', 'formspress' ),
 				enableSorting: true,
 				render: ( { item } ) => (
 					<Text>
@@ -268,48 +271,69 @@ const FormsListPage = () => {
 			}
 			setNotice( {
 				type: 'success',
-				message: __( 'Shortcode copied to clipboard.', 'flowforms' ),
+				message: __( 'Shortcode copied to clipboard.', 'formspress' ),
 			} );
 		} catch ( e ) {
-			setError( __( 'Could not copy the shortcode.', 'flowforms' ) );
+			setError( __( 'Could not copy the shortcode.', 'formspress' ) );
 		}
 	}, [] );
 
 	const actions = useMemo(
-		() => [
+		() =>
+			applyFilters(
+				'flowforms.forms.list.actions',
+				[
 			{
 				id: 'edit',
-				label: __( 'Edit', 'flowforms' ),
+				label: __( 'Edit', 'formspress' ),
 				isPrimary: true,
 				icon: 'edit',
 				callback: ( [ f ] ) => navigate( `/forms/${ f.id }/edit` ),
 			},
 			{
 				id: 'entries',
-				label: __( 'View Entries', 'flowforms' ),
+				label: __( 'View Entries', 'formspress' ),
 				callback: ( [ f ] ) => navigate( `/forms/${ f.id }/entries` ),
 			},
+			...( isProActive
+				? []
+				: [
+						{
+							id: 'analytics',
+							label: __( 'Analytics', 'formspress' ),
+							callback: ( [ f ] ) =>
+								navigate( `/forms/${ f.id }/analytics` ),
+						},
+				  ] ),
 			/* Quick clipboard copy of the universal shortcode so users can
 			 * paste it into page builders without opening the form editor. */
 			{
 				id: 'copy-shortcode',
-				label: __( 'Copy shortcode', 'flowforms' ),
+				label: __( 'Copy shortcode', 'formspress' ),
 				callback: handleCopyShortcode,
 			},
 			{
 				id: 'duplicate',
-				label: __( 'Duplicate', 'flowforms' ),
+				label: __( 'Duplicate', 'formspress' ),
 				callback: handleDuplicate,
 			},
 			{
 				id: 'delete',
-				label: __( 'Delete', 'flowforms' ),
+				label: __( 'Delete', 'formspress' ),
 				isDestructive: true,
 				supportsBulk: true,
 				callback: handleDelete,
 			},
-		],
-		[ navigate, handleDelete, handleDuplicate, handleCopyShortcode ]
+				],
+				{ navigate }
+			),
+		[
+			navigate,
+			isProActive,
+			handleDelete,
+			handleDuplicate,
+			handleCopyShortcode,
+		]
 	);
 
 	const showEmpty =
@@ -320,12 +344,12 @@ const FormsListPage = () => {
 	return (
 		<PageHeader
 			className="ff-page ff-page--dataviews"
-			title={ __( 'Forms', 'flowforms' ) }
-			description={ __( 'Create and manage your forms.', 'flowforms' ) }
+			title={ __( 'Forms', 'formspress' ) }
+			description={ __( 'Create and manage your forms.', 'formspress' ) }
 			hideBack
 			right={
 				<Button variant="primary" onClick={ () => setBrowser( true ) }>
-					{ __( 'New Form', 'flowforms' ) }
+					{ __( 'New Form', 'formspress' ) }
 				</Button>
 			}
 		>
@@ -343,15 +367,15 @@ const FormsListPage = () => {
 				{ showEmpty ? (
 					<EmptyState
 						icon="feedback"
-						title={ __( 'No forms yet', 'flowforms' ) }
+						title={ __( 'No forms yet', 'formspress' ) }
 						description={ __(
 							'Create your first form to start collecting submissions.',
-							'flowforms'
+							'formspress'
 						) }
 						action={ () => setBrowser( true ) }
 						actionLabel={ __(
 							'Create Your First Form',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				) : (

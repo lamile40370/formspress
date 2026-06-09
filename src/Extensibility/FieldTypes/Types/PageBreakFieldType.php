@@ -11,7 +11,7 @@ class PageBreakFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Page Break', 'flowforms' );
+		return __( 'Page Break', 'formspress' );
 	}
 
 	public function get_group(): string {

@@ -15,10 +15,10 @@ import {
  * helpfulness, page-rating widgets.
  */
 export default {
-	title: __( 'Feedback', 'flowforms' ),
+	title: __( 'Feedback', 'formspress' ),
 	description: __(
 		'Rate experience + free-form comment. Mint card, green accent.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [ 'feedback', 'rating', 'survey', 'review', 'nps' ],
 	content: styledGroup( {
@@ -30,7 +30,7 @@ export default {
 		maxWidth: '520px',
 		inner: [
 			heading( {
-				text: __( 'Help us improve', 'flowforms' ),
+				text: __( 'Help us improve', 'formspress' ),
 				size: '24px',
 				weight: '700',
 				color: '#065f46',
@@ -38,38 +38,38 @@ export default {
 			description( {
 				text: __(
 					'Two minutes — your feedback shapes the next release.',
-					'flowforms'
+					'formspress'
 				),
 				color: '#047857',
 				size: '14px',
 				marginBottom: '20px',
 			} ),
 			fieldRadio( {
-				label: __( 'How was your experience?', 'flowforms' ),
+				label: __( 'How was your experience?', 'formspress' ),
 				required: true,
 				options: [
 					{
-						label: __( 'Excellent', 'flowforms' ),
+						label: __( 'Excellent', 'formspress' ),
 						value: 'excellent',
 					},
-					{ label: __( 'Good', 'flowforms' ), value: 'good' },
-					{ label: __( 'Average', 'flowforms' ), value: 'average' },
-					{ label: __( 'Poor', 'flowforms' ), value: 'poor' },
+					{ label: __( 'Good', 'formspress' ), value: 'good' },
+					{ label: __( 'Average', 'formspress' ), value: 'average' },
+					{ label: __( 'Poor', 'formspress' ), value: 'poor' },
 				],
 			} ),
 			fieldTextarea( {
-				label: __( 'Anything we should know?', 'flowforms' ),
+				label: __( 'Anything we should know?', 'formspress' ),
 				rows: 4,
 			} ),
 			fieldEmail( {
-				label: __( 'Email (optional)', 'flowforms' ),
+				label: __( 'Email (optional)', 'formspress' ),
 				placeholder: __(
 					"We'll only use it to follow up.",
-					'flowforms'
+					'formspress'
 				),
 			} ),
 			submitButton( {
-				text: __( 'Send feedback', 'flowforms' ),
+				text: __( 'Send feedback', 'formspress' ),
 				bg: '#059669',
 				fg: '#ffffff',
 			} ),

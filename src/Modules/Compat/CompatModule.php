@@ -14,8 +14,8 @@ use FlowForms\Modules\Forms\Services\FormRepository;
  *
  * Currently covers translation tooling (WPML + Polylang). The shape is
  * generic so additional compat providers can plug in via:
- *   - `flowforms_translate_string` filter (translate)
- *   - `flowforms_register_string` action (register)
+ *   - `formspress_translate_string` filter (translate)
+ *   - `formspress_register_string` action (register)
  */
 class CompatModule extends AbstractModule {
 
@@ -26,7 +26,7 @@ class CompatModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Compatibility', 'flowforms' );
+		return __( 'Compatibility', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {

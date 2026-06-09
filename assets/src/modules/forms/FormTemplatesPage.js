@@ -1,11 +1,11 @@
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import Badge from '../../components/Badge';
 import Toast from '../../components/Toast';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { get, post } from '../../api/client';
 import { TEMPLATES, templateCreate } from '../../api/endpoints';
 import registerBlocks from './standard-builder/blocks/register';
@@ -13,8 +13,8 @@ import registerBlocks from './standard-builder/blocks/register';
 registerBlocks();
 
 const TYPE_LABELS = {
-	standard: __( 'Standard', 'flowforms' ),
-	flow: __( 'Flow', 'flowforms' ),
+	standard: __( 'Standard', 'formspress' ),
+	flow: __( 'Flow', 'formspress' ),
 };
 const TYPE_STYLES = {
 	standard: { backgroundColor: '#e7f5ea', color: '#00a32a' },
@@ -53,6 +53,15 @@ const parseBlockAttrs = ( raw = '' ) => {
 
 const stripGutenbergComments = ( html = '' ) =>
 	html.replace( /<!--\s*\/?wp:[\s\S]*?-->/g, '' );
+
+const shuffleTemplates = ( templates = [] ) => {
+	const shuffled = [ ...templates ];
+	for ( let i = shuffled.length - 1; i > 0; i-- ) {
+		const j = Math.floor( Math.random() * ( i + 1 ) );
+		[ shuffled[ i ], shuffled[ j ] ] = [ shuffled[ j ], shuffled[ i ] ];
+	}
+	return shuffled;
+};
 
 const normalizePlaceholderImages = ( html = '' ) =>
 	html.replace(
@@ -294,21 +303,163 @@ const renderTemplateMarkup = ( markup = '' ) => {
 	return stripGutenbergComments( html ).trim();
 };
 
+const normalizeFieldOptions = ( options = [] ) =>
+	( Array.isArray( options ) ? options : [] ).map( ( option ) => {
+		if ( option && 'object' === typeof option ) {
+			return {
+				label: option.label ?? option.value ?? '',
+				value: option.value ?? option.label ?? '',
+			};
+		}
+		return { label: option, value: option };
+	} );
+
+const previewFieldType = ( field = {} ) => {
+	if ( FIELD_TYPES.includes( field.type ) ) return field.type;
+	if ( 'yes_no' === field.type ) return 'radio';
+	if ( 'rating' === field.type || 'nps' === field.type ) return 'radio';
+	if ( 'phone' === field.type ) return 'text';
+	return 'text';
+};
+
+const previewFieldAttrs = ( field = {} ) => {
+	let options = normalizeFieldOptions( field.options );
+	if ( 'yes_no' === field.type ) {
+		options = [
+			{ label: field.yes_label || __( 'Yes', 'formspress' ), value: 'yes' },
+			{ label: field.no_label || __( 'No', 'formspress' ), value: 'no' },
+		];
+	}
+	if ( 'rating' === field.type ) {
+		const max = Number( field.max || 5 );
+		options = Array.from( { length: max }, ( _, index ) => ( {
+			label: String( index + 1 ),
+			value: String( index + 1 ),
+		} ) );
+	}
+	if ( 'nps' === field.type ) {
+		options = Array.from( { length: 11 }, ( _, index ) => ( {
+			label: String( index ),
+			value: String( index ),
+		} ) );
+	}
+	return {
+		fieldId: field.id || field.fieldId || field.label || 'field',
+		label: field.label || __( 'Your answer', 'formspress' ),
+		required: !! field.required,
+		options,
+		rows: field.rows || 4,
+		placeholder: field.placeholder || '',
+	};
+};
+
+const renderFallbackField = ( field ) => {
+	if ( ! field ) return '';
+	return renderFieldBlock(
+		previewFieldType( field ),
+		previewFieldAttrs( field ),
+		''
+	);
+};
+
+const renderFallbackPreview = ( item = {} ) => {
+	const fields = Array.isArray( item.fields ) ? item.fields : [];
+	const title =
+		item.settings?.welcome_title ||
+		item.title ||
+		item.label ||
+		__( 'Template', 'formspress' );
+	const description =
+		item.settings?.welcome_description || item.description || '';
+
+	if ( 'flow' === item.type ) {
+		const currentField = fields[ 0 ];
+		return `<section class="ff-flow-template-preview"><div class="ff-flow-template-preview__progress"><span></span><span></span><span></span></div><h2>${ escapeHtml(
+			title
+		) }</h2>${
+			description ? `<p>${ escapeHtml( description ) }</p>` : ''
+		}<div class="ff-flow-template-preview__question">${ renderFallbackField(
+			currentField
+		) }</div><button class="ff-form__submit" type="button">${ escapeHtml(
+			item.settings?.start_label || __( 'Start', 'formspress' )
+		) }</button></section>`;
+	}
+
+	return `<section class="ff-schema-template-preview"><h2>${ escapeHtml(
+		title
+	) }</h2>${
+		description ? `<p>${ escapeHtml( description ) }</p>` : ''
+	}${ fields.slice( 0, 5 ).map( renderFallbackField ).join( '' ) }</section>`;
+};
+
 const templatePreviewStyles = `
-	*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;color:#111827;background:#f8fafc}body{overflow:auto}.ff-template-preview-doc{padding:20px;min-width:320px}.ff-form{--ff-color-primary:#2271b1;--ff-color-text:#111827;--ff-color-bg:#fff;--ff-color-border:#d1d5db;--ff-font-size:16px;--ff-font-family:inherit;--ff-border-radius:8px;--ff-spacing:16px;color:var(--ff-color-text);font-family:var(--ff-font-family);font-size:var(--ff-font-size);max-width:760px;margin:0 auto}.wp-block-group{position:relative}.wp-block-group>*:first-child,.wp-block-column>*:first-child{margin-top:0}.wp-block-group>*:last-child,.wp-block-column>*:last-child{margin-bottom:0}.wp-block-columns{display:flex;gap:32px;align-items:stretch}.wp-block-column{flex:1;min-width:0}.wp-block-cover{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff}.wp-block-cover__image-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.wp-block-cover__background{position:absolute;inset:0}.wp-block-cover__inner-container{position:relative;z-index:1;width:100%;max-width:inherit}.wp-block-image{margin:0 0 20px}.wp-block-image img{display:block;width:100%;height:auto}.wp-block-heading{margin-top:0}.has-text-align-center{text-align:center}.wp-block-button{display:inline-block}.wp-block-button.has-custom-width{display:block}.wp-block-button__width-100 .wp-block-button__link{width:100%}.wp-block-button__link{border:0;cursor:default;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}.ff-form__field{margin-bottom:1.25em}.ff-form__label{display:block;font-size:.875em;font-weight:600;margin-bottom:.4em}.ff-form__required{color:#d63638;margin-left:2px;font-weight:700}.ff-form__field-content{margin-bottom:.4em}.ff-form__field-content>*{margin-bottom:.35em;margin-top:0}.ff-form__field-content>:last-child{margin-bottom:0}.ff-form__field-content .ff-field-label{font-size:.875em;font-weight:700;line-height:1.25}.ff-form__field-content .ff-field-help{font-size:.8em;line-height:1.45;opacity:.72}.ff-form__field.is-required .ff-field-label:after{color:#d63638;content:" *";font-weight:700}.ff-form__description-text{color:#606060;font-size:.8em;margin-bottom:.4em}.ff-form__input,.ff-form__select,.ff-form__textarea{background-color:var(--ff-color-bg);border:1px solid var(--ff-color-border);border-radius:var(--ff-border-radius);box-sizing:border-box;color:var(--ff-color-text);display:block;font-family:var(--ff-font-family);font-size:var(--ff-font-size);max-width:100%;padding:10px 14px;width:100%}.ff-form__textarea{min-height:120px;resize:none}.ff-form__choices{display:flex;flex-direction:column;gap:8px}.ff-form__choice{align-items:center;display:flex;font-weight:400;gap:8px}.ff-form__fieldset{border:0;margin:0;padding:0}.ff-form__footer{align-items:center;display:flex;gap:12px;margin-top:1.5em}.ff-form__footer .wp-block-buttons{width:100%}.ff-form__submit{background-color:var(--ff-color-primary);border:none;border-radius:var(--ff-border-radius);color:#fff;font-family:var(--ff-font-family);font-size:var(--ff-font-size);font-weight:600;padding:12px 28px}.ff-form__field-error,.ff-form__honeypot,.screen-reader-text{display:none!important}@media(max-width:520px){.ff-template-preview-doc{padding:14px}.wp-block-columns{flex-direction:column;gap:18px}}
+	*{box-sizing:border-box}
+	html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;color:#111827;background:#f8fafc}
+	body{overflow:hidden}
+	:root{--ff-preview-scale:.76}
+	.ff-template-preview-doc{width:calc(100% / var(--ff-preview-scale));min-width:720px;padding:16px;transform:scale(var(--ff-preview-scale));transform-origin:top left}
+	.ff-form{--ff-color-primary:#2271b1;--ff-color-text:#111827;--ff-color-bg:#fff;--ff-color-border:#d1d5db;--ff-font-size:16px;--ff-font-family:inherit;--ff-border-radius:8px;--ff-spacing:16px;color:var(--ff-color-text);font-family:var(--ff-font-family);font-size:var(--ff-font-size);max-width:980px;margin:0 auto}
+	.wp-block-group{position:relative}
+	.wp-block-group>*:first-child,.wp-block-column>*:first-child{margin-top:0}
+	.wp-block-group>*:last-child,.wp-block-column>*:last-child{margin-bottom:0}
+	.wp-block-columns{display:flex;gap:28px;align-items:stretch}
+	.wp-block-column{flex:1;min-width:0}
+	.wp-block-cover{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff}
+	.wp-block-cover__image-background{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+	.wp-block-cover__background{position:absolute;inset:0}
+	.wp-block-cover__inner-container{position:relative;z-index:1;width:100%;max-width:inherit}
+	.wp-block-image{margin:0 0 18px}
+	.wp-block-image img{display:block;width:100%;height:auto}
+	.wp-block-heading{margin-top:0}
+	.has-text-align-center{text-align:center}
+	.wp-block-button{display:inline-block}
+	.wp-block-button.has-custom-width{display:block}
+	.wp-block-button__width-100 .wp-block-button__link{width:100%}
+	.wp-block-button__link{border:0;cursor:default;display:inline-flex;align-items:center;justify-content:center;text-decoration:none}
+	.ff-form__field{margin-bottom:1em}
+	.ff-form__label{display:block;font-size:.875em;font-weight:600;margin-bottom:.4em}
+	.ff-form__required{color:#d63638;margin-left:2px;font-weight:700}
+	.ff-form__field-content{margin-bottom:.4em}
+	.ff-form__field-content>*{margin-bottom:.35em;margin-top:0}
+	.ff-form__field-content>:last-child{margin-bottom:0}
+	.ff-form__field-content .ff-field-label{font-size:.875em;font-weight:700;line-height:1.25}
+	.ff-form__field-content .ff-field-help{font-size:.8em;line-height:1.45;opacity:.72}
+	.ff-form__field.is-required .ff-field-label:after{color:#d63638;content:" *";font-weight:700}
+	.ff-form__description-text{color:#606060;font-size:.8em;margin-bottom:.4em}
+	.ff-form__input,.ff-form__select,.ff-form__textarea{background-color:var(--ff-color-bg);border:1px solid var(--ff-color-border);border-radius:var(--ff-border-radius);box-sizing:border-box;color:var(--ff-color-text);display:block;font-family:var(--ff-font-family);font-size:var(--ff-font-size);max-width:100%;padding:10px 14px;width:100%}
+	.ff-form__textarea{min-height:112px;resize:none}
+	.ff-form__choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+	.ff-form__choice{align-items:center;display:flex;font-weight:400;gap:8px}
+	.ff-form__fieldset{border:0;margin:0;padding:0}
+	.ff-form__footer{align-items:center;display:flex;gap:12px;margin-top:1.25em}
+	.ff-form__footer .wp-block-buttons{width:100%}
+	.ff-form__submit{background-color:var(--ff-color-primary);border:none;border-radius:var(--ff-border-radius);color:#fff;font-family:var(--ff-font-family);font-size:var(--ff-font-size);font-weight:600;padding:12px 28px}
+	.ff-form__field-error,.ff-form__honeypot,.screen-reader-text{display:none!important}
+	.ff-flow-template-preview,.ff-schema-template-preview{min-height:100%;border:1px solid #dbe3ea;border-radius:22px;background:#fff;padding:42px;box-shadow:0 18px 60px rgba(15,23,42,.08)}
+	.ff-flow-template-preview{display:flex;min-height:560px;flex-direction:column;justify-content:center;background:#111827;color:#f8fafc}
+	.ff-flow-template-preview h2,.ff-schema-template-preview h2{margin:0 0 10px;font-size:34px;line-height:1.1}
+	.ff-flow-template-preview p,.ff-schema-template-preview p{margin:0 0 24px;color:inherit;opacity:.72;font-size:15px;line-height:1.55}
+	.ff-flow-template-preview__progress{display:flex;gap:8px;margin-bottom:28px}
+	.ff-flow-template-preview__progress span{display:block;height:6px;flex:1;border-radius:999px;background:rgba(255,255,255,.22)}
+	.ff-flow-template-preview__progress span:first-child{background:#38bdf8}
+	.ff-flow-template-preview__question{margin-bottom:18px}
+	.ff-flow-template-preview .ff-form__choice span{color:#f8fafc}
+	.ff-flow-template-preview .ff-form__choices{grid-template-columns:repeat(3,minmax(0,1fr))}
+	.ff-flow-template-preview .ff-form__submit{background:#38bdf8;color:#082f49}
+	@media(max-width:520px){:root{--ff-preview-scale:.62}.ff-template-preview-doc{min-width:640px;padding:12px}.wp-block-columns{gap:18px}}
 `;
 
 const buildPreviewDocument = ( item ) => {
 	const body = item?.block_markup
 		? renderTemplateMarkup( item.block_markup )
-		: '';
+		: renderFallbackPreview( item );
 	return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${ templatePreviewStyles }</style></head><body><main class="ff-template-preview-doc"><form class="ff-form ff-form--standard">${ body }</form></main></body></html>`;
 };
 
-const TemplatePreview = ( { item } ) => (
+export const TemplatePreview = ( { item } ) => (
 	<div className="formspress-template-preview">
 		<iframe
-			title={ item?.title || item?.label || __( 'Template preview', 'flowforms' ) }
+			title={ item?.title || item?.label || __( 'Template preview', 'formspress' ) }
 			srcDoc={ buildPreviewDocument( item ) }
 			loading="lazy"
 		/>
@@ -357,14 +508,14 @@ const FormTemplatesPage = () => {
 					: [];
 				// Normalise — DataViews wants `title` not `label`.
 				setList(
-					merged.map( ( t ) => ( {
+					shuffleTemplates( merged ).map( ( t ) => ( {
 						...t,
 						title: t.label || t.title || t.id,
 					} ) )
 				);
 			} )
 			.catch( () =>
-				setError( __( 'Could not load templates.', 'flowforms' ) )
+				setError( __( 'Could not load templates.', 'formspress' ) )
 			);
 	}, [] );
 
@@ -380,7 +531,7 @@ const FormTemplatesPage = () => {
 				e.message ||
 					__(
 						'Could not create the form from this template.',
-						'flowforms'
+						'formspress'
 					)
 			);
 		} finally {
@@ -388,40 +539,23 @@ const FormTemplatesPage = () => {
 		}
 	};
 
-	// Client-side filter + search (we have all templates loaded already).
-	const filtered = useMemo( () => {
-		if ( ! list ) return [];
-		const search = ( view.search || '' ).trim().toLowerCase();
-		const typeF = view.filters?.find( ( f ) => 'type' === f.field );
-		return list.filter( ( t ) => {
-			if ( typeF?.value && t.type !== typeF.value ) return false;
-			if ( search ) {
-				const hay = `${ t.title } ${
-					t.description || ''
-				}`.toLowerCase();
-				if ( ! hay.includes( search ) ) return false;
-			}
-			return true;
-		} );
-	}, [ list, view.search, view.filters ] );
-
 	const fields = useMemo(
 		() => [
 			{
 				id: 'title',
-				label: __( 'Name', 'flowforms' ),
+				label: __( 'Name', 'formspress' ),
 				enableGlobalSearch: true,
 				enableSorting: true,
 			},
 			{
 				id: 'description',
-				label: __( 'Description', 'flowforms' ),
+				label: __( 'Description', 'formspress' ),
 				enableGlobalSearch: true,
 			},
 			{
 				id: 'type',
-				label: __( 'Type', 'flowforms' ),
-				filterBy: { operators: [ 'is' ] },
+				label: __( 'Type', 'formspress' ),
+				filterBy: { operators: [ 'isAny' ] },
 				elements: Object.entries( TYPE_LABELS ).map(
 					( [ value, label ] ) => ( { value, label } )
 				),
@@ -433,18 +567,23 @@ const FormTemplatesPage = () => {
 			},
 			{
 				id: 'preview',
-				label: __( 'Preview', 'flowforms' ),
+				label: __( 'Preview', 'formspress' ),
 				render: ( { item } ) => <TemplatePreview item={ item } />,
 			},
 		],
 		[]
+		);
+
+	const { data: shownTemplates, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( list || [], view, fields ),
+		[ list, view, fields ]
 	);
 
 	const actions = useMemo(
 		() => [
 			{
 				id: 'use',
-				label: __( 'Use template', 'flowforms' ),
+				label: __( 'Use template', 'formspress' ),
 				isPrimary: true,
 				callback: ( items ) => {
 					const t = items?.[ 0 ];
@@ -463,18 +602,13 @@ const FormTemplatesPage = () => {
 		);
 	}
 
-	const paginationInfo = {
-		totalItems: filtered.length,
-		totalPages: Math.max( 1, Math.ceil( filtered.length / view.perPage ) ),
-	};
-
 	return (
 		<PageHeader
 			className="ff-page ff-page--dataviews"
-			title={ __( 'Templates', 'flowforms' ) }
+			title={ __( 'Templates', 'formspress' ) }
 			description={ __(
 				'Start from a curated form template — multi-step quizzes, contact, surveys, RSVP and more.',
-				'flowforms'
+				'formspress'
 			) }
 		>
 			<div className="ff-page__body">
@@ -483,8 +617,8 @@ const FormTemplatesPage = () => {
 					onRemove={ () => setError( null ) }
 				/>
 				<div className="ff-dataviews-container">
-					<DataViews
-						data={ filtered }
+						<DataViews
+							data={ shownTemplates }
 						fields={ fields }
 						view={ view }
 						onChangeView={ setView }

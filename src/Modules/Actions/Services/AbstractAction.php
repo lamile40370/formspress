@@ -14,8 +14,11 @@ abstract class AbstractAction {
 	 * Field descriptors used to auto-render the action's settings UI.
 	 *
 	 * Each descriptor is an associative array with at least `key`, `type` and `label`.
-	 * Supported `type` values: text, textarea, select, toggle, url, password, number.
-	 * Optional keys: help, placeholder, default, options (select), rows (textarea), min/max (number).
+	 * Supported `type` values: text, textarea, select, toggle, url, password, number,
+	 * multi-select, field-select, field-mapping-repeater, email-designer, email-template-picker,
+	 * wp-page-token, key-value-repeater, section.
+	 * Optional keys: help, placeholder, default, options (select), rows (textarea),
+	 * min/max (number), depends_on.
 	 *
 	 * @return array<int, array<string, mixed>>
 	 */

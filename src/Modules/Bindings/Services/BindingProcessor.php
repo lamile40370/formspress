@@ -227,7 +227,7 @@ class BindingProcessor {
 		if ( ! post_type_exists( $post_type ) ) {
 			$this->log( sprintf(
 				/* translators: %s post type slug */
-				__( 'Register the CPT %s in your theme/functions.php before using this binding.', 'flowforms' ),
+				__( 'Register the CPT %s in your theme/functions.php before using this binding.', 'formspress' ),
 				$post_type
 			) );
 			return 0;

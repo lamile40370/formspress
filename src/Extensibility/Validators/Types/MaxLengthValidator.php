@@ -11,12 +11,12 @@ class MaxLengthValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Maximum length', 'flowforms' );
+		return __( 'Maximum length', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'max', 'type' => 'number', 'label' => __( 'Maximum characters', 'flowforms' ), 'default' => 255, 'min' => 1 ],
+			[ 'key' => 'max', 'type' => 'number', 'label' => __( 'Maximum characters', 'formspress' ), 'default' => 255, 'min' => 1 ],
 		];
 	}
 
@@ -28,7 +28,7 @@ class MaxLengthValidator extends AbstractValidator {
 		if ( mb_strlen( (string) $value ) > $max ) {
 			return sprintf(
 				/* translators: %d is maximum length */
-				__( 'Must be no more than %d characters.', 'flowforms' ),
+				__( 'Must be no more than %d characters.', 'formspress' ),
 				$max
 			);
 		}

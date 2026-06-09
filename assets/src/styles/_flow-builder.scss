@@ -1060,13 +1060,31 @@
    ───────────────────────────────────────────────────────────────────── */
 
 .ff-template-browser-modal {
-	width: min(1100px, 92vw);
+	width: min(1480px, calc(100vw - 48px)) !important;
+	max-width: calc(100vw - 48px) !important;
+	height: min(860px, calc(100vh - 48px));
+	max-height: calc(100vh - 48px);
+
+	.components-modal__content {
+		display: flex;
+		flex-direction: column;
+		height: calc(100% - 72px);
+		min-height: 0;
+		overflow: hidden;
+
+		> div:not( .components-modal__header ) {
+			display: flex;
+			flex: 1 1 auto;
+			min-height: 0;
+		}
+	}
 }
 
 .ff-template-browser {
 	display: flex;
-	gap: 24px;
-	min-height: 480px;
+	flex: 1;
+	min-height: 0 !important;
+	overflow: hidden;
 
 	&__sidebar {
 		flex: 0 0 240px;
@@ -1108,6 +1126,41 @@
 	&__main {
 		flex: 1;
 		min-width: 0;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+
+		.dataviews-wrapper {
+			flex: 1;
+			min-height: 0;
+			overflow: hidden;
+		}
+
+		.dataviews-view-grid,
+		.dataviews-view-table,
+		.dataviews-no-results {
+			flex: 1 1 auto;
+			min-height: 0;
+		}
+
+		.dataviews-view-grid,
+		.dataviews-view-table {
+			overflow-y: auto;
+		}
+
+		.dataviews-footer {
+			margin-top: auto;
+		}
+
+		.dataviews-view-grid__media:has( .formspress-template-preview ) {
+			aspect-ratio: 1 / 1;
+		}
+
+		.formspress-template-preview {
+			height: 100%;
+			aspect-ratio: auto;
+		}
 	}
 
 	&__loading {
@@ -1129,6 +1182,52 @@
 		color: #757575;
 		padding: 48px 24px;
 		font-size: 13px;
+	}
+
+	&__icon-preview {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 64px;
+		height: 64px;
+		border-radius: 4px;
+		background: #f0f6ff;
+		color: #1d2327;
+	}
+
+	&__blank-preview {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		min-height: 180px;
+		background: #f6f7f7;
+
+		.ff-template-browser__icon-preview {
+			width: 72px;
+			height: 72px;
+		}
+	}
+
+	&__type {
+		display: inline-flex;
+		align-items: center;
+		width: fit-content;
+		padding: 2px 8px;
+		border-radius: 2px;
+		font-size: 12px;
+		line-height: 1.4;
+
+		&--standard {
+			background: #e7f5ea;
+			color: #00a32a;
+		}
+
+		&--flow {
+			background: #f0f6ff;
+			color: #2271b1;
+		}
 	}
 }
 

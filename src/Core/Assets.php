@@ -93,12 +93,9 @@ class Assets {
 			);
 		}
 
-		wp_set_script_translations( 'flowforms-admin', 'flowforms', FLOWFORMS_DIR . 'languages' );
+		wp_set_script_translations( 'flowforms-admin', 'formspress', FLOWFORMS_DIR . 'languages' );
 
-		wp_localize_script(
-			'flowforms-admin',
-			'flowFormsData',
-			[
+		$data = [
 				'apiNamespace'      => 'flowforms/v1',
 				'nonce'             => wp_create_nonce( 'wp_rest' ),
 				'adminUrl'          => admin_url(),
@@ -107,6 +104,10 @@ class Assets {
 				'version'           => FLOWFORMS_VERSION,
 				'navItems'          => $this->registry->get_all_nav_items(),
 				'settings'          => get_option( 'flowforms_settings', [] ),
+				'pro'               => [
+					'active'     => false,
+					'pricingUrl' => apply_filters( 'flowforms_pro_pricing_url', 'https://example.com/formspress-pro' ),
+				],
 				'themeVariations'   => self::get_theme_variations(),
 				'themeFontSizes'    => self::get_theme_font_sizes(),
 				'themeFontFamilies' => self::get_theme_font_families(),
@@ -165,13 +166,23 @@ class Assets {
 				// `theme.json` + `styles/*.json`. This is what the form builder
 				// surfaces in the "Theme" tab.
 				'fseThemeVariations' => self::get_fse_theme_variations(),
+				'wpPages'           => self::get_wp_pages(),
 				'bindingTargets'    => $this->get_binding_targets(),
+				'features'          => [
+					'conditionalLogic' => (bool) apply_filters( 'flowforms_can_use_conditional_logic', false ),
+					'ai'               => (bool) apply_filters( 'flowforms_can_use_ai', false ),
+				],
 				'user'              => [
 					'name'   => wp_get_current_user()->display_name,
 					'avatar' => get_avatar_url( get_current_user_id(), [ 'size' => 64 ] ),
 				],
-			]
-		);
+		];
+
+		$data = apply_filters( 'flowforms_admin_data', $data, $this->container );
+
+		wp_localize_script( 'flowforms-admin', 'flowFormsData', $data );
+
+		do_action( 'flowforms_admin_assets_enqueued', 'flowforms-admin', $this->container );
 	}
 
 	/**
@@ -539,6 +550,40 @@ class Assets {
 	}
 
 	/**
+	 * Return published WordPress pages that admin controls can use as suggestions.
+	 *
+	 * @return array<int, array{id:int,title:string,url:string,path:string}>
+	 */
+	private static function get_wp_pages(): array {
+		$pages = get_pages( [
+			'post_status' => [ 'publish', 'private' ],
+			'sort_column' => 'post_title',
+			'sort_order'  => 'ASC',
+			'number'      => 100,
+		] );
+
+		return array_values( array_filter( array_map(
+			static function ( \WP_Post $page ): ?array {
+				$url = get_permalink( $page );
+
+				if ( ! is_string( $url ) || '' === $url ) {
+					return null;
+				}
+
+				$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+
+				return [
+					'id'    => (int) $page->ID,
+					'title' => html_entity_decode( get_the_title( $page ), ENT_QUOTES, get_bloginfo( 'charset' ) ),
+					'url'   => esc_url_raw( $url ),
+					'path'  => '/' . ltrim( $path, '/' ),
+				];
+			},
+			is_array( $pages ) ? $pages : []
+		) ) );
+	}
+
+	/**
 	 * Build a list of theme presets for the form builder, sourced from the
 	 * active FSE theme's `theme.json` and its style variations.
 	 *
@@ -561,7 +606,7 @@ class Assets {
 
 		$variations[] = self::build_variation(
 			'theme-default',
-			wp_get_theme()->get( 'Name' ) ?: __( 'Default', 'flowforms' ),
+			wp_get_theme()->get( 'Name' ) ?: __( 'Default', 'formspress' ),
 			$base_palette,
 			$base_fonts,
 			$base_styles
@@ -572,7 +617,7 @@ class Assets {
 			$style_variations = \WP_Theme_JSON_Resolver::get_style_variations();
 
 			foreach ( $style_variations as $variation ) {
-				$name        = $variation['title'] ?? __( 'Variation', 'flowforms' );
+				$name        = $variation['title'] ?? __( 'Variation', 'formspress' );
 				$var_palette = self::extract_palette( $variation['settings'] ?? [] );
 				$var_fonts   = self::extract_font_families( $variation['settings'] ?? [] );
 				$var_styles  = $variation['styles'] ?? [];

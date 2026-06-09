@@ -6,11 +6,6 @@ use FlowForms\Core\AbstractModule;
 
 /**
  * Integrations hub — nav-only module.
- *
- * Aggregates the disparate integrations (Mailchimp, ConvertKit, etc.,
- * Stripe, Webhooks) under one parent in the admin sidebar so users have
- * a single, predictable entry point. Actual configuration lives in the
- * respective per-integration modules.
  */
 class IntegrationsModule extends AbstractModule {
 
@@ -19,7 +14,7 @@ class IntegrationsModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Integrations', 'flowforms' );
+		return __( 'Integrations', 'formspress' );
 	}
 
 	public function get_routes(): ?string {
@@ -29,24 +24,24 @@ class IntegrationsModule extends AbstractModule {
 	public function get_nav_items(): array {
 		return [
 			[
-				'label'       => __( 'Integrations', 'flowforms' ),
+				'label'       => __( 'Integrations', 'formspress' ),
 				'path'        => '/integrations',
 				'icon'        => 'admin-plugins',
 				'position'    => 50,
-				'description' => __( 'Connect FormsPress to email marketing, CRM and payment services.', 'flowforms' ),
+				'description' => __( 'Connect FormsPress to external services with add-ons.', 'formspress' ),
 				'children'    => [
 					[
-						'label' => __( 'All integrations', 'flowforms' ),
+						'label' => __( 'All integrations', 'formspress' ),
 						'path'  => '/integrations',
 						'icon'  => 'admin-plugins',
 					],
 					[
-						'label' => __( 'Webhooks', 'flowforms' ),
+						'label' => __( 'Webhooks', 'formspress' ),
 						'path'  => '/integrations/webhooks',
 						'icon'  => 'rest-api',
 					],
 					[
-						'label' => __( 'Stripe', 'flowforms' ),
+						'label' => __( 'Stripe', 'formspress' ),
 						'path'  => '/integrations/stripe',
 						'icon'  => 'admin-plugins',
 					],

@@ -11,11 +11,11 @@ class QuickPollTemplate extends AbstractTemplate {
 	}
 
 	public function get_label(): string {
-		return __( 'Quick poll', 'flowforms' );
+		return __( 'Quick poll', 'formspress' );
 	}
 
 	public function get_description(): string {
-		return __( 'A single-question poll to gather a quick opinion.', 'flowforms' );
+		return __( 'A single-question poll to gather a quick opinion.', 'formspress' );
 	}
 
 	public function get_category(): string {
@@ -35,13 +35,13 @@ class QuickPollTemplate extends AbstractTemplate {
 			[
 				'id'       => 'choice',
 				'type'     => 'radio',
-				'label'    => __( 'Which option do you prefer?', 'flowforms' ),
+				'label'    => __( 'Which option do you prefer?', 'formspress' ),
 				'required' => true,
 				'options'  => [
-					__( 'Option A', 'flowforms' ),
-					__( 'Option B', 'flowforms' ),
-					__( 'Option C', 'flowforms' ),
-					__( 'None of the above', 'flowforms' ),
+					__( 'Option A', 'formspress' ),
+					__( 'Option B', 'formspress' ),
+					__( 'Option C', 'formspress' ),
+					__( 'None of the above', 'formspress' ),
 				],
 			],
 		];
@@ -49,13 +49,13 @@ class QuickPollTemplate extends AbstractTemplate {
 
 	public function get_settings(): array {
 		return [
-			'welcome_title'       => __( 'Quick poll', 'flowforms' ),
-			'welcome_description' => __( 'One question — takes 5 seconds.', 'flowforms' ),
-			'start_label'         => __( 'Start', 'flowforms' ),
-			'end_title'           => __( 'Thanks!', 'flowforms' ),
-			'success_message'     => __( 'Your vote has been recorded.', 'flowforms' ),
-			'submit_label'        => __( 'Submit', 'flowforms' ),
-			'next_label'          => __( 'OK', 'flowforms' ),
+			'welcome_title'       => __( 'Quick poll', 'formspress' ),
+			'welcome_description' => __( 'One question — takes 5 seconds.', 'formspress' ),
+			'start_label'         => __( 'Start', 'formspress' ),
+			'end_title'           => __( 'Thanks!', 'formspress' ),
+			'success_message'     => __( 'Your vote has been recorded.', 'formspress' ),
+			'submit_label'        => __( 'Submit', 'formspress' ),
+			'next_label'          => __( 'OK', 'formspress' ),
 		];
 	}
 }

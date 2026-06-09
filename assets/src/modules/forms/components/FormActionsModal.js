@@ -17,7 +17,7 @@ const FormActionsModal = ( {
 
 	return (
 		<Modal
-			title={ __( 'Form actions', 'flowforms' ) }
+			title={ __( 'Form actions', 'formspress' ) }
 			onRequestClose={ onClose }
 			size="fill"
 			className="ff-form-actions-modal"
@@ -26,23 +26,23 @@ const FormActionsModal = ( {
 				<div className="ff-form-actions-modal__summary">
 					<div>
 						<strong>
-							{ __( 'Submission workflow', 'flowforms' ) }
+							{ __( 'Submission workflow', 'formspress' ) }
 						</strong>
 						<p>
 							{ __(
 								'Configure the actions that run after a successful submission.',
-								'flowforms'
+								'formspress'
 							) }
 						</p>
 					</div>
 					<div className="ff-form-actions-modal__stats">
 						<div className="ff-form-actions-modal__stat">
 							<strong>{ ( actions || [] ).length }</strong>
-							<span>{ __( 'Total', 'flowforms' ) }</span>
+							<span>{ __( 'Total', 'formspress' ) }</span>
 						</div>
 						<div className="ff-form-actions-modal__stat">
 							<strong>{ enabledCount }</strong>
-							<span>{ __( 'Enabled', 'flowforms' ) }</span>
+							<span>{ __( 'Enabled', 'formspress' ) }</span>
 						</div>
 					</div>
 				</div>
@@ -58,8 +58,8 @@ const FormActionsModal = ( {
 					<p>
 						{ sprintf(
 							/* translators: %s: form title. */
-							__( 'Actions are saved with "%s".', 'flowforms' ),
-							form?.title || __( 'Untitled form', 'flowforms' )
+							__( 'Actions are saved with "%s".', 'formspress' ),
+							form?.title || __( 'Untitled form', 'formspress' )
 						) }
 					</p>
 					<Button
@@ -68,7 +68,7 @@ const FormActionsModal = ( {
 						isBusy={ isSaving }
 						disabled={ isSaving }
 					>
-						{ __( 'Done', 'flowforms' ) }
+						{ __( 'Done', 'formspress' ) }
 					</Button>
 				</footer>
 			</div>

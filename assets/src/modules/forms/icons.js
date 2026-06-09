@@ -1,4 +1,15 @@
-import { envelope, link, redo, brush, chartBar, cog } from '@wordpress/icons';
+import {
+	envelope,
+	link,
+	redo,
+	brush,
+	chartBar,
+	cog,
+	payment,
+	megaphone,
+	institution,
+	plugins,
+} from '@wordpress/icons';
 
 /**
  * String-to-icon map shared by Actions, Templates, and any other
@@ -10,7 +21,18 @@ import { envelope, link, redo, brush, chartBar, cog } from '@wordpress/icons';
  * Note: 'email' is the public name; it maps to the @wordpress/icons
  * `envelope` icon (there is no `email` export).
  */
-export const ICON_MAP = { email: envelope, link, redo, brush, chartBar, cog };
+export const ICON_MAP = {
+	email: envelope,
+	link,
+	redo,
+	brush,
+	chartBar,
+	cog,
+	payment,
+	megaphone,
+	institution,
+	plugins,
+};
 
 export const ICON_OPTIONS = [
 	{ value: 'email', label: 'Email' },

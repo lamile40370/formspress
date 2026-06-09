@@ -11,17 +11,17 @@ class HcaptchaProvider extends AbstractSpamProvider {
 	}
 
 	public function get_label(): string {
-		return __( 'hCaptcha', 'flowforms' );
+		return __( 'hCaptcha', 'formspress' );
 	}
 
 	public function get_description(): string {
-		return __( 'Privacy-respecting CAPTCHA service.', 'flowforms' );
+		return __( 'Privacy-respecting CAPTCHA service.', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'site_key',   'type' => 'text',     'label' => __( 'Site key', 'flowforms' ) ],
-			[ 'key' => 'secret_key', 'type' => 'password', 'label' => __( 'Secret key', 'flowforms' ) ],
+			[ 'key' => 'site_key',   'type' => 'text',     'label' => __( 'Site key', 'formspress' ) ],
+			[ 'key' => 'secret_key', 'type' => 'password', 'label' => __( 'Secret key', 'formspress' ) ],
 		];
 	}
 
@@ -43,7 +43,7 @@ class HcaptchaProvider extends AbstractSpamProvider {
 			return true;
 		}
 		if ( $token === '' ) {
-			return __( 'Spam check failed: missing token.', 'flowforms' );
+			return __( 'Spam check failed: missing token.', 'formspress' );
 		}
 
 		$response = wp_remote_post( 'https://api.hcaptcha.com/siteverify', [
@@ -56,12 +56,12 @@ class HcaptchaProvider extends AbstractSpamProvider {
 		] );
 
 		if ( is_wp_error( $response ) ) {
-			return __( 'Spam check failed: provider unreachable.', 'flowforms' );
+			return __( 'Spam check failed: provider unreachable.', 'formspress' );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( ! is_array( $body ) || empty( $body['success'] ) ) {
-			return __( 'Spam check failed.', 'flowforms' );
+			return __( 'Spam check failed.', 'formspress' );
 		}
 
 		return true;

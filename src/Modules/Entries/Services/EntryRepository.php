@@ -21,7 +21,8 @@ class EntryRepository {
 		$page     = max( 1, (int) ( $args['page'] ?? 1 ) );
 		$per_page = min( 100, max( 1, (int) ( $args['per_page'] ?? 20 ) ) );
 		$offset   = ( $page - 1 ) * $per_page;
-		$status   = sanitize_text_field( $args['status'] ?? '' );
+		$form_ids = $this->sanitize_int_list( $args['form_id'] ?? $form_id );
+		$statuses = $this->sanitize_list( $args['status'] ?? '', [ 'unread', 'read', 'starred', 'spam' ] );
 		$search   = sanitize_text_field( $args['search'] ?? '' );
 		$sort     = in_array( $args['sort'] ?? '', [ 'id', 'form_title', 'created_at', 'status' ], true ) ? $args['sort'] : 'created_at';
 		$order    = strtoupper( $args['order'] ?? 'DESC' ) === 'ASC' ? 'ASC' : 'DESC';
@@ -30,14 +31,12 @@ class EntryRepository {
 		$where    = "e.status != 'trash'";
 		$params   = [];
 
-		if ( $form_id > 0 ) {
-			$where   .= ' AND e.form_id = %d';
-			$params[] = $form_id;
+		if ( $form_ids ) {
+			$this->append_in_condition( $where, $params, 'e.form_id', $form_ids, '%d' );
 		}
 
-		if ( $status !== '' ) {
-			$where   .= ' AND e.status = %s';
-			$params[] = $status;
+		if ( $statuses ) {
+			$this->append_in_condition( $where, $params, 'e.status', $statuses );
 		}
 
 		if ( $search !== '' ) {
@@ -71,6 +70,31 @@ class EntryRepository {
 			'per_page'    => $per_page,
 			'total_pages' => (int) ceil( $total / $per_page ),
 		];
+	}
+
+	private function sanitize_list( mixed $value, array $allowed ): array {
+		$raw = is_array( $value ) ? $value : explode( ',', (string) $value );
+		$sanitized = array_map(
+			static fn( $item ) => sanitize_text_field( (string) $item ),
+			$raw
+		);
+		$sanitized = array_filter( array_unique( $sanitized ) );
+
+		return array_values( array_intersect( $sanitized, $allowed ) );
+	}
+
+	private function sanitize_int_list( mixed $value ): array {
+		$raw = is_array( $value ) ? $value : explode( ',', (string) $value );
+		$ids = array_map( 'absint', $raw );
+		$ids = array_filter( array_unique( $ids ) );
+
+		return array_values( $ids );
+	}
+
+	private function append_in_condition( string &$where, array &$params, string $column, array $values, string $placeholder = '%s' ): void {
+		$placeholders = implode( ', ', array_fill( 0, count( $values ), $placeholder ) );
+		$where .= " AND {$column} IN ({$placeholders})";
+		array_push( $params, ...$values );
 	}
 
 	public function get( int $id ): ?array {

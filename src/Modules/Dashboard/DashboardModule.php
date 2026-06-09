@@ -11,7 +11,7 @@ class DashboardModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Dashboard', 'flowforms' );
+		return __( 'Dashboard', 'formspress' );
 	}
 
 	public function get_routes(): ?string {
@@ -21,11 +21,11 @@ class DashboardModule extends AbstractModule {
 	public function get_nav_items(): array {
 		return [
 			[
-				'label'       => __( 'Dashboard', 'flowforms' ),
+				'label'       => __( 'Dashboard', 'formspress' ),
 				'path'        => '/',
 				'icon'        => 'dashboard',
 				'position'    => 10,
-				'description' => __( 'Overview of your forms and submissions.', 'flowforms' ),
+				'description' => __( 'Overview of your forms and submissions.', 'formspress' ),
 			],
 		];
 	}

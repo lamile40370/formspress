@@ -65,7 +65,7 @@ const FieldEditor = ( {
 					style={ { margin: 0, textTransform: 'capitalize' } }
 				>
 					{ field.type.replace( '_', ' ' ) }{ ' ' }
-					{ __( 'Field', 'flowforms' ) }
+					{ __( 'Field', 'formspress' ) }
 				</Heading>
 				<div className="ff-field-editor__actions">
 					<Button
@@ -73,7 +73,7 @@ const FieldEditor = ( {
 						size="small"
 						onClick={ onMoveUp }
 						disabled={ isFirst }
-						label={ __( 'Move up', 'flowforms' ) }
+						label={ __( 'Move up', 'formspress' ) }
 					>
 						↑
 					</Button>
@@ -82,7 +82,7 @@ const FieldEditor = ( {
 						size="small"
 						onClick={ onMoveDown }
 						disabled={ isLast }
-						label={ __( 'Move down', 'flowforms' ) }
+						label={ __( 'Move down', 'formspress' ) }
 					>
 						↓
 					</Button>
@@ -92,7 +92,7 @@ const FieldEditor = ( {
 						isDestructive
 						onClick={ onDelete }
 						icon={ trash }
-						label={ __( 'Delete field', 'flowforms' ) }
+						label={ __( 'Delete field', 'formspress' ) }
 					/>
 				</div>
 			</div>
@@ -100,7 +100,7 @@ const FieldEditor = ( {
 			<VStack spacing={ 3 } className="ff-field-editor__body">
 				{ field.type !== 'page_break' && field.type !== 'hidden' && (
 					<TextControl
-						label={ __( 'Label', 'flowforms' ) }
+						label={ __( 'Label', 'formspress' ) }
 						value={ field.label || '' }
 						onChange={ set( 'label' ) }
 						__nextHasNoMarginBottom
@@ -110,12 +110,12 @@ const FieldEditor = ( {
 
 				{ field.type !== 'section' && field.type !== 'page_break' && (
 					<TextControl
-						label={ __( 'Field ID', 'flowforms' ) }
+						label={ __( 'Field ID', 'formspress' ) }
 						value={ field.id || '' }
 						onChange={ set( 'id' ) }
 						help={ __(
 							'Used in email templates as {field:id}',
-							'flowforms'
+							'formspress'
 						) }
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -124,7 +124,7 @@ const FieldEditor = ( {
 
 				{ showPlaceholder && (
 					<TextControl
-						label={ __( 'Placeholder', 'flowforms' ) }
+						label={ __( 'Placeholder', 'formspress' ) }
 						value={ field.placeholder || '' }
 						onChange={ set( 'placeholder' ) }
 						__nextHasNoMarginBottom
@@ -134,7 +134,7 @@ const FieldEditor = ( {
 
 				{ field.type !== 'section' && field.type !== 'page_break' && (
 					<TextareaControl
-						label={ __( 'Description', 'flowforms' ) }
+						label={ __( 'Description', 'formspress' ) }
 						value={ field.description || '' }
 						onChange={ set( 'description' ) }
 						rows={ 2 }
@@ -144,7 +144,7 @@ const FieldEditor = ( {
 
 				{ showRequired && (
 					<ToggleControl
-						label={ __( 'Required', 'flowforms' ) }
+						label={ __( 'Required', 'formspress' ) }
 						checked={ !! field.required }
 						onChange={ set( 'required' ) }
 						__nextHasNoMarginBottom
@@ -153,12 +153,12 @@ const FieldEditor = ( {
 
 				{ field.type === 'hidden' && (
 					<TextControl
-						label={ __( 'Value', 'flowforms' ) }
+						label={ __( 'Value', 'formspress' ) }
 						value={ field.default_value || '' }
 						onChange={ set( 'default_value' ) }
 						help={ __(
 							'Supports {user_email}, {user_id}, {site_url}',
-							'flowforms'
+							'formspress'
 						) }
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -167,7 +167,7 @@ const FieldEditor = ( {
 
 				{ field.type === 'rating' && (
 					<SelectControl
-						label={ __( 'Max Stars', 'flowforms' ) }
+						label={ __( 'Max Stars', 'formspress' ) }
 						value={ field.max || 5 }
 						options={ [ 3, 4, 5, 6, 7, 10 ].map( ( n ) => ( {
 							value: n,
@@ -182,7 +182,7 @@ const FieldEditor = ( {
 				{ showOptions && (
 					<div className="ff-field-editor__options">
 						<p style={ { fontWeight: 500, marginBottom: '8px' } }>
-							{ __( 'Options', 'flowforms' ) }
+							{ __( 'Options', 'formspress' ) }
 						</p>
 						{ ( field.options || [] ).map( ( opt, i ) => (
 							<div
@@ -193,7 +193,7 @@ const FieldEditor = ( {
 									value={ opt }
 									onChange={ ( v ) => setOption( i, v ) }
 									placeholder={ sprintf(
-										__( 'Option %d', 'flowforms' ),
+										__( 'Option %d', 'formspress' ),
 										i + 1
 									) }
 									__nextHasNoMarginBottom
@@ -213,14 +213,14 @@ const FieldEditor = ( {
 							size="small"
 							onClick={ addOption }
 						>
-							{ __( '+ Add Option', 'flowforms' ) }
+							{ __( '+ Add Option', 'formspress' ) }
 						</Button>
 					</div>
 				) }
 
 				{ field.type === 'section' && (
 					<TextareaControl
-						label={ __( 'Content', 'flowforms' ) }
+						label={ __( 'Content', 'formspress' ) }
 						value={ field.content || '' }
 						onChange={ set( 'content' ) }
 						rows={ 3 }

@@ -10,7 +10,7 @@ const Edit = ( props ) => {
 
 	const extras = (
 		<RangeControl
-			label={ __( 'Rows', 'flowforms' ) }
+			label={ __( 'Rows', 'formspress' ) }
 			value={ rows }
 			min={ 2 }
 			max={ 20 }

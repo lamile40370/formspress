@@ -6,8 +6,8 @@ namespace FlowForms\Modules\Compat\Services;
  * WPML compatibility provider.
  *
  * Bridges FormsPress translation events to WPML's String Translation API:
- *   - `flowforms_register_string` → `wpml_register_single_string`
- *   - `flowforms_translate_string` → `wpml_translate_single_string`
+ *   - `formspress_register_string` -> `wpml_register_single_string`
+ *   - `formspress_translate_string` -> `wpml_translate_single_string`
  *
  * Activates only when WPML String Translation is loaded.
  */
@@ -18,9 +18,9 @@ class WpmlCompat {
 			return;
 		}
 
-		add_action( 'flowforms_register_string', [ $this, 'register_string' ], 10, 3 );
-		add_filter( 'flowforms_translate_string', [ $this, 'translate_string' ], 10, 4 );
-		add_filter( 'flowforms_active_compat_providers', [ $this, 'declare_provider' ] );
+		add_action( 'formspress_register_string', [ $this, 'register_string' ], 10, 3 );
+		add_filter( 'formspress_translate_string', [ $this, 'translate_string' ], 10, 4 );
+		add_filter( 'formspress_active_compat_providers', [ $this, 'declare_provider' ] );
 	}
 
 	public function is_active(): bool {

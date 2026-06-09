@@ -12,11 +12,12 @@ class ListEntries extends AbstractEndpoint {
 	public function __construct( private readonly EntryRepository $repo ) {}
 
 	public function __invoke( WP_REST_Request $request ): WP_REST_Response {
-		$form_id = (int) ( $request->get_param( 'form_id' ) ?? 0 );
+		$form_id = $request->get_param( 'form_id' ) ?? 0;
 
-		$result = $this->repo->get_all( $form_id, [
+		$result = $this->repo->get_all( 0, [
 			'page'     => $request->get_param( 'page' ),
 			'per_page' => $request->get_param( 'per_page' ),
+			'form_id'  => $form_id,
 			'status'   => $request->get_param( 'status' ) ?? '',
 			'search'   => $request->get_param( 'search' ) ?? '',
 			'sort'     => $request->get_param( 'sort' ) ?? 'created_at',

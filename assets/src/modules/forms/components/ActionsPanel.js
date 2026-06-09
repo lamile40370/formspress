@@ -6,6 +6,7 @@ import {
 	ToggleControl,
 	CheckboxControl,
 	SelectControl,
+	RadioControl,
 	FormTokenField,
 	PanelBody,
 	Dropdown,
@@ -29,10 +30,94 @@ import {
 	arrowUp,
 	arrowDown,
 	closeSmall,
+	lock,
+	external,
 } from '@wordpress/icons';
 import { get } from '../../../api/client';
 import { ACTIONS } from '../../../api/endpoints';
 import EmailDesigner from './EmailDesigner';
+
+const UPGRADE_URL = 'https://example.com/formspress-pro';
+
+const PRO_ACTION_TEASERS = [
+	{
+		id: 'redirect',
+		label: __( 'Redirect to URL', 'formspress' ),
+		description: __(
+			'Send visitors to a custom URL after submission.',
+			'formspress'
+		),
+	},
+	{
+		id: 'webhook',
+		label: __( 'Send Webhook', 'formspress' ),
+		description: __(
+			'Send submissions to CRMs, automation tools, and custom endpoints.',
+			'formspress'
+		),
+	},
+	{
+		id: 'stripe_payment',
+		label: __( 'Stripe payment', 'formspress' ),
+		description: __(
+			'Collect payments with Stripe Checkout.',
+			'formspress'
+		),
+	},
+	{
+		id: 'mailchimp',
+		label: __( 'Email marketing integrations', 'formspress' ),
+		description: __(
+			'Add contacts to Mailchimp, Brevo, ConvertKit, ActiveCampaign, and more.',
+			'formspress'
+		),
+	},
+];
+
+const matchesActionSearch = ( action, query ) => {
+	if ( ! query ) {
+		return true;
+	}
+
+	const text = `${ action.label || '' } ${ action.description || '' }`
+		.toLowerCase()
+		.trim();
+
+	return text.includes( query );
+};
+
+const ProBadge = () => <span className="ff-actions-pro-badge">Pro</span>;
+
+const ProActionsNotice = ( { compact = false } ) => (
+	<div
+		className={ `ff-actions-pro-notice${
+			compact ? ' ff-actions-pro-notice--compact' : ''
+		}` }
+	>
+		<Icon icon={ lock } size={ compact ? 16 : 20 } />
+		<div>
+			<strong>
+				{ __( 'More actions are available in Pro', 'formspress' ) }
+			</strong>
+			<p>
+				{ __(
+					'Upgrade to add redirects, webhooks, payments, and marketing integrations to your submission workflow.',
+					'formspress'
+				) }
+			</p>
+		</div>
+		<Button
+			variant="secondary"
+			size="compact"
+			href={ UPGRADE_URL }
+			target="_blank"
+			rel="noreferrer"
+			icon={ external }
+		>
+			{ __( 'Upgrade', 'formspress' ) }
+		</Button>
+	</div>
+);
 
 const FieldRenderer = ( {
 	field,
@@ -42,6 +127,10 @@ const FieldRenderer = ( {
 	action,
 	onActionChange,
 } ) => {
+	if ( ! isActionFieldVisible( field, action ) ) {
+		return null;
+	}
+
 	const fieldType = normalizeFieldType( field );
 	const fallback = field.default ?? ( 'toggle' === fieldType ? false : '' );
 	const current = value ?? fallback;
@@ -72,6 +161,14 @@ const FieldRenderer = ( {
 					onChange={ onChange }
 				/>
 			);
+		case 'wp-page-token':
+			return (
+				<WordPressPageTokenField
+					field={ field }
+					value={ current }
+					onChange={ onChange }
+				/>
+			);
 		case 'field-mapping-repeater':
 			return (
 				<FieldMappingRepeater
@@ -81,6 +178,16 @@ const FieldRenderer = ( {
 					form={ form }
 				/>
 			);
+		case 'key-value-repeater':
+			return (
+				<KeyValueRepeater
+					field={ field }
+					value={ current }
+					onChange={ onChange }
+				/>
+			);
+		case 'section':
+			return <ActionSettingsSection field={ field } />;
 		case 'email-designer':
 			return (
 				<EmailDesigner
@@ -98,6 +205,15 @@ const FieldRenderer = ( {
 					onActionChange={ onActionChange }
 				/>
 			);
+		case 'send-to-routing':
+			return (
+				<SendToRoutingField
+					field={ field }
+					form={ form }
+					action={ action }
+					onActionChange={ onActionChange }
+				/>
+			);
 		case 'textarea':
 			return <TextareaControl { ...common } rows={ field.rows ?? 4 } />;
 		case 'select':
@@ -109,7 +225,7 @@ const FieldRenderer = ( {
 				<ToggleControl
 					label={ field.label }
 					help={ field.help }
-					checked={ !! value }
+					checked={ !! current }
 					onChange={ onChange }
 					__nextHasNoMarginBottom
 				/>
@@ -153,6 +269,27 @@ const normalizeFieldType = ( field ) => {
 	return type;
 };
 
+const ActionSettingsSection = ( { field } ) => (
+	<div className="ff-actions-settings__subsection">
+		<h4>{ field.label }</h4>
+		{ field.description && <p>{ field.description }</p> }
+	</div>
+);
+
+const isActionFieldVisible = ( field, action ) => {
+	const dependency = field?.depends_on || field?.dependsOn;
+
+	if ( ! dependency?.key ) {
+		return true;
+	}
+
+	const current = action?.[ dependency.key ] ?? '';
+	const expected = dependency.value ?? dependency.values;
+	const expectedValues = Array.isArray( expected ) ? expected : [ expected ];
+
+	return expectedValues.map( String ).includes( String( current ) );
+};
+
 // Quick-load dropdown that pulls the picked template's body into the action body.
 const EmailTemplatePicker = ( { value, onChange, action, onActionChange } ) => {
 	const [ templates, setTemplates ] = useState( [] );
@@ -164,7 +301,7 @@ const EmailTemplatePicker = ( { value, onChange, action, onActionChange } ) => {
 	}, [] );
 
 	const options = [
-		{ value: '0', label: __( '— None —', 'flowforms' ) },
+		{ value: '0', label: __( '— None —', 'formspress' ) },
 		...templates.map( ( t ) => ( {
 			value: String( t.id ),
 			label: t.name,
@@ -195,13 +332,13 @@ const EmailTemplatePicker = ( { value, onChange, action, onActionChange } ) => {
 		<SelectControl
 			__nextHasNoMarginBottom
 			__next40pxDefaultSize
-			label={ __( 'Load template', 'flowforms' ) }
+			label={ __( 'Load template', 'formspress' ) }
 			value={ String( value || '0' ) }
 			options={ options }
 			onChange={ handleChange }
 			help={ __(
 				'Pre-fills body (and subject) from a saved Email Template.',
-				'flowforms'
+				'formspress'
 			) }
 		/>
 	);
@@ -247,10 +384,10 @@ const getFormFieldOptions = ( form, fieldDescriptor ) => {
 			label: fieldDescriptor.placeholder
 				? sprintf(
 						/* translators: %s: field placeholder. */
-						__( 'Select a field, for example %s', 'flowforms' ),
+						__( 'Select a field, for example %s', 'formspress' ),
 						fieldDescriptor.placeholder
 				  )
-				: __( 'Select a field', 'flowforms' ),
+				: __( 'Select a field', 'formspress' ),
 		},
 		...fields.map( ( field ) => {
 			const id = field.id || field.fieldId || '';
@@ -261,6 +398,213 @@ const getFormFieldOptions = ( form, fieldDescriptor ) => {
 			};
 		} ),
 	];
+};
+
+const EMAIL_ROUTING_OPERATORS = [
+	{ value: 'is', label: __( 'is', 'formspress' ) },
+	{ value: 'is_not', label: __( 'is not', 'formspress' ) },
+	{ value: 'contains', label: __( 'contains', 'formspress' ) },
+	{
+		value: 'not_contains',
+		label: __( 'does not contain', 'formspress' ),
+	},
+	{ value: 'is_empty', label: __( 'is empty', 'formspress' ) },
+	{ value: 'not_empty', label: __( 'is not empty', 'formspress' ) },
+];
+
+const normalizeRoutingRows = ( value ) => {
+	if ( ! Array.isArray( value ) ) {
+		return [];
+	}
+
+	return value
+		.filter( ( row ) => row && 'object' === typeof row )
+		.map( ( row ) => ( {
+			to: row.to || '',
+			field: row.field || row.field_id || '',
+			operator: row.operator || 'is',
+			value: row.value || '',
+		} ) );
+};
+
+const SendToRoutingField = ( { field, form, action, onActionChange } ) => {
+	const mode = action?.to_mode || 'email';
+	const routingRows = normalizeRoutingRows( action?.routing );
+	const fieldOptions = getFormFieldOptions( form, {
+		placeholder: __( 'email', 'formspress' ),
+	} );
+
+	const updateAction = ( updates ) => {
+		onActionChange( {
+			...action,
+			...updates,
+		} );
+	};
+
+	const updateRoute = ( index, key, nextValue ) => {
+		const next = [ ...routingRows ];
+		next[ index ] = { ...next[ index ], [ key ]: nextValue };
+		updateAction( { routing: next } );
+	};
+
+	const addRoute = () => {
+		updateAction( {
+			routing: [
+				...routingRows,
+				{ to: '', field: '', operator: 'is', value: '' },
+			],
+		} );
+	};
+
+	const removeRoute = ( index ) => {
+		updateAction( {
+			routing: routingRows.filter(
+				( _, itemIndex ) => itemIndex !== index
+			),
+		} );
+	};
+
+	const rows = routingRows.length
+		? routingRows
+		: [ { to: '', field: '', operator: 'is', value: '' } ];
+
+	return (
+		<div className="ff-send-to-routing">
+			<RadioControl
+				label={ field.label || __( 'Send to', 'formspress' ) }
+				selected={ mode }
+				options={ [
+					{
+						label: __( 'Enter email', 'formspress' ),
+						value: 'email',
+					},
+					{
+						label: __( 'Select a field', 'formspress' ),
+						value: 'field',
+					},
+					{
+						label: __( 'Configure routing', 'formspress' ),
+						value: 'routing',
+					},
+				] }
+				onChange={ ( nextMode ) =>
+					updateAction( { to_mode: nextMode } )
+				}
+			/>
+
+			{ mode === 'email' && (
+				<TextControl
+					label={ __( 'Email address', 'formspress' ) }
+					help={ __(
+						'Use commas for multiple recipients. Merge tags like {field:email} are supported.',
+						'formspress'
+					) }
+					value={ action?.to || '' }
+					onChange={ ( to ) => updateAction( { to } ) }
+					placeholder="admin@example.com"
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+			) }
+
+			{ mode === 'field' && (
+				<SelectControl
+					label={ __( 'Recipient field', 'formspress' ) }
+					help={ __(
+						'The selected field value must contain a valid email address.',
+						'formspress'
+					) }
+					value={ action?.to_field || '' }
+					options={ fieldOptions }
+					onChange={ ( to_field ) => updateAction( { to_field } ) }
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+			) }
+
+			{ mode === 'routing' && (
+				<div className="ff-send-to-routing__routes">
+					{ rows.map( ( route, index ) => (
+						<div
+							key={ index }
+							className="ff-send-to-routing__route"
+						>
+							<TextControl
+								label={ __( 'Send to', 'formspress' ) }
+								value={ route.to }
+								onChange={ ( nextValue ) =>
+									updateRoute( index, 'to', nextValue )
+								}
+								placeholder="team@example.com"
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+							/>
+							<SelectControl
+								label={ __( 'If field', 'formspress' ) }
+								value={ route.field }
+								options={ fieldOptions }
+								onChange={ ( nextValue ) =>
+									updateRoute( index, 'field', nextValue )
+								}
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+							/>
+							<SelectControl
+								label={ __( 'Condition', 'formspress' ) }
+								value={ route.operator }
+								options={ EMAIL_ROUTING_OPERATORS }
+								onChange={ ( nextValue ) =>
+									updateRoute(
+										index,
+										'operator',
+										nextValue
+									)
+								}
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+							/>
+							{ ! [ 'is_empty', 'not_empty' ].includes(
+								route.operator
+							) && (
+								<TextControl
+									label={ __( 'Value', 'formspress' ) }
+									value={ route.value }
+									onChange={ ( nextValue ) =>
+										updateRoute(
+											index,
+											'value',
+											nextValue
+										)
+									}
+									placeholder={ __(
+										'Enter value',
+										'formspress'
+									) }
+									__nextHasNoMarginBottom
+									__next40pxDefaultSize
+								/>
+							) }
+							<Button
+								icon={ closeSmall }
+								label={ __( 'Remove route', 'formspress' ) }
+								onClick={ () => removeRoute( index ) }
+								variant="tertiary"
+							/>
+						</div>
+					) ) }
+					<Button
+						variant="tertiary"
+						size="compact"
+						icon={ plus }
+						className="ff-send-to-routing__add"
+						onClick={ addRoute }
+					>
+						{ __( 'Add rule', 'formspress' ) }
+					</Button>
+				</div>
+			) }
+		</div>
+	);
 };
 
 const normalizeMultiValue = ( value ) => {
@@ -319,11 +663,71 @@ const TokenSelectField = ( { field, value, onChange } ) => {
 			value={ selectedTokens }
 			suggestions={ suggestions }
 			onChange={ handleChange }
-			__experimentalValidateInput={ ( token ) =>
-				idByToken.has( token )
-			}
+			__experimentalValidateInput={ ( token ) => idByToken.has( token ) }
 			placeholder={
-				field.placeholder || __( 'Type to search', 'flowforms' )
+				field.placeholder || __( 'Type to search', 'formspress' )
+			}
+		/>
+	);
+};
+
+const normalizePageValue = ( value ) =>
+	'string' === typeof value ? value.trim() : '';
+
+const getPageTokenLabel = ( page ) => {
+	const title = String( page?.title || page?.url || '' );
+	const path = String( page?.path || '' );
+
+	return path ? `${ title } (${ path })` : title;
+};
+
+const WordPressPageTokenField = ( { field, value, onChange } ) => {
+	const pages = Array.isArray( window.flowFormsData?.wpPages )
+		? window.flowFormsData.wpPages
+		: [];
+	const labelByUrl = new Map(
+		pages.map( ( page ) => [
+			String( page.url ),
+			getPageTokenLabel( page ),
+		] )
+	);
+	const urlByLabel = new Map(
+		pages.map( ( page ) => [
+			getPageTokenLabel( page ),
+			String( page.url ),
+		] )
+	);
+	const selectedUrl = normalizePageValue( value );
+	const selectedToken = selectedUrl
+		? labelByUrl.get( selectedUrl ) || selectedUrl
+		: '';
+
+	const handleChange = ( tokens ) => {
+		const token = tokens.length
+			? String( tokens[ tokens.length - 1 ] )
+			: '';
+
+		if ( '' === token ) {
+			onChange( '' );
+			return;
+		}
+
+		onChange( urlByLabel.get( token ) || token );
+	};
+
+	return (
+		<FormTokenField
+			__next40pxDefaultSize
+			__experimentalExpandOnFocus
+			label={ field.label }
+			help={ field.help || '' }
+			value={ selectedToken ? [ selectedToken ] : [] }
+			suggestions={ Array.from( urlByLabel.keys() ) }
+			onChange={ handleChange }
+			__experimentalValidateInput={ ( token ) => urlByLabel.has( token ) }
+			maxLength={ 1 }
+			placeholder={
+				field.placeholder || __( 'Search pages', 'formspress' )
 			}
 		/>
 	);
@@ -361,7 +765,7 @@ const normalizeMappings = ( value ) => {
 const FieldMappingRepeater = ( { field, value, onChange, form } ) => {
 	const mappings = normalizeMappings( value );
 	const fieldOptions = getFormFieldOptions( form, {
-		placeholder: __( 'field_id', 'flowforms' ),
+		placeholder: __( 'field_id', 'formspress' ),
 	} );
 
 	const updateMapping = ( index, key, nextValue ) => {
@@ -393,7 +797,7 @@ const FieldMappingRepeater = ( { field, value, onChange, form } ) => {
 							<TextControl
 								label={ __(
 									'MailerPress custom field key',
-									'flowforms'
+									'formspress'
 								) }
 								value={ mapping.field_key }
 								onChange={ ( nextValue ) =>
@@ -410,7 +814,7 @@ const FieldMappingRepeater = ( { field, value, onChange, form } ) => {
 							<SelectControl
 								label={ __(
 									'Value from FormsPress field',
-									'flowforms'
+									'formspress'
 								) }
 								value={ mapping.field_id }
 								options={ fieldOptions }
@@ -426,15 +830,110 @@ const FieldMappingRepeater = ( { field, value, onChange, form } ) => {
 							/>
 							<Button
 								icon={ closeSmall }
-								label={ __( 'Remove mapping', 'flowforms' ) }
+								label={ __( 'Remove mapping', 'formspress' ) }
 								onClick={ () => removeMapping( index ) }
 								variant="tertiary"
 							/>
 						</div>
 					) ) }
 				</div>
-				<Button variant="secondary" icon={ plus } onClick={ addMapping }>
-					{ __( 'Add custom field mapping', 'flowforms' ) }
+				<Button
+					variant="secondary"
+					icon={ plus }
+					onClick={ addMapping }
+				>
+					{ __( 'Add custom field mapping', 'formspress' ) }
+				</Button>
+			</div>
+			{ field.help && (
+				<p className="components-base-control__help">{ field.help }</p>
+			) }
+		</div>
+	);
+};
+
+const normalizeKeyValueRows = ( value ) => {
+	if ( Array.isArray( value ) ) {
+		return value
+			.filter( ( row ) => row && 'object' === typeof row )
+			.map( ( row ) => ( {
+				key: row.key || row.field_key || '',
+				value: row.value || row.template || row.field_id || '',
+			} ) );
+	}
+
+	if ( value && 'object' === typeof value ) {
+		return Object.entries( value ).map( ( [ key, rowValue ] ) => ( {
+			key,
+			value: String( rowValue ?? '' ),
+		} ) );
+	}
+
+	return [];
+};
+
+const KeyValueRepeater = ( { field, value, onChange } ) => {
+	const rows = normalizeKeyValueRows( value );
+	const keyLabel = field.keyLabel || __( 'Key', 'formspress' );
+	const valueLabel = field.valueLabel || __( 'Value', 'formspress' );
+
+	const updateRow = ( index, rowKey, nextValue ) => {
+		const next = [ ...rows ];
+		next[ index ] = { ...next[ index ], [ rowKey ]: nextValue };
+		onChange( next );
+	};
+
+	const removeRow = ( index ) => {
+		onChange( rows.filter( ( _, itemIndex ) => itemIndex !== index ) );
+	};
+
+	const addRow = () => {
+		onChange( [ ...rows, { key: '', value: '' } ] );
+	};
+
+	return (
+		<div className="ff-key-value-repeater">
+			<div className="components-base-control__field">
+				<span className="components-base-control__label">
+					{ field.label }
+				</span>
+				<div className="ff-key-value-repeater__rows">
+					{ rows.map( ( row, index ) => (
+						<div
+							key={ index }
+							className="ff-key-value-repeater__row"
+						>
+							<TextControl
+								label={ keyLabel }
+								value={ row.key }
+								onChange={ ( nextValue ) =>
+									updateRow( index, 'key', nextValue )
+								}
+								placeholder={ field.keyPlaceholder || '' }
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+							/>
+							<TextControl
+								label={ valueLabel }
+								value={ row.value }
+								onChange={ ( nextValue ) =>
+									updateRow( index, 'value', nextValue )
+								}
+								placeholder={ field.valuePlaceholder || '' }
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+							/>
+							<Button
+								icon={ closeSmall }
+								label={ __( 'Remove row', 'formspress' ) }
+								onClick={ () => removeRow( index ) }
+								variant="tertiary"
+							/>
+						</div>
+					) ) }
+				</div>
+				<Button variant="secondary" icon={ plus } onClick={ addRow }>
+					{ field.addLabel || __( 'Add row', 'formspress' ) }
 				</Button>
 			</div>
 			{ field.help && (
@@ -451,72 +950,86 @@ const ActionConfig = ( {
 	onDelete,
 	onDuplicate,
 	availableActions,
+	lockedActions = [],
 	form,
 } ) => {
 	const typeOptions = [
-		{ value: '', label: __( '— Select action type —', 'flowforms' ) },
+		{ value: '', label: __( '— Select action type —', 'formspress' ) },
 		...availableActions.map( ( a ) => ( { value: a.id, label: a.label } ) ),
 	];
 
 	const set = ( key ) => ( value ) =>
 		onChange( { ...action, [ key ]: value } );
 	const currentDef = availableActions.find( ( a ) => a.id === action.type );
-	const label = currentDef?.label || __( 'New action', 'flowforms' );
+	const lockedDef = lockedActions.find( ( a ) => a.id === action.type );
+	const label =
+		currentDef?.label ||
+		lockedDef?.label ||
+		__( 'New action', 'formspress' );
 	const description = currentDef?.description || '';
+	const isLocked = !! lockedDef && ! currentDef;
 
 	return (
 		<PanelBody
 			title={ `${ index + 1 }. ${ label }${
-				! action.enabled ? ` — ${ __( 'Disabled', 'flowforms' ) }` : ''
+				! action.enabled ? ` — ${ __( 'Disabled', 'formspress' ) }` : ''
 			}` }
 			initialOpen={ true }
 		>
 			<div className="ff-actions-stack">
 				<SelectControl
-					label={ __( 'Action type', 'flowforms' ) }
+					label={ __( 'Action type', 'formspress' ) }
 					value={ action.type || '' }
 					options={ typeOptions }
 					onChange={ set( 'type' ) }
 					help={ description }
+					disabled={ isLocked }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
 
+				{ isLocked && <ProActionsNotice compact /> }
+
 				<ToggleControl
-					label={ __( 'Enabled', 'flowforms' ) }
+					label={ __( 'Enabled', 'formspress' ) }
 					checked={ !! action.enabled }
 					onChange={ set( 'enabled' ) }
+					disabled={ isLocked }
 					help={
 						action.enabled
-							? __( 'Runs on every submission.', 'flowforms' )
-							: __( 'Skipped on submissions.', 'flowforms' )
+							? __( 'Runs on every submission.', 'formspress' )
+							: __( 'Skipped on submissions.', 'formspress' )
 					}
 					__nextHasNoMarginBottom
 				/>
 
-				{ currentDef?.fields?.map( ( field ) => (
-					<FieldRenderer
-						key={ field.key }
-						field={ field }
-						value={ action[ field.key ] }
-						onChange={ set( field.key ) }
-						form={ form }
-						action={ action }
-						onActionChange={ onChange }
-					/>
-				) ) }
+				{ currentDef?.fields
+					?.filter( ( field ) =>
+						isActionFieldVisible( field, action )
+					)
+					.map( ( field ) => (
+						<FieldRenderer
+							key={ field.key }
+							field={ field }
+							value={ action[ field.key ] }
+							onChange={ set( field.key ) }
+							form={ form }
+							action={ action }
+							onActionChange={ onChange }
+						/>
+					) ) }
 
 				<DropdownMenu
 					icon={ moreVertical }
-					label={ __( 'Action options', 'flowforms' ) }
+					label={ __( 'Action options', 'formspress' ) }
 					controls={ [
 						{
-							title: __( 'Duplicate', 'flowforms' ),
+							title: __( 'Duplicate', 'formspress' ),
 							icon: copy,
 							onClick: onDuplicate,
 						},
 						{
-							title: __( 'Remove action', 'flowforms' ),
+							title: __( 'Remove action', 'formspress' ),
 							icon: trash,
 							onClick: onDelete,
 						},
@@ -530,23 +1043,26 @@ const ActionConfig = ( {
 
 const ActionInserter = ( {
 	availableActions,
+	lockedActions = [],
 	onSelect,
-	label = __( 'Add', 'flowforms' ),
+	label = __( 'Add', 'formspress' ),
 	variant = 'secondary',
 } ) => {
 	const [ search, setSearch ] = useState( '' );
 	const filteredActions = useMemo( () => {
 		const query = search.trim().toLowerCase();
-		if ( ! query ) {
-			return availableActions;
-		}
-		return availableActions.filter( ( action ) => {
-			const text = `${ action.label || '' } ${
-				action.description || ''
-			}`.toLowerCase();
-			return text.includes( query );
-		} );
+		return availableActions.filter( ( action ) =>
+			matchesActionSearch( action, query )
+		);
 	}, [ availableActions, search ] );
+	const filteredLockedActions = useMemo( () => {
+		const query = search.trim().toLowerCase();
+		return lockedActions.filter( ( action ) =>
+			matchesActionSearch( action, query )
+		);
+	}, [ lockedActions, search ] );
+	const hasResults =
+		filteredActions.length > 0 || filteredLockedActions.length > 0;
 
 	return (
 		<Dropdown
@@ -572,36 +1088,68 @@ const ActionInserter = ( {
 						__nextHasNoMarginBottom
 						value={ search }
 						onChange={ setSearch }
-						placeholder={ __( 'Search actions', 'flowforms' ) }
+						placeholder={ __( 'Search actions', 'formspress' ) }
 					/>
 					<div className="ff-actions-inserter__results" role="list">
-						{ filteredActions.length ? (
-							filteredActions.map( ( action ) => (
-								<button
-									key={ action.id }
-									type="button"
-									className="ff-actions-inserter__item"
-									onClick={ () => {
-										onSelect( action.id );
-										setSearch( '' );
-										onClose();
-									} }
-								>
-									<span className="ff-actions-inserter__item-title">
-										{ action.label }
-									</span>
-									{ action.description && (
-										<span className="ff-actions-inserter__item-description">
-											{ action.description }
+						{ hasResults ? (
+							<>
+								{ filteredActions.map( ( action ) => (
+									<button
+										key={ action.id }
+										type="button"
+										className="ff-actions-inserter__item"
+										onClick={ () => {
+											onSelect( action.id );
+											setSearch( '' );
+											onClose();
+										} }
+									>
+										<span className="ff-actions-inserter__item-title">
+											{ action.label }
 										</span>
-									) }
-								</button>
-							) )
+										{ action.description && (
+											<span className="ff-actions-inserter__item-description">
+												{ action.description }
+											</span>
+										) }
+									</button>
+								) ) }
+								{ filteredLockedActions.map( ( action ) => (
+									<button
+										key={ action.id }
+										type="button"
+										className="ff-actions-inserter__item ff-actions-inserter__item--locked"
+										onClick={ () =>
+											window.open(
+												UPGRADE_URL,
+												'_blank',
+												'noopener,noreferrer'
+											)
+										}
+									>
+										<span className="ff-actions-inserter__locked-title">
+											<span className="ff-actions-inserter__item-title">
+												<Icon
+													icon={ lock }
+													size={ 16 }
+												/>
+												{ action.label }
+											</span>
+											<ProBadge />
+										</span>
+										{ action.description && (
+											<span className="ff-actions-inserter__item-description">
+												{ action.description }
+											</span>
+										) }
+									</button>
+								) ) }
+							</>
 						) : (
 							<p className="ff-actions-inserter__empty">
 								{ __(
 									'No matching actions found.',
-									'flowforms'
+									'formspress'
 								) }
 							</p>
 						) }
@@ -616,6 +1164,7 @@ const ActionWorkspace = ( {
 	actions,
 	form,
 	availableActions,
+	lockedActions,
 	addAction,
 	updateAction,
 	deleteAction,
@@ -639,9 +1188,17 @@ const ActionWorkspace = ( {
 		? Math.min( Math.max( selectedIndex, 0 ), actions.length - 1 )
 		: 0;
 	const selectedAction = actions[ safeSelectedIndex ];
-	const selectedDef = availableActions.find(
-		( action ) => action.id === selectedAction?.type
-	);
+	const selectedDef =
+		availableActions.find(
+			( action ) => action.id === selectedAction?.type
+		) ||
+		lockedActions.find( ( action ) => action.id === selectedAction?.type );
+	const selectedIsLocked =
+		!! selectedAction &&
+		! availableActions.some(
+			( action ) => action.id === selectedAction.type
+		) &&
+		lockedActions.some( ( action ) => action.id === selectedAction.type );
 	const setSelectedAction = ( updated ) => {
 		updateAction( safeSelectedIndex, updated );
 	};
@@ -664,9 +1221,10 @@ const ActionWorkspace = ( {
 			<div className="ff-actions-workspace ff-actions-workspace--empty-state">
 				<aside className="ff-actions-workspace__list">
 					<div className="ff-actions-workspace__list-header">
-						<strong>{ __( 'Actions', 'flowforms' ) }</strong>
+						<strong>{ __( 'Actions', 'formspress' ) }</strong>
 						<ActionInserter
 							availableActions={ availableActions }
+							lockedActions={ lockedActions }
 							onSelect={ ( actionType ) => {
 								addAction( actionType );
 								setSelectedIndex( 0 );
@@ -677,7 +1235,7 @@ const ActionWorkspace = ( {
 						<p>
 							{ __(
 								'No submission actions configured.',
-								'flowforms'
+								'formspress'
 							) }
 						</p>
 					</div>
@@ -688,20 +1246,24 @@ const ActionWorkspace = ( {
 						<div className="ff-actions-empty-panel">
 							<Icon icon={ send } size={ 32 } />
 							<p className="ff-actions-detail__eyebrow">
-								{ __( 'Action configuration', 'flowforms' ) }
+								{ __( 'Action configuration', 'formspress' ) }
 							</p>
-							<h2>{ __( 'No action selected', 'flowforms' ) }</h2>
+							<h2>
+								{ __( 'No action selected', 'formspress' ) }
+							</h2>
 							<p>
 								{ __(
-									'Choose an action to run after a successful submission, such as sending an email notification, redirecting the visitor, or calling a webhook.',
-									'flowforms'
+									'Start with the free email notification action. More workflow actions are available in FormsPress Pro.',
+									'formspress'
 								) }
 							</p>
+							{ lockedActions.length > 0 && <ProActionsNotice /> }
 							<div className="ff-actions-empty-panel__actions">
 								<ActionInserter
 									availableActions={ availableActions }
+									lockedActions={ lockedActions }
 									variant="primary"
-									label={ __( 'Add action', 'flowforms' ) }
+									label={ __( 'Add action', 'formspress' ) }
 									onSelect={ ( actionType ) => {
 										addAction( actionType );
 										setSelectedIndex( 0 );
@@ -719,9 +1281,10 @@ const ActionWorkspace = ( {
 		<div className="ff-actions-workspace">
 			<aside className="ff-actions-workspace__list">
 				<div className="ff-actions-workspace__list-header">
-					<strong>{ __( 'Actions', 'flowforms' ) }</strong>
+					<strong>{ __( 'Actions', 'formspress' ) }</strong>
 					<ActionInserter
 						availableActions={ availableActions }
+						lockedActions={ lockedActions }
 						onSelect={ ( actionType ) => {
 							addAction( actionType );
 							setSelectedIndex( actions.length );
@@ -731,11 +1294,16 @@ const ActionWorkspace = ( {
 
 				<div className="ff-actions-list" role="list">
 					{ actions.map( ( action, index ) => {
-						const actionDef = availableActions.find(
-							( item ) => item.id === action.type
-						);
+						const actionDef =
+							availableActions.find(
+								( item ) => item.id === action.type
+							) ||
+							lockedActions.find(
+								( item ) => item.id === action.type
+							);
 						const label =
-							actionDef?.label || __( 'New action', 'flowforms' );
+							actionDef?.label ||
+							__( 'New action', 'formspress' );
 						const isSelected = index === safeSelectedIndex;
 						const isEnabled = action.enabled !== false;
 
@@ -799,10 +1367,10 @@ const ActionWorkspace = ( {
 										</span>
 										<span className="ff-actions-list__meta">
 											{ isEnabled
-												? __( 'Enabled', 'flowforms' )
+												? __( 'Enabled', 'formspress' )
 												: __(
 														'Disabled',
-														'flowforms'
+														'formspress'
 												  ) }
 										</span>
 									</span>
@@ -812,14 +1380,14 @@ const ActionWorkspace = ( {
 										icon={ moreVertical }
 										label={ __(
 											'Action options',
-											'flowforms'
+											'formspress'
 										) }
 										controls={ [
 											[
 												{
 													title: __(
 														'Move up',
-														'flowforms'
+														'formspress'
 													),
 													icon: arrowUp,
 													isDisabled: index === 0,
@@ -832,7 +1400,7 @@ const ActionWorkspace = ( {
 												{
 													title: __(
 														'Move down',
-														'flowforms'
+														'formspress'
 													),
 													icon: arrowDown,
 													isDisabled:
@@ -850,11 +1418,11 @@ const ActionWorkspace = ( {
 													title: isEnabled
 														? __(
 																'Disable',
-																'flowforms'
+																'formspress'
 														  )
 														: __(
 																'Enable',
-																'flowforms'
+																'formspress'
 														  ),
 													icon: isEnabled
 														? unseen
@@ -875,7 +1443,7 @@ const ActionWorkspace = ( {
 												{
 													title: __(
 														'Duplicate',
-														'flowforms'
+														'formspress'
 													),
 													icon: copy,
 													onClick: () => {
@@ -890,7 +1458,7 @@ const ActionWorkspace = ( {
 												{
 													title: __(
 														'Remove',
-														'flowforms'
+														'formspress'
 													),
 													icon: trash,
 													onClick: () => {
@@ -919,11 +1487,12 @@ const ActionWorkspace = ( {
 					<div className="ff-actions-detail__header">
 						<div>
 							<p className="ff-actions-detail__eyebrow">
-								{ __( 'Action configuration', 'flowforms' ) }
+								{ __( 'Action configuration', 'formspress' ) }
 							</p>
 							<h2>
 								{ selectedDef?.label ||
-									__( 'New action', 'flowforms' ) }
+									__( 'New action', 'formspress' ) }
+								{ selectedIsLocked && <ProBadge /> }
 							</h2>
 							{ selectedDef?.description && (
 								<p className="ff-actions-detail__description">
@@ -933,9 +1502,10 @@ const ActionWorkspace = ( {
 						</div>
 						<div className="ff-actions-detail__header-actions">
 							<CheckboxControl
-								label={ __( 'Enabled', 'flowforms' ) }
+								label={ __( 'Enabled', 'formspress' ) }
 								checked={ selectedAction.enabled !== false }
 								onChange={ set( 'enabled' ) }
+								disabled={ selectedIsLocked }
 								__nextHasNoMarginBottom
 							/>
 						</div>
@@ -944,29 +1514,50 @@ const ActionWorkspace = ( {
 					<div className="ff-actions-settings">
 						<section className="ff-actions-settings__section">
 							<div className="ff-actions-settings__section-header">
-								<h3>{ __( 'Action details', 'flowforms' ) }</h3>
+								<h3>
+									{ __( 'Action details', 'formspress' ) }
+								</h3>
 							</div>
-							{ selectedDef?.fields?.length ? (
+							{ selectedIsLocked ? (
+								<ProActionsNotice />
+							) : selectedDef?.fields?.length ? (
 								<div className="ff-actions-settings__fields">
-									{ selectedDef.fields.map( ( field ) => (
-										<FieldRenderer
-											key={ field.key }
-											field={ field }
-											value={
-												selectedAction[ field.key ]
-											}
-											onChange={ set( field.key ) }
-											form={ form }
-											action={ selectedAction }
-											onActionChange={ setSelectedAction }
-										/>
-									) ) }
+									{ selectedDef.fields
+										.filter( ( field ) =>
+											isActionFieldVisible(
+												field,
+												selectedAction
+											)
+										)
+										.map( ( field ) => (
+											<div
+												key={ field.key }
+												className={ `ff-actions-settings__field ff-actions-settings__field--${ field.key }` }
+											>
+												<FieldRenderer
+													field={ field }
+													value={
+														selectedAction[
+															field.key
+														]
+													}
+													onChange={ set(
+														field.key
+													) }
+													form={ form }
+													action={ selectedAction }
+													onActionChange={
+														setSelectedAction
+													}
+												/>
+											</div>
+										) ) }
 								</div>
 							) : (
 								<Notice status="info" isDismissible={ false }>
 									{ __(
 										'Select an action type to configure its settings.',
-										'flowforms'
+										'formspress'
 									) }
 								</Notice>
 							) }
@@ -981,6 +1572,7 @@ const ActionWorkspace = ( {
 const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 	const [ available, setAvailable ] = useState( [] );
 	const [ deleteCandidateIndex, setDeleteCandidateIndex ] = useState( null );
+	const isProActive = !! window.flowFormsData?.pro?.active;
 
 	useEffect( () => {
 		get( ACTIONS )
@@ -991,6 +1583,12 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 	const addAction = ( actionType = 'email' ) => {
 		onChange( [ ...actions, { type: actionType, enabled: true } ] );
 	};
+	const lockedActions = isProActive
+		? []
+		: PRO_ACTION_TEASERS.filter(
+				( teaser ) =>
+					! available.some( ( action ) => action.id === teaser.id )
+		  );
 
 	const updateAction = ( index, updated ) => {
 		const next = [ ...actions ];
@@ -1047,21 +1645,21 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 		( action ) => action.id === deleteCandidateAction?.type
 	);
 	const deleteCandidateLabel =
-		deleteCandidateDefinition?.label || __( 'this action', 'flowforms' );
+		deleteCandidateDefinition?.label || __( 'this action', 'formspress' );
 	const confirmDeleteDialog = (
 		<ConfirmDialog
 			isOpen={ deleteCandidateIndex !== null && !! deleteCandidateAction }
 			onConfirm={ confirmDeleteAction }
 			onCancel={ () => setDeleteCandidateIndex( null ) }
-			confirmButtonText={ __( 'Remove', 'flowforms' ) }
-			cancelButtonText={ __( 'Cancel', 'flowforms' ) }
-			title={ __( 'Remove action?', 'flowforms' ) }
+			confirmButtonText={ __( 'Remove', 'formspress' ) }
+			cancelButtonText={ __( 'Cancel', 'formspress' ) }
+			title={ __( 'Remove action?', 'formspress' ) }
 		>
 			{ sprintf(
 				/* translators: %s: action label. */
 				__(
 					'Are you sure you want to remove “%s”? This action cannot be undone.',
-					'flowforms'
+					'formspress'
 				),
 				deleteCandidateLabel
 			) }
@@ -1075,6 +1673,7 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 					actions={ actions }
 					form={ form }
 					availableActions={ available }
+					lockedActions={ lockedActions }
 					addAction={ addAction }
 					updateAction={ updateAction }
 					deleteAction={ requestDeleteAction }
@@ -1091,7 +1690,7 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 			<div className="ff-gb-actions">
 				{ actions.length === 0 && (
 					<PanelBody
-						title={ __( 'Submission actions', 'flowforms' ) }
+						title={ __( 'Submission actions', 'formspress' ) }
 						initialOpen={ true }
 					>
 						<div className="ff-actions-stack">
@@ -1104,16 +1703,19 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 								} }
 							>
 								{ __(
-									'Send an email, call a webhook, or redirect when a form is submitted.',
-									'flowforms'
+									'Send an email notification after every submission. More action types are available in FormsPress Pro.',
+									'formspress'
 								) }
 							</p>
+							{ lockedActions.length > 0 && (
+								<ProActionsNotice compact />
+							) }
 							<Button
 								variant="secondary"
 								icon={ plus }
 								onClick={ addAction }
 							>
-								{ __( 'Add action', 'flowforms' ) }
+								{ __( 'Add action', 'formspress' ) }
 							</Button>
 						</div>
 					</PanelBody>
@@ -1125,6 +1727,7 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 						action={ action }
 						index={ i }
 						availableActions={ available }
+						lockedActions={ lockedActions }
 						form={ form }
 						onChange={ ( updated ) => updateAction( i, updated ) }
 						onDelete={ () => requestDeleteAction( i ) }
@@ -1139,7 +1742,7 @@ const ActionsPanel = ( { actions, onChange, form, variant = 'sidebar' } ) => {
 							icon={ plus }
 							onClick={ addAction }
 						>
-							{ __( 'Add another action', 'flowforms' ) }
+							{ __( 'Add another action', 'formspress' ) }
 						</Button>
 					</div>
 				) }

@@ -38,19 +38,19 @@ function Edit( { attributes, setAttributes } ) {
 	const selectedForm = forms.find( ( f ) => f.id === formId );
 
 	const formOptions = [
-		{ value: 0, label: __( '— Choose a flow form —', 'flowforms' ) },
+		{ value: 0, label: __( '— Choose a flow form —', 'formspress' ) },
 		...forms.map( ( f ) => ( { value: f.id, label: f.title } ) ),
 	];
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Flow Form', 'flowforms' ) }>
+				<PanelBody title={ __( 'Flow Form', 'formspress' ) }>
 					{ isLoading ? (
 						<Spinner />
 					) : (
 						<SelectControl
-							label={ __( 'Choose a flow form…', 'flowforms' ) }
+							label={ __( 'Choose a flow form…', 'formspress' ) }
 							value={ formId }
 							options={ formOptions }
 							onChange={ ( v ) =>
@@ -63,7 +63,7 @@ function Edit( { attributes, setAttributes } ) {
 						/>
 					) }
 					<ToggleControl
-						label={ __( 'Display title', 'flowforms' ) }
+						label={ __( 'Display title', 'formspress' ) }
 						checked={ !! displayTitle }
 						onChange={ ( v ) =>
 							setAttributes( { displayTitle: v } )
@@ -77,10 +77,10 @@ function Edit( { attributes, setAttributes } ) {
 				{ ! formId ? (
 					<Placeholder
 						icon="media-interactive"
-						label={ __( 'FormsPress Flow Form', 'flowforms' ) }
+						label={ __( 'FormsPress Flow Form', 'formspress' ) }
 						instructions={ __(
 							'Choose a flow form in the block sidebar.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				) : (
@@ -90,13 +90,13 @@ function Edit( { attributes, setAttributes } ) {
 							{ selectedForm?.title ||
 								`${ __(
 									'Flow Form #',
-									'flowforms'
+									'formspress'
 								) }${ formId }` }
 						</strong>
 						<em>
 							{ __(
 								'Conversational form — renders on the frontend.',
-								'flowforms'
+								'formspress'
 							) }
 						</em>
 					</div>

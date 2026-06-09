@@ -16,8 +16,8 @@ use FlowForms\Modules\Templates\Services\TemplateBlocks as TB;
 class ContactFormTemplate extends AbstractTemplate {
 
 	public function get_id(): string          { return 'contact-form'; }
-	public function get_label(): string       { return __( 'Contact form', 'flowforms' ); }
-	public function get_description(): string { return __( 'Hero banner + white-card contact form — classic name / email / subject / message.', 'flowforms' ); }
+	public function get_label(): string       { return __( 'Contact form', 'formspress' ); }
+	public function get_description(): string { return __( 'Hero banner + white-card contact form — classic name / email / subject / message.', 'formspress' ); }
 	public function get_category(): string    { return 'contact'; }
 	public function get_type(): string        { return 'standard'; }
 	public function get_icon(): string        { return 'email'; }
@@ -27,10 +27,10 @@ class ContactFormTemplate extends AbstractTemplate {
 		// understand `block_markup` (e.g. older exports) still sees
 		// the field list.
 		return [
-			[ 'id' => 'name',    'type' => 'text',     'label' => __( 'Your name', 'flowforms' ), 'required' => true ],
-			[ 'id' => 'email',   'type' => 'email',    'label' => __( 'Email', 'flowforms' ),     'required' => true ],
-			[ 'id' => 'subject', 'type' => 'text',     'label' => __( 'Subject', 'flowforms' ) ],
-			[ 'id' => 'message', 'type' => 'textarea', 'label' => __( 'Message', 'flowforms' ),   'required' => true ],
+			[ 'id' => 'name',    'type' => 'text',     'label' => __( 'Your name', 'formspress' ), 'required' => true ],
+			[ 'id' => 'email',   'type' => 'email',    'label' => __( 'Email', 'formspress' ),     'required' => true ],
+			[ 'id' => 'subject', 'type' => 'text',     'label' => __( 'Subject', 'formspress' ) ],
+			[ 'id' => 'message', 'type' => 'textarea', 'label' => __( 'Message', 'formspress' ),   'required' => true ],
 		];
 	}
 
@@ -40,7 +40,7 @@ class ContactFormTemplate extends AbstractTemplate {
 				'type'     => 'email',
 				'enabled'  => true,
 				'to'       => get_option( 'admin_email', '' ),
-				'subject'  => sprintf( __( 'New contact form submission: %s', 'flowforms' ), '{field:subject}' ),
+				'subject'  => sprintf( __( 'New contact form submission: %s', 'formspress' ), '{field:subject}' ),
 				'body'     => '',
 				'reply_to' => '{field:email}',
 			],
@@ -51,9 +51,9 @@ class ContactFormTemplate extends AbstractTemplate {
 		$image_url = TB::placeholder( '1200x420', '2563eb', 'ffffff' );
 
 		$inner = implode( "\n", [
-			TB::image( $image_url, __( 'Contact', 'flowforms' ), [ 'radius' => '16px' ] ),
+			TB::image( $image_url, __( 'Contact', 'formspress' ), [ 'radius' => '16px' ] ),
 			TB::heading( [
-				'text'         => __( 'Contact us', 'flowforms' ),
+				'text'         => __( 'Contact us', 'formspress' ),
 				'level'        => 2,
 				'size'         => '30px',
 				'weight'       => '700',
@@ -61,16 +61,16 @@ class ContactFormTemplate extends AbstractTemplate {
 				'marginBottom' => '4px',
 			] ),
 			TB::description( [
-				'text'         => __( 'We typically reply within one business day.', 'flowforms' ),
+				'text'         => __( 'We typically reply within one business day.', 'formspress' ),
 				'color'        => '#6b7280',
 				'size'         => '15px',
 				'marginBottom' => '24px',
 			] ),
-			TB::field_text(     [ 'fieldId' => 'name',    'label' => __( 'Your name', 'flowforms' ), 'required' => true, 'placeholder' => __( 'Jane Doe', 'flowforms' ) ] ),
-			TB::field_email(    [ 'fieldId' => 'email',   'label' => __( 'Email', 'flowforms' ),     'required' => true, 'placeholder' => 'you@example.com' ] ),
-			TB::field_text(     [ 'fieldId' => 'subject', 'label' => __( 'Subject', 'flowforms' ),   'placeholder' => __( 'How can we help?', 'flowforms' ) ] ),
-			TB::field_textarea( [ 'fieldId' => 'message', 'label' => __( 'Message', 'flowforms' ),   'required' => true, 'rows' => 6 ] ),
-			TB::submit_button(  [ 'text' => __( 'Send message', 'flowforms' ) ] ),
+			TB::field_text(     [ 'fieldId' => 'name',    'label' => __( 'Your name', 'formspress' ), 'required' => true, 'placeholder' => __( 'Jane Doe', 'formspress' ) ] ),
+			TB::field_email(    [ 'fieldId' => 'email',   'label' => __( 'Email', 'formspress' ),     'required' => true, 'placeholder' => 'you@example.com' ] ),
+			TB::field_text(     [ 'fieldId' => 'subject', 'label' => __( 'Subject', 'formspress' ),   'placeholder' => __( 'How can we help?', 'formspress' ) ] ),
+			TB::field_textarea( [ 'fieldId' => 'message', 'label' => __( 'Message', 'formspress' ),   'required' => true, 'rows' => 6 ] ),
+			TB::submit_button(  [ 'text' => __( 'Send message', 'formspress' ) ] ),
 		] );
 
 		return TB::group( [

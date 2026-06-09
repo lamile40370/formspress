@@ -6,7 +6,6 @@ use FlowForms\Core\AbstractEndpoint;
 use FlowForms\Extensibility\Storage\StorageRegistry;
 use FlowForms\Modules\Entries\Services\EntryProcessor;
 use FlowForms\Modules\Forms\Services\FormRepository;
-use FlowForms\Modules\Webhooks\Services\HeadlessSupport;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -40,10 +39,18 @@ class SubmitForm extends AbstractEndpoint {
 		   request; anonymous + token-less submissions still work as before
 		   (back-compat). */
 		$token = isset( $_REQUEST['_ff_pub_token'] ) ? sanitize_text_field( (string) $_REQUEST['_ff_pub_token'] ) : '';
-		if ( '' !== $token && class_exists( HeadlessSupport::class ) && ! HeadlessSupport::token_matches( $form_id, $token ) ) {
+		$settings = get_option( 'flowforms_settings', [] );
+		if ( ! empty( $settings['headless_require_token'] ) && '' === $token ) {
 			return new WP_REST_Response( [
 				'success' => false,
-				'message' => __( 'Invalid public submission token.', 'flowforms' ),
+				'message' => __( 'A public submission token is required.', 'formspress' ),
+			], 401 );
+		}
+		$token_valid = (bool) apply_filters( 'flowforms_public_submission_token_valid', true, $form_id, $token );
+		if ( '' !== $token && ! $token_valid ) {
+			return new WP_REST_Response( [
+				'success' => false,
+				'message' => __( 'Invalid public submission token.', 'formspress' ),
 			], 401 );
 		}
 
@@ -71,7 +78,7 @@ class SubmitForm extends AbstractEndpoint {
 		}
 
 		$meta = [
-			'ip_address' => $this->get_client_ip(),
+			'ip_address' => ( $settings['ip_logging'] ?? true ) ? $this->get_client_ip() : '',
 			'user_agent' => sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ?? '' ),
 			'user_id'    => get_current_user_id() ?: null,
 			'source_url' => sanitize_text_field( $body['_source_url'] ?? '' ),

@@ -23,7 +23,7 @@ class DataExporter {
 	 */
 	public function register( array $exporters ): array {
 		$exporters['formspress'] = [
-			'exporter_friendly_name' => __( 'FormsPress submissions', 'flowforms' ),
+			'exporter_friendly_name' => __( 'FormsPress submissions', 'formspress' ),
 			'callback'               => [ $this, 'export' ],
 		];
 
@@ -93,33 +93,33 @@ class DataExporter {
 
 			$items = [
 				[
-					'name'  => __( 'Submission date', 'flowforms' ),
+					'name'  => __( 'Submission date', 'formspress' ),
 					'value' => $entry['created_at'],
 				],
 				[
-					'name'  => __( 'Form ID', 'flowforms' ),
+					'name'  => __( 'Form ID', 'formspress' ),
 					'value' => (string) $entry['form_id'],
 				],
 				[
-					'name'  => __( 'Source URL', 'flowforms' ),
+					'name'  => __( 'Source URL', 'formspress' ),
 					'value' => $entry['source_url'] ?: '',
 				],
 				[
-					'name'  => __( 'IP address', 'flowforms' ),
+					'name'  => __( 'IP address', 'formspress' ),
 					'value' => $entry['ip_address'] ?: '',
 				],
 			];
 
 			foreach ( $by_entry[ $entry_id ] ?? [] as $value_row ) {
 				$items[] = [
-					'name'  => $value_row['field_label'] ?: __( 'Field', 'flowforms' ),
+					'name'  => $value_row['field_label'] ?: __( 'Field', 'formspress' ),
 					'value' => (string) $value_row['field_value'],
 				];
 			}
 
 			$data[] = [
 				'group_id'    => 'formspress-entry',
-				'group_label' => __( 'Form submissions', 'flowforms' ),
+				'group_label' => __( 'Form submissions', 'formspress' ),
 				'item_id'     => 'formspress-entry-' . $entry_id,
 				'data'        => $items,
 			];

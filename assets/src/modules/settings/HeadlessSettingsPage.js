@@ -18,10 +18,10 @@ const HeadlessSettingsPage = () => {
 
 	return (
 		<SettingsShell
-			title={ __( 'Headless API', 'flowforms' ) }
+			title={ __( 'Headless API', 'formspress' ) }
 			description={ __(
 				'CORS + public-token bearer auth for decoupled frontends.',
-				'flowforms'
+				'formspress'
 			) }
 			{ ...state }
 			onSave={ () => state.save() }
@@ -30,26 +30,36 @@ const HeadlessSettingsPage = () => {
 				<CardBody>
 					<VStack spacing={ 4 }>
 						<Heading level={ 3 }>
-							{ __( 'Headless mode', 'flowforms' ) }
+							{ __( 'Headless mode', 'formspress' ) }
 						</Heading>
 						<ToggleControl
 							label={ __(
 								'Enable headless submission',
-								'flowforms'
+								'formspress'
 							) }
 							help={ __(
 								'Adds CORS headers and accepts ff_pub_<token> bearer auth for public form submissions.',
-								'flowforms'
+								'formspress'
 							) }
 							checked={ !! settings?.headless_mode }
 							onChange={ set( 'headless_mode' ) }
 							__nextHasNoMarginBottom
 						/>
+						<ToggleControl
+							label={ __( 'Require public submission token', 'formspress' ) }
+							help={ __(
+								'Reject anonymous REST submissions unless they include a valid per-form ff_pub token.',
+								'formspress'
+							) }
+							checked={ !! settings?.headless_require_token }
+							onChange={ set( 'headless_require_token' ) }
+							__nextHasNoMarginBottom
+						/>
 						<TextareaControl
-							label={ __( 'Allowed CORS origins', 'flowforms' ) }
+							label={ __( 'Allowed CORS origins', 'formspress' ) }
 							help={ __(
 								'One origin per line. Use * for any (dev only).',
-								'flowforms'
+								'formspress'
 							) }
 							value={ settings?.cors_origins ?? '*' }
 							onChange={ set( 'cors_origins' ) }
@@ -58,9 +68,9 @@ const HeadlessSettingsPage = () => {
 							__nextHasNoMarginBottom
 						/>
 						<Text variant="muted" size="small">
-							{ __( 'Full reference:', 'flowforms' ) }{ ' ' }
+							{ __( 'Full reference:', 'formspress' ) }{ ' ' }
 							<ExternalLink href="https://flowforms.test/docs/headless">
-								{ __( 'Headless API guide', 'flowforms' ) }
+								{ __( 'Headless API guide', 'formspress' ) }
 							</ExternalLink>
 						</Text>
 					</VStack>

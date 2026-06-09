@@ -17,7 +17,7 @@ class DuplicateForm extends AbstractEndpoint {
 		$new_id = $this->repo->duplicate( $id );
 
 		if ( ! $new_id ) {
-			return $this->error( __( 'Failed to duplicate form.', 'flowforms' ), 500 );
+			return $this->error( __( 'Failed to duplicate form.', 'formspress' ), 500 );
 		}
 
 		return $this->success( $this->repo->get( $new_id ), 201 );

@@ -20,7 +20,11 @@ class CreateFromTemplate extends AbstractEndpoint {
 		$template = $this->registry->get( $id );
 
 		if ( ! $template ) {
-			return $this->error( __( 'Template not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Template not found.', 'formspress' ), 404 );
+		}
+
+		if ( 'flow' === $template->type && ! apply_filters( 'flowforms_can_use_flow_forms', false ) ) {
+			return $this->error( __( 'Flow forms are available in FormsPress Pro.', 'formspress' ), 403 );
 		}
 
 		$override_title = $request->get_param( 'title' );
@@ -53,7 +57,7 @@ class CreateFromTemplate extends AbstractEndpoint {
 		$new_id = $this->repo->create( $create_args );
 
 		if ( ! $new_id ) {
-			return $this->error( __( 'Failed to create form from template.', 'flowforms' ), 500 );
+			return $this->error( __( 'Failed to create form from template.', 'formspress' ), 500 );
 		}
 
 		return $this->success( $this->repo->get( $new_id ), 201 );

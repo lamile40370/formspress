@@ -11,7 +11,7 @@ class YesNoFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Yes / No', 'flowforms' );
+		return __( 'Yes / No', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -28,8 +28,8 @@ class YesNoFieldType extends AbstractFieldType {
 		$req      = $required ? 'required' : '';
 
 		return '<div class="ff-form__choices" role="radiogroup">'
-			. '<label class="ff-form__choice"><input type="radio" name="' . $id . '" value="yes" ' . $req . ' /> ' . esc_html__( 'Yes', 'flowforms' ) . '</label>'
-			. '<label class="ff-form__choice"><input type="radio" name="' . $id . '" value="no" /> ' . esc_html__( 'No', 'flowforms' ) . '</label>'
+			. '<label class="ff-form__choice"><input type="radio" name="' . $id . '" value="yes" ' . $req . ' /> ' . esc_html__( 'Yes', 'formspress' ) . '</label>'
+			. '<label class="ff-form__choice"><input type="radio" name="' . $id . '" value="no" /> ' . esc_html__( 'No', 'formspress' ) . '</label>'
 			. '</div>';
 	}
 }

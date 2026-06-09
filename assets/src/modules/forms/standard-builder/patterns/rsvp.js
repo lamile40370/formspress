@@ -15,10 +15,10 @@ import {
  * picks up the warm orange tone for a cohesive palette.
  */
 export default {
-	title: __( 'RSVP', 'flowforms' ),
+	title: __( 'RSVP', 'formspress' ),
 	description: __(
 		'Event RSVP — warm cream card with attendance + party-size fields.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [ 'rsvp', 'event', 'invitation', 'attendance', 'guest' ],
 	content: styledGroup( {
@@ -30,7 +30,7 @@ export default {
 		maxWidth: '540px',
 		inner: [
 			heading( {
-				text: __( 'Will you attend?', 'flowforms' ),
+				text: __( 'Will you attend?', 'formspress' ),
 				size: '30px',
 				weight: '700',
 				color: '#78350f',
@@ -38,39 +38,39 @@ export default {
 			description( {
 				text: __(
 					'Please let us know by Friday — we cannot wait to celebrate with you!',
-					'flowforms'
+					'formspress'
 				),
 				color: '#92400e',
 				size: '15px',
 				marginBottom: '24px',
 			} ),
 			fieldText( {
-				label: __( 'Your name', 'flowforms' ),
+				label: __( 'Your name', 'formspress' ),
 				required: true,
-				placeholder: __( 'Jane & John Doe', 'flowforms' ),
+				placeholder: __( 'Jane & John Doe', 'formspress' ),
 			} ),
 			fieldRadio( {
-				label: __( 'Attendance', 'flowforms' ),
+				label: __( 'Attendance', 'formspress' ),
 				required: true,
 				options: [
 					{
-						label: __( "Yes, I'll be there", 'flowforms' ),
+						label: __( "Yes, I'll be there", 'formspress' ),
 						value: 'yes',
 					},
 					{
-						label: __( "Sorry, can't make it", 'flowforms' ),
+						label: __( "Sorry, can't make it", 'formspress' ),
 						value: 'no',
 					},
 				],
 			} ),
 			fieldNumber( {
-				label: __( 'Number of guests', 'flowforms' ),
+				label: __( 'Number of guests', 'formspress' ),
 				defaultValue: '1',
 				min: 1,
 				max: 10,
 			} ),
 			submitButton( {
-				text: __( 'Send RSVP', 'flowforms' ),
+				text: __( 'Send RSVP', 'formspress' ),
 				bg: '#d97706',
 				fg: '#ffffff',
 			} ),

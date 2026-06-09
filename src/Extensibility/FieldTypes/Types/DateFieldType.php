@@ -11,7 +11,7 @@ class DateFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Date', 'flowforms' );
+		return __( 'Date', 'formspress' );
 	}
 
 	public function get_group(): string {

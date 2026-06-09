@@ -189,7 +189,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 
 	const formOptions = useMemo(
 		() => [
-			{ value: 0, label: __( '— Choose a form —', 'flowforms' ) },
+			{ value: 0, label: __( '— Choose a form —', 'formspress' ) },
 			...forms
 				.filter( ( f ) => f.type !== 'flow' )
 				.map( ( f ) => ( { value: f.id, label: f.title } ) ),
@@ -260,7 +260,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 					<ToolbarGroup>
 						<ToolbarButton
 							icon={ editIcon }
-							label={ __( 'Edit form', 'flowforms' ) }
+							label={ __( 'Edit form', 'formspress' ) }
 							href={ editUrl }
 							target="_blank"
 							rel="noopener noreferrer"
@@ -270,13 +270,13 @@ function Edit( { attributes, setAttributes, clientId } ) {
 			) }
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Form', 'flowforms' ) }>
+				<PanelBody title={ __( 'Form', 'formspress' ) }>
 					<VStack spacing={ 3 }>
 						{ isLoading ? (
 							<Spinner />
 						) : (
 							<SelectControl
-								label={ __( 'Choose a form…', 'flowforms' ) }
+								label={ __( 'Choose a form…', 'formspress' ) }
 								value={ formId }
 								options={ formOptions }
 								onChange={ ( v ) => {
@@ -310,17 +310,17 @@ function Edit( { attributes, setAttributes, clientId } ) {
 								>
 									{ __(
 										'Edit form in builder',
-										'flowforms'
+										'formspress'
 									) }
 								</Button>
 								<ExternalLink href={ editUrl }>
-									{ __( 'Opens in a new tab', 'flowforms' ) }
+									{ __( 'Opens in a new tab', 'formspress' ) }
 								</ExternalLink>
 							</VStack>
 						) }
 
 						<ToggleControl
-							label={ __( 'Display title', 'flowforms' ) }
+							label={ __( 'Display title', 'formspress' ) }
 							checked={ !! displayTitle }
 							onChange={ ( v ) =>
 								setAttributes( { displayTitle: v } )
@@ -328,7 +328,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 							__nextHasNoMarginBottom
 						/>
 						<ToggleControl
-							label={ __( 'Display description', 'flowforms' ) }
+							label={ __( 'Display description', 'formspress' ) }
 							checked={ !! displayDescription }
 							onChange={ ( v ) =>
 								setAttributes( { displayDescription: v } )
@@ -343,10 +343,10 @@ function Edit( { attributes, setAttributes, clientId } ) {
 				<div { ...blockProps }>
 					<Placeholder
 						icon="feedback"
-						label={ __( 'FormsPress Form', 'flowforms' ) }
+						label={ __( 'FormsPress Form', 'formspress' ) }
 						instructions={ __(
 							'Choose a form in the block sidebar.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				</div>
@@ -354,7 +354,7 @@ function Edit( { attributes, setAttributes, clientId } ) {
 				<div { ...blockProps }>
 					<Placeholder
 						icon="feedback"
-						label={ __( 'Loading form…', 'flowforms' ) }
+						label={ __( 'Loading form…', 'formspress' ) }
 					>
 						<Spinner />
 					</Placeholder>
@@ -366,11 +366,11 @@ function Edit( { attributes, setAttributes, clientId } ) {
 						icon="feedback"
 						label={
 							detail?.title ||
-							__( 'FormsPress Form', 'flowforms' )
+							__( 'FormsPress Form', 'formspress' )
 						}
 						instructions={ __(
 							'This form was saved with the legacy builder — open it in the form editor and save again to enable the live block tree.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				</div>

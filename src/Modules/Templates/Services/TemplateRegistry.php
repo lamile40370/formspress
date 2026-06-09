@@ -19,6 +19,13 @@ use FlowForms\Modules\Templates\Services\Templates\FitnessClassBookingTemplate;
 use FlowForms\Modules\Templates\Services\Templates\HealthcareAppointmentTemplate;
 use FlowForms\Modules\Templates\Services\Templates\NonprofitDonationTemplate;
 use FlowForms\Modules\Templates\Services\Templates\PhotographyBookingTemplate;
+use FlowForms\Modules\Templates\Services\Templates\SaasDemoRequestTemplate;
+use FlowForms\Modules\Templates\Services\Templates\ProductFeedbackTemplate;
+use FlowForms\Modules\Templates\Services\Templates\ClientOnboardingTemplate;
+use FlowForms\Modules\Templates\Services\Templates\CourseEnrollmentTemplate;
+use FlowForms\Modules\Templates\Services\Templates\TravelInquiryTemplate;
+use FlowForms\Modules\Templates\Services\Templates\VolunteerApplicationTemplate;
+use FlowForms\Modules\Templates\Services\Templates\WaitlistSignupTemplate;
 
 class TemplateRegistry {
 
@@ -29,16 +36,23 @@ class TemplateRegistry {
 
 	public function __construct() {
 		$built_ins = [
-			// Hero / lead-gen
+			// Keep the first page visually mixed: lead-gen, operations,
+			// hospitality, education, feedback and flow templates are
+			// intentionally interleaved instead of grouped by category.
+			new SaasDemoRequestTemplate(),
 			new HeroCoverSignupTemplate(),
-			new NewsletterSignupTemplate(),
-			new QuoteRequestTemplate(),
-			// Contact / support
+			new ProductFeedbackTemplate(),
+			new ClientOnboardingTemplate(),
+			new TravelInquiryTemplate(),
+			new CourseEnrollmentTemplate(),
+			new WaitlistSignupTemplate(),
+			new VolunteerApplicationTemplate(),
 			new ContactFormTemplate(),
-			new SupportRequestTemplate(),
-			// Events
+			new QuoteRequestTemplate(),
 			new EventRegistrationTemplate(),
-			// Industry-specific
+			new LeadCaptureFlowTemplate(),
+			new NewsletterSignupTemplate(),
+			new SupportRequestTemplate(),
 			new RestaurantReservationTemplate(),
 			new RealEstateInquiryTemplate(),
 			new FitnessClassBookingTemplate(),
@@ -46,8 +60,6 @@ class TemplateRegistry {
 			new NonprofitDonationTemplate(),
 			new PhotographyBookingTemplate(),
 			new JobApplicationTemplate(),
-			// Flow forms (multi-step)
-			new LeadCaptureFlowTemplate(),
 			new CustomerSurveyTemplate(),
 			new EventRSVPTemplate(),
 			new QuickPollTemplate(),

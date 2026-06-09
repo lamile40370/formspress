@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { Button, __experimentalText as Text } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import { useParams } from 'react-router-dom';
 import { get, del } from '../../api/client';
@@ -13,16 +12,18 @@ import {
 import PageHeader from '../../components/PageHeader';
 import EmptyState from '../../components/EmptyState';
 import Toast from '../../components/Toast';
+import { DataViews } from '@wordpress/dataviews';
 import EntryDetailModal from './EntryDetailModal';
 import useConfirmDialog from '../../hooks/useConfirmDialog';
 import useDataViewPreferences from '../../hooks/useDataViewPreferences';
+import { setFilterParam } from '../../utils/dataviewsFilters';
 
 const STATUS_LABELS = {
-	unread: __( 'Unread', 'flowforms' ),
-	read: __( 'Read', 'flowforms' ),
-	starred: __( 'Starred', 'flowforms' ),
-	spam: __( 'Spam', 'flowforms' ),
-	trash: __( 'Trash', 'flowforms' ),
+	unread: __( 'Unread', 'formspress' ),
+	read: __( 'Read', 'formspress' ),
+	starred: __( 'Starred', 'formspress' ),
+	spam: __( 'Spam', 'formspress' ),
+	trash: __( 'Trash', 'formspress' ),
 };
 const STATUS_STYLES = {
 	unread: { backgroundColor: '#e7f5ea', color: '#00a32a' },
@@ -63,7 +64,7 @@ const EntriesListPage = () => {
 		try {
 			const params = { page: view.page, per_page: view.perPage };
 			const statusF = view.filters?.find( ( f ) => f.field === 'status' );
-			if ( statusF?.value ) params.status = statusF.value;
+			setFilterParam( params, 'status', statusF );
 			if ( view.search ) params.search = view.search;
 			if ( view.sort?.field ) {
 				params.sort = view.sort.field;
@@ -76,7 +77,7 @@ const EntriesListPage = () => {
 			setError( null );
 		} catch ( e ) {
 			setError(
-				e.message || __( 'Failed to load entries.', 'flowforms' )
+				e.message || __( 'Failed to load entries.', 'formspress' )
 			);
 		} finally {
 			setLoading( false );
@@ -100,15 +101,15 @@ const EntriesListPage = () => {
 			const confirmed = await confirm( {
 				message:
 					count === 1
-						? __( 'Delete this entry permanently?', 'flowforms' )
+						? __( 'Delete this entry permanently?', 'formspress' )
 						: sprintf(
 								__(
 									'Delete %d entries permanently?',
-									'flowforms'
+									'formspress'
 								),
 								count
 						  ),
-				confirmButtonText: __( 'Delete', 'flowforms' ),
+				confirmButtonText: __( 'Delete', 'formspress' ),
 			} );
 			if ( ! confirmed ) return;
 			try {
@@ -124,15 +125,15 @@ const EntriesListPage = () => {
 					type: 'success',
 					message:
 						count === 1
-							? __( 'Entry deleted.', 'flowforms' )
+							? __( 'Entry deleted.', 'formspress' )
 							: sprintf(
-									__( '%d entries deleted.', 'flowforms' ),
+									__( '%d entries deleted.', 'formspress' ),
 									count
 							  ),
 				} );
 			} catch ( e ) {
 				setError(
-					e.message || __( 'Failed to delete entries.', 'flowforms' )
+					e.message || __( 'Failed to delete entries.', 'formspress' )
 				);
 			}
 		},
@@ -163,7 +164,7 @@ const EntriesListPage = () => {
 			a.click();
 			URL.revokeObjectURL( url );
 		} catch ( e ) {
-			setError( __( 'Failed to export entries.', 'flowforms' ) );
+			setError( __( 'Failed to export entries.', 'formspress' ) );
 		}
 	};
 
@@ -171,9 +172,9 @@ const EntriesListPage = () => {
 		() => [
 			{
 				id: 'status',
-				label: __( 'Status', 'flowforms' ),
+				label: __( 'Status', 'formspress' ),
 				enableSorting: false,
-				filterBy: { operators: [ 'is' ] },
+				filterBy: { operators: [ 'isAny' ] },
 				elements: Object.entries( STATUS_LABELS )
 					.filter( ( [ k ] ) => k !== 'trash' )
 					.map( ( [ value, label ] ) => ( { value, label } ) ),
@@ -202,7 +203,7 @@ const EntriesListPage = () => {
 			},
 			{
 				id: 'created_at',
-				label: __( 'Date', 'flowforms' ),
+				label: __( 'Date', 'formspress' ),
 				enableSorting: true,
 				render: ( { item } ) => (
 					<Button
@@ -215,13 +216,13 @@ const EntriesListPage = () => {
 			},
 			{
 				id: 'ip_address',
-				label: __( 'IP', 'flowforms' ),
+				label: __( 'IP', 'formspress' ),
 				enableSorting: false,
 				render: ( { item } ) => <Text>{ item.ip_address || '—' }</Text>,
 			},
 			{
 				id: 'source_url',
-				label: __( 'Source', 'flowforms' ),
+				label: __( 'Source', 'formspress' ),
 				enableSorting: false,
 				render: ( { item } ) => (
 					<Text
@@ -244,13 +245,13 @@ const EntriesListPage = () => {
 		() => [
 			{
 				id: 'view',
-				label: __( 'View', 'flowforms' ),
+				label: __( 'View', 'formspress' ),
 				isPrimary: true,
 				callback: ( [ e ] ) => setSelected( e.id ),
 			},
 			{
 				id: 'delete',
-				label: __( 'Delete', 'flowforms' ),
+				label: __( 'Delete', 'formspress' ),
 				isDestructive: true,
 				supportsBulk: true,
 				callback: handleDelete,
@@ -267,12 +268,12 @@ const EntriesListPage = () => {
 			className="ff-page ff-page--dataviews"
 			title={
 				form
-					? sprintf( __( 'Entries — %s', 'flowforms' ), form.title )
-					: __( 'Entries', 'flowforms' )
+					? sprintf( __( 'Entries — %s', 'formspress' ), form.title )
+					: __( 'Entries', 'formspress' )
 			}
 			right={
 				<Button variant="secondary" onClick={ handleExport }>
-					{ __( 'Export CSV', 'flowforms' ) }
+					{ __( 'Export CSV', 'formspress' ) }
 				</Button>
 			}
 		>
@@ -290,10 +291,10 @@ const EntriesListPage = () => {
 				{ showEmpty ? (
 					<EmptyState
 						icon="feedback"
-						title={ __( 'No entries yet', 'flowforms' ) }
+						title={ __( 'No entries yet', 'formspress' ) }
 						description={ __(
 							'Submissions will appear here once your form receives responses.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				) : (

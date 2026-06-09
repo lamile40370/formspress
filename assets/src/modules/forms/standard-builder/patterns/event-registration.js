@@ -22,22 +22,22 @@ const sideBySideNames = `<!-- wp:columns {"style":{"spacing":{"blockGap":{"left"
 <div class="wp-block-columns">
 <!-- wp:column -->
 <div class="wp-block-column">
-${ fieldText( { label: __( 'First name', 'flowforms' ), required: true } ) }
+${ fieldText( { label: __( 'First name', 'formspress' ), required: true } ) }
 </div>
 <!-- /wp:column -->
 <!-- wp:column -->
 <div class="wp-block-column">
-${ fieldText( { label: __( 'Last name', 'flowforms' ), required: true } ) }
+${ fieldText( { label: __( 'Last name', 'formspress' ), required: true } ) }
 </div>
 <!-- /wp:column -->
 </div>
 <!-- /wp:columns -->`;
 
 export default {
-	title: __( 'Event registration', 'flowforms' ),
+	title: __( 'Event registration', 'formspress' ),
 	description: __(
 		'Conference / workshop registration with ticket type + dietary. Layout-rich.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [ 'event', 'register', 'ticket', 'workshop', 'conference' ],
 	content: styledGroup( {
@@ -49,7 +49,7 @@ export default {
 		maxWidth: '600px',
 		inner: [
 			heading( {
-				text: __( 'Register for the event', 'flowforms' ),
+				text: __( 'Register for the event', 'formspress' ),
 				size: '30px',
 				weight: '800',
 				color: '#0f172a',
@@ -57,7 +57,7 @@ export default {
 			description( {
 				text: __(
 					'Limited seats — registration closes one week before the event.',
-					'flowforms'
+					'formspress'
 				),
 				color: '#475569',
 				size: '15px',
@@ -65,43 +65,43 @@ export default {
 			} ),
 			sideBySideNames,
 			fieldEmail( {
-				label: __( 'Email', 'flowforms' ),
+				label: __( 'Email', 'formspress' ),
 				required: true,
 				placeholder: 'you@example.com',
 			} ),
-			fieldText( { label: __( 'Company / organisation', 'flowforms' ) } ),
+			fieldText( { label: __( 'Company / organisation', 'formspress' ) } ),
 			fieldSelect( {
-				label: __( 'Ticket type', 'flowforms' ),
+				label: __( 'Ticket type', 'formspress' ),
 				required: true,
 				options: [
 					{
-						label: __( 'General admission', 'flowforms' ),
+						label: __( 'General admission', 'formspress' ),
 						value: 'general',
 					},
-					{ label: __( 'VIP', 'flowforms' ), value: 'vip' },
-					{ label: __( 'Student', 'flowforms' ), value: 'student' },
+					{ label: __( 'VIP', 'formspress' ), value: 'vip' },
+					{ label: __( 'Student', 'formspress' ), value: 'student' },
 				],
 			} ),
 			fieldCheckbox( {
-				label: __( 'Dietary preferences', 'flowforms' ),
+				label: __( 'Dietary preferences', 'formspress' ),
 				options: [
 					{
-						label: __( 'Vegetarian', 'flowforms' ),
+						label: __( 'Vegetarian', 'formspress' ),
 						value: 'vegetarian',
 					},
-					{ label: __( 'Vegan', 'flowforms' ), value: 'vegan' },
+					{ label: __( 'Vegan', 'formspress' ), value: 'vegan' },
 					{
-						label: __( 'Gluten-free', 'flowforms' ),
+						label: __( 'Gluten-free', 'formspress' ),
 						value: 'gluten-free',
 					},
 				],
 			} ),
 			fieldTextarea( {
-				label: __( 'Anything else we should know?', 'flowforms' ),
+				label: __( 'Anything else we should know?', 'formspress' ),
 				rows: 3,
 			} ),
 			submitButton( {
-				text: __( 'Complete registration', 'flowforms' ),
+				text: __( 'Complete registration', 'formspress' ),
 				bg: '#dc2626',
 				fg: '#ffffff',
 				full: true,

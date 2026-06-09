@@ -11,18 +11,18 @@ class RecaptchaV3Provider extends AbstractSpamProvider {
 	}
 
 	public function get_label(): string {
-		return __( 'Google reCAPTCHA v3', 'flowforms' );
+		return __( 'Google reCAPTCHA v3', 'formspress' );
 	}
 
 	public function get_description(): string {
-		return __( 'Invisible score-based protection from Google. Recommended threshold: 0.5.', 'flowforms' );
+		return __( 'Invisible score-based protection from Google. Recommended threshold: 0.5.', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'site_key',   'type' => 'text',     'label' => __( 'Site key', 'flowforms' ) ],
-			[ 'key' => 'secret_key', 'type' => 'password', 'label' => __( 'Secret key', 'flowforms' ) ],
-			[ 'key' => 'threshold',  'type' => 'number',   'label' => __( 'Score threshold', 'flowforms' ), 'default' => 0.5, 'min' => 0, 'max' => 1, 'help' => __( 'Submissions scoring below this are rejected. 0.0 (bot) — 1.0 (human).', 'flowforms' ) ],
+			[ 'key' => 'site_key',   'type' => 'text',     'label' => __( 'Site key', 'formspress' ) ],
+			[ 'key' => 'secret_key', 'type' => 'password', 'label' => __( 'Secret key', 'formspress' ) ],
+			[ 'key' => 'threshold',  'type' => 'number',   'label' => __( 'Score threshold', 'formspress' ), 'default' => 0.5, 'min' => 0, 'max' => 1, 'help' => __( 'Submissions scoring below this are rejected. 0.0 (bot) — 1.0 (human).', 'formspress' ) ],
 		];
 	}
 
@@ -47,7 +47,7 @@ class RecaptchaV3Provider extends AbstractSpamProvider {
 			return true;
 		}
 		if ( $token === '' ) {
-			return __( 'Spam check failed: missing token.', 'flowforms' );
+			return __( 'Spam check failed: missing token.', 'formspress' );
 		}
 
 		$response = wp_remote_post( 'https://www.google.com/recaptcha/api/siteverify', [
@@ -60,19 +60,19 @@ class RecaptchaV3Provider extends AbstractSpamProvider {
 		] );
 
 		if ( is_wp_error( $response ) ) {
-			return __( 'Spam check failed: provider unreachable.', 'flowforms' );
+			return __( 'Spam check failed: provider unreachable.', 'formspress' );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
 		if ( ! is_array( $body ) || empty( $body['success'] ) ) {
-			return __( 'Spam check failed.', 'flowforms' );
+			return __( 'Spam check failed.', 'formspress' );
 		}
 
 		$threshold = isset( $config['threshold'] ) ? (float) $config['threshold'] : 0.5;
 		$score     = isset( $body['score'] ) ? (float) $body['score'] : 0.0;
 
 		if ( $score < $threshold ) {
-			return __( 'Submission flagged as suspicious. Please try again.', 'flowforms' );
+			return __( 'Submission flagged as suspicious. Please try again.', 'formspress' );
 		}
 
 		return true;

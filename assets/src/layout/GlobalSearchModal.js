@@ -26,13 +26,13 @@ const GlobalSearchModal = ( { isOpen, onClose, onNavigate } ) => {
 
 	return (
 		<Modal
-			title={ __( 'Search', 'flowforms' ) }
+			title={ __( 'Search', 'formspress' ) }
 			onRequestClose={ onClose }
 			size="medium"
 		>
 			<VStack spacing={ 3 }>
 				<TextControl
-					placeholder={ __( 'Search pages…', 'flowforms' ) }
+					placeholder={ __( 'Search pages…', 'formspress' ) }
 					value={ search }
 					onChange={ setSearch }
 					autoFocus
@@ -63,7 +63,7 @@ const GlobalSearchModal = ( { isOpen, onClose, onNavigate } ) => {
 								padding: '16px',
 							} }
 						>
-							{ __( 'No results found.', 'flowforms' ) }
+							{ __( 'No results found.', 'formspress' ) }
 						</p>
 					) }
 				</div>

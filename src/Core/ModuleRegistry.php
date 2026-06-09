@@ -23,15 +23,11 @@ class ModuleRegistry {
 			\FlowForms\Modules\Entries\EntriesModule::class,
 			\FlowForms\Modules\Actions\ActionsModule::class,
 			\FlowForms\Modules\Templates\TemplatesModule::class,
-			\FlowForms\Modules\EmailTemplates\EmailTemplatesModule::class,
-			\FlowForms\Modules\Webhooks\WebhooksModule::class,
-			\FlowForms\Modules\Analytics\AnalyticsModule::class,
 			\FlowForms\Modules\Settings\SettingsModule::class,
 			\FlowForms\Modules\FieldTypes\FieldTypesModule::class,
 			\FlowForms\Modules\SpamProviders\SpamProvidersModule::class,
 			\FlowForms\Modules\Blocks\BlocksModule::class,
 			\FlowForms\Modules\Bindings\BindingsModule::class,
-			\FlowForms\Modules\Stripe\StripeModule::class,
 			\FlowForms\Modules\Compat\CompatModule::class,
 			\FlowForms\Modules\Privacy\PrivacyModule::class,
 			\FlowForms\Modules\Integrations\IntegrationsModule::class,
@@ -47,6 +43,8 @@ class ModuleRegistry {
 			$module = new $class();
 			$this->modules[ $module->get_id() ] = $module;
 
+			do_action( 'flowforms_registering_module', $module, $this->container );
+
 			$module->register_services( $this->container );
 
 			foreach ( $module->get_subscribers() as $subscriber_class ) {
@@ -60,6 +58,8 @@ class ModuleRegistry {
 				} );
 			}
 		}
+
+		do_action( 'flowforms_modules_registered', $this->modules, $this->container );
 	}
 
 	public function boot_modules(): void {
@@ -80,6 +80,8 @@ class ModuleRegistry {
 		foreach ( $this->modules as $module ) {
 			$items = array_merge( $items, $module->get_nav_items() );
 		}
+
+		$items = apply_filters( 'flowforms_nav_items', $items, $this->modules );
 
 		usort( $items, fn( $a, $b ) => ( $a['position'] ?? 50 ) <=> ( $b['position'] ?? 50 ) );
 

@@ -20,13 +20,13 @@ class SaveAsTemplate extends AbstractEndpoint {
 		$form    = $this->repo->get( $form_id );
 
 		if ( ! $form ) {
-			return $this->error( __( 'Source form not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Source form not found.', 'formspress' ), 404 );
 		}
 
 		$label = sanitize_text_field( (string) $request->get_param( 'label' ) );
 
 		if ( '' === $label ) {
-			return $this->error( __( 'Template label is required.', 'flowforms' ), 400 );
+			return $this->error( __( 'Template label is required.', 'formspress' ), 400 );
 		}
 
 		$record = $this->registry->save_user_template( [

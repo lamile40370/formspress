@@ -33,7 +33,7 @@ const OptionsControl = ( { options = [], onChange } ) => {
 	return (
 		<BaseControl
 			id={ id }
-			label={ __( 'Options', 'flowforms' ) }
+			label={ __( 'Options', 'formspress' ) }
 			__nextHasNoMarginBottom
 		>
 			<div style={ { display: 'flex', flexDirection: 'column', gap: 8 } }>
@@ -45,9 +45,9 @@ const OptionsControl = ( { options = [], onChange } ) => {
 								onChange={ ( v ) =>
 									update( index, 'label', v )
 								}
-								placeholder={ __( 'Label', 'flowforms' ) }
+								placeholder={ __( 'Label', 'formspress' ) }
 								hideLabelFromVision
-								label={ __( 'Label', 'flowforms' ) }
+								label={ __( 'Label', 'formspress' ) }
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 							/>
@@ -58,9 +58,9 @@ const OptionsControl = ( { options = [], onChange } ) => {
 								onChange={ ( v ) =>
 									update( index, 'value', v )
 								}
-								placeholder={ __( 'Value', 'flowforms' ) }
+								placeholder={ __( 'Value', 'formspress' ) }
 								hideLabelFromVision
-								label={ __( 'Value', 'flowforms' ) }
+								label={ __( 'Value', 'formspress' ) }
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 							/>
@@ -68,7 +68,7 @@ const OptionsControl = ( { options = [], onChange } ) => {
 						<FlexItem>
 							<Button
 								icon={ closeSmall }
-								label={ __( 'Remove option', 'flowforms' ) }
+								label={ __( 'Remove option', 'formspress' ) }
 								onClick={ () => remove( index ) }
 								size="small"
 							/>
@@ -81,7 +81,7 @@ const OptionsControl = ( { options = [], onChange } ) => {
 					onClick={ add }
 					__next40pxDefaultSize
 				>
-					{ __( 'Add option', 'flowforms' ) }
+					{ __( 'Add option', 'formspress' ) }
 				</Button>
 			</div>
 		</BaseControl>

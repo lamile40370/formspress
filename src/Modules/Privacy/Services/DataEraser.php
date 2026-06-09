@@ -25,7 +25,7 @@ class DataEraser {
 	 */
 	public function register( array $erasers ): array {
 		$erasers['formspress'] = [
-			'eraser_friendly_name' => __( 'FormsPress submissions', 'flowforms' ),
+			'eraser_friendly_name' => __( 'FormsPress submissions', 'formspress' ),
 			'callback'             => [ $this, 'erase' ],
 		];
 
@@ -125,7 +125,7 @@ class DataEraser {
 					'%d FormsPress submission was anonymized.',
 					'%d FormsPress submissions were anonymized.',
 					$removed,
-					'flowforms'
+					'formspress'
 				),
 				$removed
 			);

@@ -297,7 +297,7 @@ const DEFAULT_STYLE = {
 const FALLBACK_THEME_PRESETS = [
 	{
 		id: 'default',
-		label: __( 'Classic', 'flowforms' ),
+		label: __( 'Classic', 'formspress' ),
 		bg: '#ffffff',
 		text: '#1d2327',
 		primary: '#2271b1',
@@ -305,7 +305,7 @@ const FALLBACK_THEME_PRESETS = [
 	},
 	{
 		id: 'dark',
-		label: __( 'Dark', 'flowforms' ),
+		label: __( 'Dark', 'formspress' ),
 		bg: '#1a1a1a',
 		text: '#f0f0f0',
 		primary: '#6bb6ff',
@@ -355,16 +355,16 @@ const THEME_FONT_SIZES = ( () => {
 } )();
 
 const FALLBACK_FONT_SIZES = [
-	{ name: __( 'Small', 'flowforms' ), slug: 'small', size: '14px' },
-	{ name: __( 'Medium', 'flowforms' ), slug: 'medium', size: '16px' },
-	{ name: __( 'Large', 'flowforms' ), slug: 'large', size: '18px' },
-	{ name: __( 'X-Large', 'flowforms' ), slug: 'x-large', size: '22px' },
+	{ name: __( 'Small', 'formspress' ), slug: 'small', size: '14px' },
+	{ name: __( 'Medium', 'formspress' ), slug: 'medium', size: '16px' },
+	{ name: __( 'Large', 'formspress' ), slug: 'large', size: '18px' },
+	{ name: __( 'X-Large', 'formspress' ), slug: 'x-large', size: '22px' },
 ];
 
 const FALLBACK_FONT_FAMILIES = [
 	{
 		slug: 'inherit',
-		name: __( 'Theme default', 'flowforms' ),
+		name: __( 'Theme default', 'formspress' ),
 		fontFamily: 'inherit',
 	},
 	{ slug: 'system', name: 'System UI', fontFamily: 'system-ui, sans-serif' },
@@ -391,7 +391,7 @@ const FONT_FAMILY_OPTIONS = ( () => {
 	if ( ! opts.some( ( o ) => o.value === 'inherit' ) ) {
 		opts.unshift( {
 			value: 'inherit',
-			label: __( 'Theme default', 'flowforms' ),
+			label: __( 'Theme default', 'formspress' ),
 		} );
 	}
 	return opts;
@@ -486,7 +486,7 @@ const FieldPreviewBlock = ( { field, style } ) => {
 				readOnly
 				style={ inputStyle }
 				placeholder={
-					field.placeholder || __( 'Your answer…', 'flowforms' )
+					field.placeholder || __( 'Your answer…', 'formspress' )
 				}
 			/>
 		);
@@ -497,7 +497,7 @@ const FieldPreviewBlock = ( { field, style } ) => {
 				readOnly
 				style={ { ...inputStyle, minHeight: 72, resize: 'none' } }
 				placeholder={
-					field.placeholder || __( 'Your answer…', 'flowforms' )
+					field.placeholder || __( 'Your answer…', 'formspress' )
 				}
 			/>
 		);
@@ -505,7 +505,7 @@ const FieldPreviewBlock = ( { field, style } ) => {
 	if ( field.type === 'select' ) {
 		return (
 			<select style={ inputStyle }>
-				<option>{ __( 'Select…', 'flowforms' ) }</option>
+				<option>{ __( 'Select…', 'formspress' ) }</option>
 				{ ( field.options || [] ).map( ( o, i ) => (
 					<option key={ i }>{ o }</option>
 				) ) }
@@ -578,7 +578,7 @@ const FieldPreviewBlock = ( { field, style } ) => {
 				} }
 			>
 				<span style={ { flex: 1, borderTop: '1px dashed #ddd' } } />
-				{ __( 'Page Break', 'flowforms' ) }
+				{ __( 'Page Break', 'formspress' ) }
 				<span style={ { flex: 1, borderTop: '1px dashed #ddd' } } />
 			</div>
 		);
@@ -589,18 +589,18 @@ const FieldPreviewBlock = ( { field, style } ) => {
 /* ── Field inserter popover (legacy, used by inline appender) ─────── */
 
 const FieldGroups = [
-	{ id: 'basic', label: __( 'Basic', 'flowforms' ) },
-	{ id: 'choice', label: __( 'Choice', 'flowforms' ) },
-	{ id: 'advanced', label: __( 'Advanced', 'flowforms' ) },
-	{ id: 'layout', label: __( 'Layout', 'flowforms' ) },
+	{ id: 'basic', label: __( 'Basic', 'formspress' ) },
+	{ id: 'choice', label: __( 'Choice', 'formspress' ) },
+	{ id: 'advanced', label: __( 'Advanced', 'formspress' ) },
+	{ id: 'layout', label: __( 'Layout', 'formspress' ) },
 ];
 
 /* French labels for the sidebar inserter group titles. */
 const FieldGroupsFR = {
-	basic: __( 'Texte', 'flowforms' ),
-	choice: __( 'Choix', 'flowforms' ),
-	advanced: __( 'Avancé', 'flowforms' ),
-	layout: __( 'Mise en page', 'flowforms' ),
+	basic: __( 'Texte', 'formspress' ),
+	choice: __( 'Choix', 'formspress' ),
+	advanced: __( 'Avancé', 'formspress' ),
+	layout: __( 'Mise en page', 'formspress' ),
 };
 
 const FieldInserterPopover = ( {
@@ -643,7 +643,7 @@ const FieldInserterPopover = ( {
 						ref={ inputRef }
 						value={ search }
 						onChange={ setSearch }
-						placeholder={ __( 'Search', 'flowforms' ) }
+						placeholder={ __( 'Search', 'formspress' ) }
 						className="ff-std-inserter-popover__search-control"
 						onKeyDown={ ( e ) => {
 							if ( e.key === 'Escape' ) onClose();
@@ -658,7 +658,7 @@ const FieldInserterPopover = ( {
 				<div className="ff-std-inserter-popover__body">
 					{ filtered.length === 0 && (
 						<p className="ff-std-inserter-popover__empty">
-							{ __( 'No results.', 'flowforms' ) }
+							{ __( 'No results.', 'formspress' ) }
 						</p>
 					) }
 					{ filtered.map( ( group ) => (
@@ -727,7 +727,7 @@ const TreeRow = ( {
 				<span className="ff-std-tree__item-label">
 					{ isRow
 						? sprintf(
-								__( 'Row (%d cols)', 'flowforms' ),
+								__( 'Row (%d cols)', 'formspress' ),
 								( field.cols || [] ).length
 						  )
 						: field.label || <em>{ field.type }</em> }
@@ -744,7 +744,7 @@ const TreeRow = ( {
 						e.stopPropagation();
 						onDelete( path );
 					} }
-					label={ __( 'Delete', 'flowforms' ) }
+					label={ __( 'Delete', 'formspress' ) }
 				/>
 			</div>
 			{ isRow &&
@@ -755,7 +755,7 @@ const TreeRow = ( {
 							style={ { paddingLeft: 16 + ( depth + 1 ) * 14 } }
 						>
 							{ sprintf(
-								__( 'Col %1$d · %2$s', 'flowforms' ),
+								__( 'Col %1$d · %2$s', 'formspress' ),
 								ci + 1,
 								col.width
 							) }
@@ -794,7 +794,7 @@ const FieldTreeView = ( { fields, selectedPath, onSelect, onDelete } ) => {
 		<div className="ff-std-tree">
 			<div className="ff-std-tree__header">
 				<span className="ff-std-tree__title">
-					{ __( 'Fields', 'flowforms' ) }
+					{ __( 'Fields', 'formspress' ) }
 				</span>
 				<span className="ff-std-tree__count">{ total }</span>
 			</div>
@@ -805,7 +805,7 @@ const FieldTreeView = ( { fields, selectedPath, onSelect, onDelete } ) => {
 						<p>
 							{ __(
 								'Use the + buttons in the canvas to add fields.',
-								'flowforms'
+								'formspress'
 							) }
 						</p>
 					</div>
@@ -852,9 +852,9 @@ const StandardBlockAppender = ( {
 				variant={ variant }
 				className="ff-std-appender__btn"
 				onClick={ () => setOpen( true ) }
-				label={ isLabeled ? undefined : __( 'Add field', 'flowforms' ) }
+				label={ isLabeled ? undefined : __( 'Add field', 'formspress' ) }
 			>
-				{ isLabeled ? __( 'Add your first field', 'flowforms' ) : null }
+				{ isLabeled ? __( 'Add your first field', 'formspress' ) : null }
 			</Button>
 			{ isOpen && (
 				<FieldInserterPopover
@@ -907,7 +907,7 @@ const StandardFieldBlock = ( {
 								onUpdate( { ...field, label: e.target.value } )
 							}
 							onClick={ ( e ) => e.stopPropagation() }
-							placeholder={ __( 'Field label…', 'flowforms' ) }
+							placeholder={ __( 'Field label…', 'formspress' ) }
 						/>
 						{ field.required && (
 							<span className="ff-std-block__required">*</span>
@@ -1034,7 +1034,7 @@ const RowBlock = ( {
 									e.stopPropagation();
 									removeCol( colIdx );
 								} }
-								title={ __( 'Remove column', 'flowforms' ) }
+								title={ __( 'Remove column', 'formspress' ) }
 							>
 								×
 							</button>
@@ -1119,14 +1119,14 @@ const StyleInspector = ( { style, onChange } ) => {
 	return (
 		<div className="ff-std-style-inspector">
 			<PanelBody
-				title={ __( 'Color source', 'flowforms' ) }
+				title={ __( 'Color source', 'formspress' ) }
 				initialOpen={ true }
 			>
 				<VStack spacing={ 3 }>
 					<ToggleGroupControl
 						label={ __(
 							'Where do colors come from?',
-							'flowforms'
+							'formspress'
 						) }
 						value={ source }
 						isBlock
@@ -1136,22 +1136,22 @@ const StyleInspector = ( { style, onChange } ) => {
 					>
 						<ToggleGroupControlOption
 							value="custom"
-							label={ __( 'Custom palette', 'flowforms' ) }
+							label={ __( 'Custom palette', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="theme"
-							label={ __( 'Inherit from theme', 'flowforms' ) }
+							label={ __( 'Inherit from theme', 'formspress' ) }
 						/>
 					</ToggleGroupControl>
 					{ source === 'theme' && (
 						<Text variant="muted" size={ 12 }>
 							{ __(
 								'Colors & fonts read live from the site theme — change the site Style Variation and this form follows.',
-								'flowforms'
+								'formspress'
 							) }{ ' ' }
 							{ __(
 								'Bindings: Primary → --wp--preset--color--primary · Background → --wp--preset--color--base · Text → --wp--preset--color--contrast · Font → --wp--preset--font-family--body.',
-								'flowforms'
+								'formspress'
 							) }
 						</Text>
 					) }
@@ -1160,14 +1160,14 @@ const StyleInspector = ( { style, onChange } ) => {
 
 			{ FORM_STYLE_VARIATIONS.length > 0 && (
 				<PanelBody
-					title={ __( 'FormsPress style variations', 'flowforms' ) }
+					title={ __( 'FormsPress style variations', 'formspress' ) }
 					initialOpen={ false }
 				>
 					<VStack spacing={ 3 }>
 						<Text variant="muted" size={ 12 }>
 							{ __(
 								'Apply a shipped variation as a starting point — you can still customize after.',
-								'flowforms'
+								'formspress'
 							) }
 						</Text>
 						<div className="ff-std-theme-grid">
@@ -1220,14 +1220,14 @@ const StyleInspector = ( { style, onChange } ) => {
 			) }
 
 			<PanelBody
-				title={ __( 'Theme', 'flowforms' ) }
+				title={ __( 'Theme', 'formspress' ) }
 				initialOpen={ source === 'custom' }
 			>
 				<VStack spacing={ 2 }>
 					<Text variant="muted" size={ 12 }>
 						{ __(
 							'Apply a preset from your active theme. You can still customize each color below.',
-							'flowforms'
+							'formspress'
 						) }
 					</Text>
 					<div className="ff-std-theme-grid">
@@ -1271,37 +1271,37 @@ const StyleInspector = ( { style, onChange } ) => {
 			</PanelBody>
 
 			<PanelBody
-				title={ __( 'Colors', 'flowforms' ) }
+				title={ __( 'Colors', 'formspress' ) }
 				initialOpen={ true }
 			>
 				<VStack spacing={ 3 }>
 					<ColorSwatchControl
-						label={ __( 'Primary / Accent', 'flowforms' ) }
+						label={ __( 'Primary / Accent', 'formspress' ) }
 						value={ s.primary_color }
 						onChange={ set( 'primary_color' ) }
 					/>
 					<ColorSwatchControl
-						label={ __( 'Button text', 'flowforms' ) }
+						label={ __( 'Button text', 'formspress' ) }
 						value={ s.btn_text_color }
 						onChange={ set( 'btn_text_color' ) }
 					/>
 					<ColorSwatchControl
-						label={ __( 'Background', 'flowforms' ) }
+						label={ __( 'Background', 'formspress' ) }
 						value={ s.bg_color }
 						onChange={ set( 'bg_color' ) }
 					/>
 					<ColorSwatchControl
-						label={ __( 'Text', 'flowforms' ) }
+						label={ __( 'Text', 'formspress' ) }
 						value={ s.text_color }
 						onChange={ set( 'text_color' ) }
 					/>
 					<ColorSwatchControl
-						label={ __( 'Labels', 'flowforms' ) }
+						label={ __( 'Labels', 'formspress' ) }
 						value={ s.label_color }
 						onChange={ set( 'label_color' ) }
 					/>
 					<ColorSwatchControl
-						label={ __( 'Borders', 'flowforms' ) }
+						label={ __( 'Borders', 'formspress' ) }
 						value={ s.border_color }
 						onChange={ set( 'border_color' ) }
 					/>
@@ -1309,7 +1309,7 @@ const StyleInspector = ( { style, onChange } ) => {
 			</PanelBody>
 
 			<PanelBody
-				title={ __( 'Typography', 'flowforms' ) }
+				title={ __( 'Typography', 'formspress' ) }
 				initialOpen={ false }
 			>
 				<VStack spacing={ 4 }>
@@ -1333,7 +1333,7 @@ const StyleInspector = ( { style, onChange } ) => {
 						__nextHasNoMarginBottom
 					/>
 					<SelectControl
-						label={ __( 'Font family', 'flowforms' ) }
+						label={ __( 'Font family', 'formspress' ) }
 						value={ s.font_family }
 						options={ FONT_FAMILY_OPTIONS }
 						onChange={ set( 'font_family' ) }
@@ -1341,22 +1341,22 @@ const StyleInspector = ( { style, onChange } ) => {
 						__next40pxDefaultSize
 					/>
 					<SelectControl
-						label={ __( 'Label weight', 'flowforms' ) }
+						label={ __( 'Label weight', 'formspress' ) }
 						value={ s.label_weight }
 						options={ [
 							{
 								value: '400',
-								label: __( 'Normal', 'flowforms' ),
+								label: __( 'Normal', 'formspress' ),
 							},
 							{
 								value: '500',
-								label: __( 'Medium', 'flowforms' ),
+								label: __( 'Medium', 'formspress' ),
 							},
 							{
 								value: '600',
-								label: __( 'Semi-bold', 'flowforms' ),
+								label: __( 'Semi-bold', 'formspress' ),
 							},
-							{ value: '700', label: __( 'Bold', 'flowforms' ) },
+							{ value: '700', label: __( 'Bold', 'formspress' ) },
 						] }
 						onChange={ set( 'label_weight' ) }
 						__nextHasNoMarginBottom
@@ -1366,12 +1366,12 @@ const StyleInspector = ( { style, onChange } ) => {
 			</PanelBody>
 
 			<PanelBody
-				title={ __( 'Fields & Layout', 'flowforms' ) }
+				title={ __( 'Fields & Layout', 'formspress' ) }
 				initialOpen={ false }
 			>
 				<VStack spacing={ 4 }>
 					<ToggleGroupControl
-						label={ __( 'Field spacing', 'flowforms' ) }
+						label={ __( 'Field spacing', 'formspress' ) }
 						value={ fieldSpacingToPreset( s.field_spacing ) }
 						isBlock
 						onChange={ ( v ) =>
@@ -1384,20 +1384,20 @@ const StyleInspector = ( { style, onChange } ) => {
 					>
 						<ToggleGroupControlOption
 							value="compact"
-							label={ __( 'Compact', 'flowforms' ) }
+							label={ __( 'Compact', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="comfortable"
-							label={ __( 'Comfy', 'flowforms' ) }
+							label={ __( 'Comfy', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="spacious"
-							label={ __( 'Spacious', 'flowforms' ) }
+							label={ __( 'Spacious', 'formspress' ) }
 						/>
 					</ToggleGroupControl>
 
 					<ToggleGroupControl
-						label={ __( 'Border style', 'flowforms' ) }
+						label={ __( 'Border style', 'formspress' ) }
 						value={ s.border_style || 'solid' }
 						isBlock
 						onChange={ ( v ) => set( 'border_style' )( v ) }
@@ -1406,20 +1406,20 @@ const StyleInspector = ( { style, onChange } ) => {
 					>
 						<ToggleGroupControlOption
 							value="none"
-							label={ __( 'None', 'flowforms' ) }
+							label={ __( 'None', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="solid"
-							label={ __( 'Solid', 'flowforms' ) }
+							label={ __( 'Solid', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="dashed"
-							label={ __( 'Dashed', 'flowforms' ) }
+							label={ __( 'Dashed', 'formspress' ) }
 						/>
 					</ToggleGroupControl>
 
 					<ToggleGroupControl
-						label={ __( 'Border radius', 'flowforms' ) }
+						label={ __( 'Border radius', 'formspress' ) }
 						value={ radiusToPreset( s.border_radius ) }
 						isBlock
 						onChange={ ( v ) =>
@@ -1430,31 +1430,31 @@ const StyleInspector = ( { style, onChange } ) => {
 					>
 						<ToggleGroupControlOption
 							value="square"
-							label={ __( 'Square', 'flowforms' ) }
+							label={ __( 'Square', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="soft"
-							label={ __( 'Soft', 'flowforms' ) }
+							label={ __( 'Soft', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="rounded"
-							label={ __( 'Rounded', 'flowforms' ) }
+							label={ __( 'Rounded', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="pill"
-							label={ __( 'Pill', 'flowforms' ) }
+							label={ __( 'Pill', 'formspress' ) }
 						/>
 					</ToggleGroupControl>
 
 					<PanelBody
-						title={ __( 'Custom', 'flowforms' ) }
+						title={ __( 'Custom', 'formspress' ) }
 						initialOpen={ false }
 					>
 						<VStack spacing={ 3 }>
 							<RangeControl
 								label={ __(
 									'Border radius (px)',
-									'flowforms'
+									'formspress'
 								) }
 								value={ s.border_radius }
 								onChange={ set( 'border_radius' ) }
@@ -1464,7 +1464,7 @@ const StyleInspector = ( { style, onChange } ) => {
 								__nextHasNoMarginBottom
 							/>
 							<RangeControl
-								label={ __( 'Border width (px)', 'flowforms' ) }
+								label={ __( 'Border width (px)', 'formspress' ) }
 								value={ s.border_width }
 								onChange={ set( 'border_width' ) }
 								min={ 0 }
@@ -1475,7 +1475,7 @@ const StyleInspector = ( { style, onChange } ) => {
 							<RangeControl
 								label={ __(
 									'Field spacing (px)',
-									'flowforms'
+									'formspress'
 								) }
 								value={ s.field_spacing }
 								onChange={ set( 'field_spacing' ) }
@@ -1487,7 +1487,7 @@ const StyleInspector = ( { style, onChange } ) => {
 							<RangeControl
 								label={ __(
 									'Padding horizontal (px)',
-									'flowforms'
+									'formspress'
 								) }
 								value={ s.input_padding_x }
 								onChange={ set( 'input_padding_x' ) }
@@ -1499,7 +1499,7 @@ const StyleInspector = ( { style, onChange } ) => {
 							<RangeControl
 								label={ __(
 									'Padding vertical (px)',
-									'flowforms'
+									'formspress'
 								) }
 								value={ s.input_padding_y }
 								onChange={ set( 'input_padding_y' ) }
@@ -1514,12 +1514,12 @@ const StyleInspector = ( { style, onChange } ) => {
 			</PanelBody>
 
 			<PanelBody
-				title={ __( 'Submit Button', 'flowforms' ) }
+				title={ __( 'Submit Button', 'formspress' ) }
 				initialOpen={ false }
 			>
 				<VStack spacing={ 4 }>
 					<ToggleGroupControl
-						label={ __( 'Style', 'flowforms' ) }
+						label={ __( 'Style', 'formspress' ) }
 						value={ s.btn_style || 'solid' }
 						isBlock
 						onChange={ ( v ) => set( 'btn_style' )( v ) }
@@ -1528,20 +1528,20 @@ const StyleInspector = ( { style, onChange } ) => {
 					>
 						<ToggleGroupControlOption
 							value="solid"
-							label={ __( 'Solid', 'flowforms' ) }
+							label={ __( 'Solid', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="outline"
-							label={ __( 'Outline', 'flowforms' ) }
+							label={ __( 'Outline', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="ghost"
-							label={ __( 'Ghost', 'flowforms' ) }
+							label={ __( 'Ghost', 'formspress' ) }
 						/>
 					</ToggleGroupControl>
 
 					<ToggleGroupControl
-						label={ __( 'Border radius', 'flowforms' ) }
+						label={ __( 'Border radius', 'formspress' ) }
 						value={ radiusToPreset( s.btn_radius ) }
 						isBlock
 						onChange={ ( v ) =>
@@ -1552,30 +1552,30 @@ const StyleInspector = ( { style, onChange } ) => {
 					>
 						<ToggleGroupControlOption
 							value="square"
-							label={ __( 'Square', 'flowforms' ) }
+							label={ __( 'Square', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="soft"
-							label={ __( 'Soft', 'flowforms' ) }
+							label={ __( 'Soft', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="rounded"
-							label={ __( 'Rounded', 'flowforms' ) }
+							label={ __( 'Rounded', 'formspress' ) }
 						/>
 						<ToggleGroupControlOption
 							value="pill"
-							label={ __( 'Pill', 'flowforms' ) }
+							label={ __( 'Pill', 'formspress' ) }
 						/>
 					</ToggleGroupControl>
 
 					<SelectControl
-						label={ __( 'Button width', 'flowforms' ) }
+						label={ __( 'Button width', 'formspress' ) }
 						value={ s.btn_width }
 						options={ [
-							{ value: 'auto', label: __( 'Auto', 'flowforms' ) },
+							{ value: 'auto', label: __( 'Auto', 'formspress' ) },
 							{
 								value: 'full',
-								label: __( 'Full width', 'flowforms' ),
+								label: __( 'Full width', 'formspress' ),
 							},
 						] }
 						onChange={ set( 'btn_width' ) }
@@ -1584,11 +1584,11 @@ const StyleInspector = ( { style, onChange } ) => {
 					/>
 
 					<PanelBody
-						title={ __( 'Custom', 'flowforms' ) }
+						title={ __( 'Custom', 'formspress' ) }
 						initialOpen={ false }
 					>
 						<RangeControl
-							label={ __( 'Border radius (px)', 'flowforms' ) }
+							label={ __( 'Border radius (px)', 'formspress' ) }
 							value={ s.btn_radius }
 							onChange={ set( 'btn_radius' ) }
 							min={ 0 }
@@ -1613,7 +1613,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 				<p>
 					{ __(
 						'Select a field on the canvas to edit its settings.',
-						'flowforms'
+						'formspress'
 					) }
 				</p>
 			</div>
@@ -1643,7 +1643,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 		return (
 			<div className="ff-std-field-inspector">
 				<PanelBody
-					title={ __( 'Layout', 'flowforms' ) }
+					title={ __( 'Layout', 'formspress' ) }
 					initialOpen={ true }
 				>
 					<VStack spacing={ 4 }>
@@ -1654,7 +1654,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 								color: '#757575',
 							} }
 						>
-							{ __( 'Choose a column layout', 'flowforms' ) }
+							{ __( 'Choose a column layout', 'formspress' ) }
 						</p>
 						<div className="ff-std-layout-grid">
 							{ LAYOUT_PRESETS.map( ( p ) => (
@@ -1703,7 +1703,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 					</VStack>
 				</PanelBody>
 				<PanelBody
-					title={ __( 'Columns', 'flowforms' ) }
+					title={ __( 'Columns', 'formspress' ) }
 					initialOpen={ false }
 				>
 					<VStack spacing={ 3 }>
@@ -1712,7 +1712,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 								<FlexBlock>
 									<SelectControl
 										label={ sprintf(
-											__( 'Col %d width', 'flowforms' ),
+											__( 'Col %d width', 'formspress' ),
 											ci + 1
 										) }
 										value={ col.width }
@@ -1754,7 +1754,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 										}
 										label={ __(
 											'Remove column',
-											'flowforms'
+											'formspress'
 										) }
 									/>
 								) }
@@ -1778,7 +1778,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 								} )
 							}
 						>
-							{ __( '+ Add column', 'flowforms' ) }
+							{ __( '+ Add column', 'formspress' ) }
 						</Button>
 					</VStack>
 				</PanelBody>
@@ -1804,14 +1804,14 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 	return (
 		<div className="ff-std-field-inspector">
 			<PanelBody
-				title={ __( 'Field', 'flowforms' ) }
+				title={ __( 'Field', 'formspress' ) }
 				initialOpen={ true }
 			>
 				<VStack spacing={ 4 }>
 					{ field.type !== 'page_break' &&
 						field.type !== 'hidden' && (
 							<TextControl
-								label={ __( 'Label', 'flowforms' ) }
+								label={ __( 'Label', 'formspress' ) }
 								value={ field.label || '' }
 								onChange={ set( 'label' ) }
 								__nextHasNoMarginBottom
@@ -1821,12 +1821,12 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 					{ field.type !== 'section' &&
 						field.type !== 'page_break' && (
 							<TextControl
-								label={ __( 'Field ID', 'flowforms' ) }
+								label={ __( 'Field ID', 'formspress' ) }
 								value={ field.id || '' }
 								onChange={ set( 'id' ) }
 								help={ __(
 									'Used as {field:id} in templates',
-									'flowforms'
+									'formspress'
 								) }
 								__nextHasNoMarginBottom
 								__next40pxDefaultSize
@@ -1834,7 +1834,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 						) }
 					{ showPlaceholder && (
 						<TextControl
-							label={ __( 'Placeholder', 'flowforms' ) }
+							label={ __( 'Placeholder', 'formspress' ) }
 							value={ field.placeholder || '' }
 							onChange={ set( 'placeholder' ) }
 							__nextHasNoMarginBottom
@@ -1844,7 +1844,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 					{ field.type !== 'section' &&
 						field.type !== 'page_break' && (
 							<TextareaControl
-								label={ __( 'Description', 'flowforms' ) }
+								label={ __( 'Description', 'formspress' ) }
 								value={ field.description || '' }
 								onChange={ set( 'description' ) }
 								rows={ 2 }
@@ -1853,7 +1853,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 						) }
 					{ showRequired && (
 						<ToggleControl
-							label={ __( 'Required', 'flowforms' ) }
+							label={ __( 'Required', 'formspress' ) }
 							checked={ !! field.required }
 							onChange={ set( 'required' ) }
 							__nextHasNoMarginBottom
@@ -1861,7 +1861,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 					) }
 					{ field.type === 'hidden' && (
 						<TextControl
-							label={ __( 'Value', 'flowforms' ) }
+							label={ __( 'Value', 'formspress' ) }
 							value={ field.default_value || '' }
 							onChange={ set( 'default_value' ) }
 							help="{user_email}, {user_id}, {site_url}"
@@ -1871,7 +1871,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 					) }
 					{ field.type === 'rating' && (
 						<SelectControl
-							label={ __( 'Max stars', 'flowforms' ) }
+							label={ __( 'Max stars', 'formspress' ) }
 							value={ field.max || 5 }
 							options={ [ 3, 4, 5, 6, 7, 10 ].map( ( n ) => ( {
 								value: n,
@@ -1886,7 +1886,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 					) }
 					{ field.type === 'section' && (
 						<TextareaControl
-							label={ __( 'Section text', 'flowforms' ) }
+							label={ __( 'Section text', 'formspress' ) }
 							value={ field.content || '' }
 							onChange={ set( 'content' ) }
 							rows={ 3 }
@@ -1898,7 +1898,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 
 			{ showOptions && (
 				<PanelBody
-					title={ __( 'Options', 'flowforms' ) }
+					title={ __( 'Options', 'formspress' ) }
 					initialOpen={ true }
 				>
 					{ ( field.options || [] ).map( ( opt, i ) => (
@@ -1908,7 +1908,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 									value={ opt }
 									onChange={ ( v ) => setOption( i, v ) }
 									placeholder={ sprintf(
-										__( 'Option %d', 'flowforms' ),
+										__( 'Option %d', 'formspress' ),
 										i + 1
 									) }
 									__nextHasNoMarginBottom
@@ -1939,7 +1939,7 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
 							} )
 						}
 					>
-						{ __( '+ Add option', 'flowforms' ) }
+						{ __( '+ Add option', 'formspress' ) }
 					</Button>
 				</PanelBody>
 			) }
@@ -1971,23 +1971,23 @@ const FieldInspector = ( { field, onChange, allFields = [] } ) => {
  */
 
 const BINDING_TARGETS = [
-	{ value: '', label: __( 'None (default)', 'flowforms' ) },
-	{ value: 'cpt', label: __( 'Create new post (CPT)', 'flowforms' ) },
+	{ value: '', label: __( 'None (default)', 'formspress' ) },
+	{ value: 'cpt', label: __( 'Create new post (CPT)', 'formspress' ) },
 	{
 		value: 'post_meta',
-		label: __( 'Post meta (of CPT created in this form)', 'flowforms' ),
+		label: __( 'Post meta (of CPT created in this form)', 'formspress' ),
 	},
 	{
 		value: 'user_meta',
-		label: __( 'User meta (existing user, matched by email)', 'flowforms' ),
+		label: __( 'User meta (existing user, matched by email)', 'formspress' ),
 	},
-	{ value: 'option', label: __( 'Site option', 'flowforms' ) },
+	{ value: 'option', label: __( 'Site option', 'formspress' ) },
 ];
 
 const POST_TYPE_OPTIONS = ( () => {
 	const list = window.flowFormsData?.bindingTargets?.post_types || [];
 	return [
-		{ value: '', label: __( '— Pick a post type —', 'flowforms' ) },
+		{ value: '', label: __( '— Pick a post type —', 'formspress' ) },
 		...list.map( ( pt ) => ( {
 			value: pt.slug,
 			label: `${ pt.label } (${ pt.slug })`,
@@ -2031,19 +2031,19 @@ const DataBindingPanel = ( { field, allFields, onChange } ) => {
 
 	return (
 		<PanelBody
-			title={ __( 'Data binding (advanced)', 'flowforms' ) }
+			title={ __( 'Data binding (advanced)', 'formspress' ) }
 			initialOpen={ false }
 		>
 			<VStack spacing={ 4 }>
 				<Text variant="muted" size={ 12 }>
 					{ __(
 						'Bind this submitted value to a WordPress data store. Runs after the entry is saved.',
-						'flowforms'
+						'formspress'
 					) }
 				</Text>
 
 				<SelectControl
-					label={ __( 'Bind submitted value to', 'flowforms' ) }
+					label={ __( 'Bind submitted value to', 'formspress' ) }
 					value={ target }
 					options={ BINDING_TARGETS }
 					onChange={ setTarget }
@@ -2058,20 +2058,20 @@ const DataBindingPanel = ( { field, allFields, onChange } ) => {
 								{ sprintf(
 									__(
 										'Note: only one field per form can create a CPT. "%s" is currently the primary — switching this field will replace it.',
-										'flowforms'
+										'formspress'
 									),
 									otherPrimary.label || otherPrimary.id
 								) }
 							</Text>
 						) }
 						<SelectControl
-							label={ __( 'Post type', 'flowforms' ) }
+							label={ __( 'Post type', 'formspress' ) }
 							value={ src.post_type || '' }
 							options={ POST_TYPE_OPTIONS }
 							onChange={ ( v ) => setSource( 'post_type', v ) }
 							help={ __(
 								'The post type must exist (register it in your theme/plugin, or enable the flowforms_auto_register_cpts filter).',
-								'flowforms'
+								'formspress'
 							) }
 							__nextHasNoMarginBottom
 							__next40pxDefaultSize
@@ -2079,7 +2079,7 @@ const DataBindingPanel = ( { field, allFields, onChange } ) => {
 						<TextControl
 							label={ __(
 								'Store own value in meta key (optional)',
-								'flowforms'
+								'formspress'
 							) }
 							value={ src.meta_key || '' }
 							onChange={ ( v ) => setSource( 'meta_key', v ) }
@@ -2092,13 +2092,13 @@ const DataBindingPanel = ( { field, allFields, onChange } ) => {
 
 				{ target === 'post_meta' && (
 					<TextControl
-						label={ __( 'Meta key', 'flowforms' ) }
+						label={ __( 'Meta key', 'formspress' ) }
 						value={ src.meta_key || '' }
 						onChange={ ( v ) => setSource( 'meta_key', v ) }
 						placeholder="e.g. company"
 						help={ __(
 							'Attached to the CPT created by the "Create new post" field in this form.',
-							'flowforms'
+							'formspress'
 						) }
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -2107,13 +2107,13 @@ const DataBindingPanel = ( { field, allFields, onChange } ) => {
 
 				{ target === 'user_meta' && (
 					<TextControl
-						label={ __( 'Meta key', 'flowforms' ) }
+						label={ __( 'Meta key', 'formspress' ) }
 						value={ src.meta_key || '' }
 						onChange={ ( v ) => setSource( 'meta_key', v ) }
 						placeholder="e.g. company"
 						help={ __(
 							'Use "_email" as the meta key to mark this field as the email anchor used to match the existing user.',
-							'flowforms'
+							'formspress'
 						) }
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -2122,7 +2122,7 @@ const DataBindingPanel = ( { field, allFields, onChange } ) => {
 
 				{ target === 'option' && (
 					<TextControl
-						label={ __( 'Option key', 'flowforms' ) }
+						label={ __( 'Option key', 'formspress' ) }
 						value={ src.option_key || '' }
 						onChange={ ( v ) => setSource( 'option_key', v ) }
 						placeholder="e.g. last_signup_email"
@@ -2152,9 +2152,9 @@ const SidebarInserter = ( { onAdd } ) => {
 	} ) ).filter( ( g ) => g.types.length > 0 );
 
 	const tabs = [
-		{ name: 'blocks', title: __( 'Blocs', 'flowforms' ) },
-		{ name: 'patterns', title: __( 'Compositions', 'flowforms' ) },
-		{ name: 'media', title: __( 'Médias', 'flowforms' ) },
+		{ name: 'blocks', title: __( 'Blocs', 'formspress' ) },
+		{ name: 'patterns', title: __( 'Compositions', 'formspress' ) },
+		{ name: 'media', title: __( 'Médias', 'formspress' ) },
 	];
 
 	return (
@@ -2164,7 +2164,7 @@ const SidebarInserter = ( { onAdd } ) => {
 					if ( tab.name !== 'blocks' ) {
 						return (
 							<div className="ff-gb-sidebar__placeholder">
-								<p>{ __( 'Coming soon', 'flowforms' ) }</p>
+								<p>{ __( 'Coming soon', 'formspress' ) }</p>
 							</div>
 						);
 					}
@@ -2174,14 +2174,14 @@ const SidebarInserter = ( { onAdd } ) => {
 								<SearchControl
 									value={ search }
 									onChange={ setSearch }
-									placeholder={ __( 'Search', 'flowforms' ) }
+									placeholder={ __( 'Search', 'formspress' ) }
 									__nextHasNoMarginBottom
 								/>
 							</div>
 							<div className="ff-gb-sidebar__body">
 								{ filtered.length === 0 && (
 									<p className="ff-gb-sidebar__empty">
-										{ __( 'No results.', 'flowforms' ) }
+										{ __( 'No results.', 'formspress' ) }
 									</p>
 								) }
 								{ filtered.map( ( group ) => (
@@ -2225,8 +2225,8 @@ const SidebarInserter = ( { onAdd } ) => {
 
 const SidebarListView = ( props ) => {
 	const tabs = [
-		{ name: 'list', title: __( 'Vue en liste', 'flowforms' ) },
-		{ name: 'structure', title: __( 'Structure', 'flowforms' ) },
+		{ name: 'list', title: __( 'Vue en liste', 'formspress' ) },
+		{ name: 'structure', title: __( 'Structure', 'formspress' ) },
 	];
 	return (
 		<div className="ff-gb-sidebar ff-gb-sidebar--listview">
@@ -2309,13 +2309,13 @@ const FormBuilderPage = () => {
 			} );
 			setNotice( {
 				type: 'success',
-				message: __( 'Form saved.', 'flowforms' ),
+				message: __( 'Form saved.', 'formspress' ),
 			} );
 			setTimeout( () => setNotice( null ), 3000 );
 		} catch ( e ) {
 			setNotice( {
 				type: 'error',
-				message: e.message || __( 'Failed to save.', 'flowforms' ),
+				message: e.message || __( 'Failed to save.', 'formspress' ),
 			} );
 		} finally {
 			setSaving( false );
@@ -2393,7 +2393,7 @@ const FormBuilderPage = () => {
 	const breadcrumbs = ( () => {
 		const out = [
 			{
-				label: __( 'Form', 'flowforms' ),
+				label: __( 'Form', 'formspress' ),
 				onClick: () => setSelectedPath( null ),
 			},
 		];
@@ -2402,7 +2402,7 @@ const FormBuilderPage = () => {
 		if ( ! top ) return out;
 		if ( top.type === 'row' ) {
 			out.push( {
-				label: __( 'Row', 'flowforms' ),
+				label: __( 'Row', 'formspress' ),
 				onClick: () => setSelectedPath( [ selectedPath[ 0 ] ] ),
 			} );
 			if ( selectedPath.length === 3 ) {
@@ -2449,15 +2449,15 @@ const FormBuilderPage = () => {
 			updateField( path, { ...row, cols: next } );
 		};
 		return (
-			<Toolbar label={ __( 'Row options', 'flowforms' ) }>
+			<Toolbar label={ __( 'Row options', 'formspress' ) }>
 				<ToolbarGroup>
 					<ToolbarButton
 						icon={
 							<span className="dashicons dashicons-columns" />
 						}
-						label={ __( 'Columns', 'flowforms' ) }
+						label={ __( 'Columns', 'formspress' ) }
 					>
-						{ sprintf( __( '%d cols', 'flowforms' ), colCount ) }
+						{ sprintf( __( '%d cols', 'formspress' ), colCount ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 				<ToolbarGroup>
@@ -2476,7 +2476,7 @@ const FormBuilderPage = () => {
 					<ToolbarButton
 						icon={ plus }
 						onClick={ addCol }
-						label={ __( 'Add column', 'flowforms' ) }
+						label={ __( 'Add column', 'formspress' ) }
 						disabled={ colCount >= 6 }
 					/>
 				</ToolbarGroup>
@@ -2485,13 +2485,13 @@ const FormBuilderPage = () => {
 						icon={ chevronUp }
 						disabled={ isFirst }
 						onClick={ () => moveField( path, -1 ) }
-						label={ __( 'Move up', 'flowforms' ) }
+						label={ __( 'Move up', 'formspress' ) }
 					/>
 					<ToolbarButton
 						icon={ chevronDown }
 						disabled={ isLast }
 						onClick={ () => moveField( path, 1 ) }
-						label={ __( 'Move down', 'flowforms' ) }
+						label={ __( 'Move down', 'formspress' ) }
 					/>
 				</ToolbarGroup>
 				<ToolbarGroup>
@@ -2499,7 +2499,7 @@ const FormBuilderPage = () => {
 						isDestructive
 						icon={ trash }
 						onClick={ () => deleteField( path ) }
-						label={ __( 'Delete row', 'flowforms' ) }
+						label={ __( 'Delete row', 'formspress' ) }
 					/>
 				</ToolbarGroup>
 			</Toolbar>
@@ -2522,7 +2522,7 @@ const FormBuilderPage = () => {
 			isLast = path[ 2 ] === siblings.length - 1;
 		}
 		return (
-			<Toolbar label={ __( 'Block options', 'flowforms' ) }>
+			<Toolbar label={ __( 'Block options', 'formspress' ) }>
 				<ToolbarGroup>
 					<ToolbarButton
 						icon={
@@ -2532,7 +2532,7 @@ const FormBuilderPage = () => {
 								}` }
 							/>
 						}
-						label={ __( 'Block type', 'flowforms' ) }
+						label={ __( 'Block type', 'formspress' ) }
 					>
 						{ def?.label || field.type }
 					</ToolbarButton>
@@ -2541,7 +2541,7 @@ const FormBuilderPage = () => {
 					<ToolbarGroup>
 						<ToolbarButton
 							icon={ <WidthFullIcon /> }
-							label={ __( 'Full width', 'flowforms' ) }
+							label={ __( 'Full width', 'formspress' ) }
 							isActive={ ( field.width || 'full' ) === 'full' }
 							onClick={ () =>
 								updateField( path, { ...field, width: 'full' } )
@@ -2549,7 +2549,7 @@ const FormBuilderPage = () => {
 						/>
 						<ToolbarButton
 							icon={ <WidthHalfIcon /> }
-							label={ __( 'Half width', 'flowforms' ) }
+							label={ __( 'Half width', 'formspress' ) }
 							isActive={ field.width === '1/2' }
 							onClick={ () =>
 								updateField( path, { ...field, width: '1/2' } )
@@ -2557,7 +2557,7 @@ const FormBuilderPage = () => {
 						/>
 						<ToolbarButton
 							icon={ <WidthThirdIcon /> }
-							label={ __( 'One third', 'flowforms' ) }
+							label={ __( 'One third', 'formspress' ) }
 							isActive={ field.width === '1/3' }
 							onClick={ () =>
 								updateField( path, { ...field, width: '1/3' } )
@@ -2570,13 +2570,13 @@ const FormBuilderPage = () => {
 						icon={ chevronUp }
 						disabled={ isFirst }
 						onClick={ () => moveField( path, -1 ) }
-						label={ __( 'Move up', 'flowforms' ) }
+						label={ __( 'Move up', 'formspress' ) }
 					/>
 					<ToolbarButton
 						icon={ chevronDown }
 						disabled={ isLast }
 						onClick={ () => moveField( path, 1 ) }
-						label={ __( 'Move down', 'flowforms' ) }
+						label={ __( 'Move down', 'formspress' ) }
 					/>
 				</ToolbarGroup>
 				<ToolbarGroup>
@@ -2584,7 +2584,7 @@ const FormBuilderPage = () => {
 						isDestructive
 						icon={ trash }
 						onClick={ () => deleteField( path ) }
-						label={ __( 'Delete', 'flowforms' ) }
+						label={ __( 'Delete', 'formspress' ) }
 					/>
 				</ToolbarGroup>
 			</Toolbar>
@@ -2610,8 +2610,8 @@ const FormBuilderPage = () => {
 			<TabPanel
 				key={ inspectorTab }
 				tabs={ [
-					{ name: 'form', title: __( 'Form', 'flowforms' ) },
-					{ name: 'block', title: __( 'Bloc', 'flowforms' ) },
+					{ name: 'form', title: __( 'Form', 'formspress' ) },
+					{ name: 'block', title: __( 'Bloc', 'formspress' ) },
 				] }
 				initialTabName={ inspectorTab }
 				onSelect={ setInspectorTab }
@@ -2621,12 +2621,12 @@ const FormBuilderPage = () => {
 						return (
 							<div className="ff-std-settings-inspector ff-gb-form-inspector">
 								<PanelBody
-									title={ __( 'Form info', 'flowforms' ) }
+									title={ __( 'Form info', 'formspress' ) }
 									initialOpen={ true }
 								>
 									<VStack spacing={ 4 }>
 										<TextControl
-											label={ __( 'Title', 'flowforms' ) }
+											label={ __( 'Title', 'formspress' ) }
 											value={ form.title || '' }
 											onChange={ ( v ) =>
 												setForm( ( f ) => ( {
@@ -2640,7 +2640,7 @@ const FormBuilderPage = () => {
 										<TextareaControl
 											label={ __(
 												'Description',
-												'flowforms'
+												'formspress'
 											) }
 											value={ form.description || '' }
 											onChange={ ( v ) =>
@@ -2655,7 +2655,7 @@ const FormBuilderPage = () => {
 										<SelectControl
 											label={ __(
 												'Status',
-												'flowforms'
+												'formspress'
 											) }
 											value={ form.status }
 											options={ [
@@ -2684,14 +2684,14 @@ const FormBuilderPage = () => {
 									</VStack>
 								</PanelBody>
 								<PanelBody
-									title={ __( 'Submission', 'flowforms' ) }
+									title={ __( 'Submission', 'formspress' ) }
 									initialOpen={ false }
 								>
 									<VStack spacing={ 4 }>
 										<TextControl
 											label={ __(
 												'Submit button label',
-												'flowforms'
+												'formspress'
 											) }
 											value={
 												settings.submit_label || ''
@@ -2705,7 +2705,7 @@ const FormBuilderPage = () => {
 										<SelectControl
 											label={ __(
 												'After submission',
-												'flowforms'
+												'formspress'
 											) }
 											value={
 												settings.success_action ||
@@ -2716,14 +2716,14 @@ const FormBuilderPage = () => {
 													value: 'message',
 													label: __(
 														'Show message',
-														'flowforms'
+														'formspress'
 													),
 												},
 												{
 													value: 'redirect',
 													label: __(
 														'Redirect to URL',
-														'flowforms'
+														'formspress'
 													),
 												},
 											] }
@@ -2741,7 +2741,7 @@ const FormBuilderPage = () => {
 											<TextareaControl
 												label={ __(
 													'Success message',
-													'flowforms'
+													'formspress'
 												) }
 												value={
 													settings.success_message ||
@@ -2762,7 +2762,7 @@ const FormBuilderPage = () => {
 											<TextControl
 												label={ __(
 													'Redirect URL',
-													'flowforms'
+													'formspress'
 												) }
 												value={
 													settings.redirect_url || ''
@@ -2781,14 +2781,14 @@ const FormBuilderPage = () => {
 									</VStack>
 								</PanelBody>
 								<PanelBody
-									title={ __( 'Anti-spam', 'flowforms' ) }
+									title={ __( 'Anti-spam', 'formspress' ) }
 									initialOpen={ false }
 								>
 									<VStack spacing={ 4 }>
 										<ToggleControl
 											label={ __(
 												'Enable honeypot',
-												'flowforms'
+												'formspress'
 											) }
 											checked={ !! settings.honeypot }
 											onChange={ ( v ) =>
@@ -2796,118 +2796,14 @@ const FormBuilderPage = () => {
 											}
 											help={ __(
 												'Hidden field to catch bots.',
-												'flowforms'
+												'formspress'
 											) }
 											__nextHasNoMarginBottom
 										/>
 									</VStack>
 								</PanelBody>
 								<PanelBody
-									title={ __(
-										'Save and resume',
-										'flowforms'
-									) }
-									initialOpen={ false }
-								>
-									<VStack spacing={ 4 }>
-										<ToggleControl
-											label={ __(
-												'Enable save and resume later',
-												'flowforms'
-											) }
-											checked={
-												!! settings.enable_save_resume
-											}
-											onChange={ ( v ) =>
-												setSettings(
-													'enable_save_resume',
-													v
-												)
-											}
-											help={ __(
-												'Lets visitors save partial progress and receive a magic link by email.',
-												'flowforms'
-											) }
-											__nextHasNoMarginBottom
-										/>
-										{ settings.enable_save_resume && (
-											<>
-												<TextControl
-													label={ __(
-														'Link label',
-														'flowforms'
-													) }
-													value={
-														settings.save_resume_label ||
-														''
-													}
-													onChange={ ( v ) =>
-														setSettings(
-															'save_resume_label',
-															v
-														)
-													}
-													placeholder={ __(
-														'Save and resume later',
-														'flowforms'
-													) }
-													__nextHasNoMarginBottom
-													__next40pxDefaultSize
-												/>
-												<TextControl
-													label={ __(
-														'Email subject',
-														'flowforms'
-													) }
-													value={
-														settings.save_resume_email_subject ||
-														''
-													}
-													onChange={ ( v ) =>
-														setSettings(
-															'save_resume_email_subject',
-															v
-														)
-													}
-													placeholder={ __(
-														'Resume your submission',
-														'flowforms'
-													) }
-													__nextHasNoMarginBottom
-													__next40pxDefaultSize
-												/>
-												<TextareaControl
-													label={ __(
-														'Email body',
-														'flowforms'
-													) }
-													value={
-														settings.save_resume_email_body ||
-														''
-													}
-													onChange={ ( v ) =>
-														setSettings(
-															'save_resume_email_body',
-															v
-														)
-													}
-													placeholder={ __(
-														'Use {magic_link} where the resume URL should appear.',
-														'flowforms'
-													) }
-													rows={ 5 }
-													help={ __(
-														'Use {magic_link} as a placeholder for the unique resume URL.',
-														'flowforms'
-													) }
-													__nextHasNoMarginBottom
-												/>
-											</>
-										) }
-									</VStack>
-								</PanelBody>
-								<PanelBody
-									title={ __( 'Style', 'flowforms' ) }
+									title={ __( 'Style', 'formspress' ) }
 									initialOpen={ false }
 								>
 									<StyleInspector
@@ -2916,7 +2812,7 @@ const FormBuilderPage = () => {
 									/>
 								</PanelBody>
 								<PanelBody
-									title={ __( 'Actions', 'flowforms' ) }
+									title={ __( 'Actions', 'formspress' ) }
 									initialOpen={ false }
 								>
 									<ActionsPanel
@@ -2937,7 +2833,7 @@ const FormBuilderPage = () => {
 								<p>
 									{ __(
 										'Select a block on the canvas to edit it.',
-										'flowforms'
+										'formspress'
 									) }
 								</p>
 							</div>
@@ -2956,7 +2852,7 @@ const FormBuilderPage = () => {
 								<div className="ff-gb-block-inspector__meta">
 									<div className="ff-gb-block-inspector__name">
 										{ selectedField.type === 'row'
-											? __( 'Row', 'flowforms' )
+											? __( 'Row', 'formspress' )
 											: selectedDef?.label ||
 											  selectedField.type }
 									</div>
@@ -2964,12 +2860,12 @@ const FormBuilderPage = () => {
 										{ selectedField.type === 'row'
 											? __(
 													'Multi-column layout.',
-													'flowforms'
+													'formspress'
 											  )
 											: selectedDef?.description ||
 											  __(
 													'Form input block.',
-													'flowforms'
+													'formspress'
 											  ) }
 									</div>
 								</div>
@@ -2992,7 +2888,7 @@ const FormBuilderPage = () => {
 		<EditorSkeleton
 			className="ff-std-builder"
 			title={ form.title }
-			titlePlaceholder={ __( 'Form title…', 'flowforms' ) }
+			titlePlaceholder={ __( 'Form title…', 'formspress' ) }
 			onTitleChange={ ( v ) =>
 				setForm( ( f ) => ( { ...f, title: v } ) )
 			}
@@ -3003,7 +2899,7 @@ const FormBuilderPage = () => {
 			onToggleLeftSidebar={ () =>
 				setLeftPanel( leftPanel === 'listview' ? null : 'listview' )
 			}
-			leftSidebarLabel={ __( 'Toggle list view', 'flowforms' ) }
+			leftSidebarLabel={ __( 'Toggle list view', 'formspress' ) }
 			leftSidebar={ leftSidebar }
 			showRightSidebar={ inspectorOpen }
 			onToggleRightSidebar={ () => setInspectorOpen( ! inspectorOpen ) }
@@ -3014,13 +2910,13 @@ const FormBuilderPage = () => {
 			moreMenuControls={ [
 				{
 					title: sprintf(
-						__( 'Entries (%d)', 'flowforms' ),
+						__( 'Entries (%d)', 'formspress' ),
 						form.entries_count || 0
 					),
 					onClick: () => navigate( `/forms/${ id }/entries` ),
 				},
 				{
-					title: __( 'Save as template…', 'flowforms' ),
+					title: __( 'Save as template…', 'formspress' ),
 					onClick: () => setSaveTplOpen( true ),
 				},
 			] }
@@ -3080,7 +2976,7 @@ const FormBuilderPage = () => {
 									type: 'success',
 									message: __(
 										'Template saved.',
-										'flowforms'
+										'formspress'
 									),
 								} )
 							}
@@ -3108,7 +3004,7 @@ const FormBuilderPage = () => {
 								style={ { color: formStyle.text_color } }
 							>
 								{ form.title ||
-									__( 'Form title', 'flowforms' ) }
+									__( 'Form title', 'formspress' ) }
 							</div>
 							{ form.description && (
 								<p
@@ -3144,7 +3040,7 @@ const FormBuilderPage = () => {
 									>
 										{ __(
 											'Start building your form',
-											'flowforms'
+											'formspress'
 										) }
 									</Heading>
 									<Text
@@ -3154,7 +3050,7 @@ const FormBuilderPage = () => {
 									>
 										{ __(
 											'Add your first field to get started. You can rearrange and customize fields any time.',
-											'flowforms'
+											'formspress'
 										) }
 									</Text>
 									<StandardBlockAppender
@@ -3290,7 +3186,7 @@ const FormBuilderPage = () => {
 										style={ submitStyles }
 									>
 										{ settings.submit_label ||
-											__( 'Submit', 'flowforms' ) }
+											__( 'Submit', 'formspress' ) }
 									</button>
 								);
 							} )() }

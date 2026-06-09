@@ -67,9 +67,8 @@
 		var prevBtn   = form.querySelector( '.ff-form__prev' );
 		var nextBtn   = form.querySelector( '.ff-form__next' );
 		var progress  = form.querySelector( '.ff-form__progress-bar' );
+		var stepCounter = form.querySelector( '.ff-form__step-counter' );
 		var pages     = Array.prototype.slice.call( form.querySelectorAll( '.ff-form__page' ) );
-		var schema    = safeJSON( form.dataset.fieldsSchema, [] );
-		var settings  = safeJSON( form.dataset.formSettings, {} );
 		var currentPageInput = form.querySelector( 'input[name="_ff_current_page"]' );
 		var totalPages = pages.length || 1;
 		var currentPage = 0;
@@ -77,6 +76,10 @@
 
 		setupRatingFields( form );
 		setupSelectPlaceholders( form );
+		setupCheckoutTotals( form );
+		if ( window.ffAnalytics && typeof window.ffAnalytics.initForm === 'function' ) {
+			window.ffAnalytics.initForm( form );
+		}
 
 		/* ── Conditional logic: re-evaluate every visible field's `data-conditions` */
 		function evaluateConditions() {
@@ -118,6 +121,12 @@
 			if ( progress ) {
 				var pct = Math.round( ( ( currentPage + 1 ) / totalPages ) * 100 );
 				progress.style.width = pct + '%';
+			}
+			if ( stepCounter ) {
+				var template = stepCounter.dataset.stepTemplate || 'Step %1$d of %2$d';
+				stepCounter.textContent = template
+					.replace( '%1$d', String( currentPage + 1 ) )
+					.replace( '%2$d', String( totalPages ) );
 			}
 			try { form.scrollIntoView( { behavior: 'smooth', block: 'start' } ); } catch ( e ) {}
 		}
@@ -163,20 +172,6 @@
 
 		if ( totalPages > 1 ) showPage( 0 );
 
-		/* ── Save-and-resume ──────────────────────────────────────── */
-		var resumeToken = null;
-		if ( settings.enable_save_resume ) {
-			mountSaveResumeUI( form, settings, function () { return collectValues( form ); }, function () { return currentPage; }, function ( t ) { resumeToken = t; } );
-			maybeRestoreFromUrl( form, formId, schema, function ( draft ) {
-				resumeToken = draft.token;
-				populateValues( form, draft.data || {} );
-				if ( totalPages > 1 && draft.current_step != null ) {
-					showPage( parseInt( draft.current_step, 10 ) || 0 );
-				}
-				evaluateConditions();
-			} );
-		}
-
 		/* ── Submission ───────────────────────────────────────────── */
 		if ( ! usesInteractivitySubmit ) {
 			form.addEventListener( 'submit', function ( e ) {
@@ -214,6 +209,7 @@
 					}
 
 					if ( result.success ) {
+						dispatchSubmitSuccess( form, result );
 						if ( result.action === 'redirect' && result.redirect ) {
 							window.location.href = result.redirect;
 						} else {
@@ -237,6 +233,12 @@
 
 		function isPageEmpty( pageEl ) {
 			if ( ! pageEl ) return true;
+			var fields = pageEl.querySelectorAll( '[data-field-id]' );
+
+			if ( fields.length === 0 ) {
+				return false;
+			}
+
 			var visible = pageEl.querySelectorAll( '[data-field-id]:not([hidden])' );
 			return visible.length === 0;
 		}
@@ -251,6 +253,71 @@
 			syncPlaceholderState();
 			select.addEventListener( 'change', syncPlaceholderState );
 		} );
+	}
+
+	function setupCheckoutTotals( form ) {
+		var products = Array.prototype.slice.call( form.querySelectorAll( '[data-ff-product]' ) );
+		var totals = Array.prototype.slice.call( form.querySelectorAll( '[data-ff-total]' ) );
+
+		if ( ! products.length || ! totals.length ) {
+			return;
+		}
+
+		function updateTotals() {
+			var total = 0;
+			var currency = ( totals[0] && totals[0].dataset.totalCurrency ) || 'EUR';
+
+			products.forEach( function ( product ) {
+				var input = product.querySelector( '[data-ff-product-quantity]' );
+				var price = parseFloat( product.dataset.productPrice || ( input && input.dataset.price ) || '0' );
+				var quantity = parseFloat( ( input && input.value ) || '0' );
+				var lineTotal = 0;
+
+				if ( Number.isNaN( price ) ) price = 0;
+				if ( Number.isNaN( quantity ) ) quantity = 0;
+
+				lineTotal = Math.max( 0, price ) * Math.max( 0, quantity );
+				total += lineTotal;
+
+				var line = product.querySelector( '[data-ff-product-line-total]' );
+				if ( line ) {
+					line.textContent = 'Line total: ' + formatMoney( lineTotal, product.dataset.productCurrency || currency );
+				}
+			} );
+
+			totals.forEach( function ( totalEl ) {
+				var totalCurrency = totalEl.dataset.totalCurrency || currency;
+				var amount = totalEl.querySelector( '[data-ff-total-amount]' );
+				var input = totalEl.querySelector( '[data-ff-total-input]' );
+
+				if ( amount ) amount.textContent = formatMoney( total, totalCurrency );
+				if ( input ) input.value = total.toFixed( 2 );
+			} );
+		}
+
+		form.addEventListener( 'input', function ( event ) {
+			if ( event.target && event.target.matches( '[data-ff-product-quantity]' ) ) {
+				updateTotals();
+			}
+		} );
+		form.addEventListener( 'change', function ( event ) {
+			if ( event.target && event.target.matches( '[data-ff-product-quantity]' ) ) {
+				updateTotals();
+			}
+		} );
+
+		updateTotals();
+	}
+
+	function formatMoney( value, currency ) {
+		try {
+			return new Intl.NumberFormat( undefined, {
+				style: 'currency',
+				currency: currency || 'EUR',
+			} ).format( Number( value || 0 ) );
+		} catch ( e ) {
+			return Number( value || 0 ).toFixed( 2 ) + ' ' + ( currency || 'EUR' );
+		}
 	}
 
 	/* Collect all form values into a flat { id: value } object. Handles
@@ -269,91 +336,6 @@
 			}
 		} );
 		return data;
-	}
-
-	function populateValues( form, data ) {
-		Object.keys( data || {} ).forEach( function ( key ) {
-			var val = data[ key ];
-			var inputs = form.querySelectorAll( '[name="' + key + '"], [name="' + key + '[]"]' );
-			inputs.forEach( function ( input ) {
-				if ( input.type === 'checkbox' || input.type === 'radio' ) {
-					var vals = String( val ).split( ',' ).map( function ( s ) { return s.trim(); } );
-					input.checked = vals.indexOf( input.value ) > -1;
-				} else {
-					input.value = val;
-				}
-			} );
-		} );
-	}
-
-	/* ── Save & resume UI ─────────────────────────────────────────── */
-
-	function mountSaveResumeUI( form, settings, getValues, getStep, setToken ) {
-		var pagination = form.querySelector( '.ff-form__pagination' );
-		var anchor     = pagination || form;
-
-		var link = document.createElement( 'button' );
-		link.type        = 'button';
-		link.className   = 'ff-form__save-resume-link';
-		link.textContent = settings.save_resume_label || 'Save and resume later';
-
-		var panel = document.createElement( 'div' );
-		panel.className = 'ff-form__save-resume-panel';
-		panel.hidden    = true;
-		panel.innerHTML =
-			'<label class="ff-form__label">Your email' +
-			'<input type="email" class="ff-form__input ff-form__save-resume-email" placeholder="you@example.com" /></label>' +
-			'<button type="button" class="ff-form__save-resume-submit">Send me a link</button>' +
-			'<div class="ff-form__save-resume-msg" aria-live="polite"></div>';
-
-		link.addEventListener( 'click', function () { panel.hidden = ! panel.hidden; } );
-
-		var submit = panel.querySelector( '.ff-form__save-resume-submit' );
-		var input  = panel.querySelector( '.ff-form__save-resume-email' );
-		var msg    = panel.querySelector( '.ff-form__save-resume-msg' );
-
-		submit.addEventListener( 'click', function () {
-			var email = ( input.value || '' ).trim();
-			if ( ! email ) { msg.textContent = 'Please enter your email.'; return; }
-			msg.textContent = 'Saving…';
-			fetch( API_ROOT + '/forms/' + form.dataset.formId + '/save-progress', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': NONCE },
-				body: JSON.stringify( {
-					email: email,
-					data: getValues(),
-					current_step: getStep(),
-					token: form.dataset.resumeToken || '',
-					_source_url: window.location.href,
-				} ),
-			} )
-			.then( function ( r ) { return r.json(); } )
-			.then( function ( result ) {
-				if ( result && result.success ) {
-					form.dataset.resumeToken = result.token;
-					setToken( result.token );
-					msg.textContent = 'Check your inbox — we sent you a link to resume.';
-				} else {
-					msg.textContent = ( result && result.message ) || 'Could not save your progress.';
-				}
-			} )
-			.catch( function () { msg.textContent = 'A network error occurred.'; } );
-		} );
-
-		anchor.parentNode.insertBefore( link, anchor );
-		anchor.parentNode.insertBefore( panel, anchor );
-	}
-
-	function maybeRestoreFromUrl( form, formId, schema, onDraft ) {
-		var params = new URLSearchParams( window.location.search );
-		var token  = params.get( 'formspress_resume' );
-		if ( ! token ) return;
-		fetch( API_ROOT + '/forms/' + formId + '/draft?token=' + encodeURIComponent( token ), {
-			headers: { 'X-WP-Nonce': NONCE },
-		} )
-		.then( function ( r ) { return r.json(); } )
-		.then( function ( draft ) { if ( draft && draft.success ) { form.dataset.resumeToken = draft.token; onDraft( draft ); } } )
-		.catch( function () {} );
 	}
 
 	/* ── Condition evaluator (mirror of PHP ConditionEvaluator) ───── */
@@ -407,6 +389,9 @@
 		var fields   = safeJSON( wrapper.dataset.fields, [] );
 		var answers  = {};
 		var currentStep = -1;
+		if ( window.ffAnalytics && typeof window.ffAnalytics.initForm === 'function' ) {
+			window.ffAnalytics.initForm( wrapper );
+		}
 
 		/* Apply theme CSS custom properties */
 		var theme = settings.theme || {};
@@ -582,6 +567,7 @@
 			idx = computeVisibleStepIndex( idx, direction );
 			var goingBack = idx < currentStep;
 			currentStep = idx;
+			wrapper.__ffCurrentStep = idx;
 			if ( idx >= activeFields.length ) {
 				submitFlow();
 				return;
@@ -592,6 +578,7 @@
 			}
 
 			var field = activeFields[ idx ];
+			dispatchStepView( wrapper, idx );
 			var pct   = Math.round( ( idx / activeFields.length ) * 100 );
 			setProgress( pct );
 
@@ -754,6 +741,7 @@
 			.then( function ( r ) { return r.json(); } )
 			.then( function ( result ) {
 				if ( result.success ) {
+					dispatchSubmitSuccess( wrapper, result );
 					if ( result.action === 'redirect' && result.redirect ) {
 						window.location.href = result.redirect;
 					} else {
@@ -1027,6 +1015,26 @@
 	function showMessage( form, message, type ) {
 		var el = form.querySelector( '.ff-form__messages' );
 		if ( el ) el.innerHTML = '<div class="ff-form__message ff-form__message--' + type + '">' + escHtml( message ) + '</div>';
+	}
+
+	function dispatchSubmitSuccess( form, result ) {
+		if ( ! form ) {
+			return;
+		}
+		form.dispatchEvent( new CustomEvent( 'flowforms:submit-success', {
+			bubbles: true,
+			detail: result || {},
+		} ) );
+	}
+
+	function dispatchStepView( form, stepIndex ) {
+		if ( ! form ) {
+			return;
+		}
+		form.dispatchEvent( new CustomEvent( 'flowforms:step-view', {
+			bubbles: true,
+			detail: { step_index: stepIndex },
+		} ) );
 	}
 
 	function el( tag, className ) {

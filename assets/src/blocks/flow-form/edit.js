@@ -26,7 +26,7 @@ const FlowFormBlockEdit = ( { attributes, setAttributes } ) => {
 	}, [] );
 
 	const formOptions = [
-		{ value: 0, label: __( '— Select a flow form —', 'flowforms' ) },
+		{ value: 0, label: __( '— Select a flow form —', 'formspress' ) },
 		...forms.map( ( f ) => ( { value: f.id, label: f.title } ) ),
 	];
 
@@ -35,12 +35,12 @@ const FlowFormBlockEdit = ( { attributes, setAttributes } ) => {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Flow Form Settings', 'flowforms' ) }>
+				<PanelBody title={ __( 'Flow Form Settings', 'formspress' ) }>
 					{ isLoading ? (
 						<Spinner />
 					) : (
 						<SelectControl
-							label={ __( 'Select Flow Form', 'flowforms' ) }
+							label={ __( 'Select Flow Form', 'formspress' ) }
 							value={ formId }
 							options={ formOptions }
 							onChange={ ( v ) =>
@@ -51,7 +51,7 @@ const FlowFormBlockEdit = ( { attributes, setAttributes } ) => {
 						/>
 					) }
 					<ToggleControl
-						label={ __( 'Display Form Title', 'flowforms' ) }
+						label={ __( 'Display Form Title', 'formspress' ) }
 						checked={ displayTitle }
 						onChange={ ( v ) =>
 							setAttributes( { displayTitle: v } )
@@ -65,10 +65,10 @@ const FlowFormBlockEdit = ( { attributes, setAttributes } ) => {
 				{ ! formId ? (
 					<Placeholder
 						icon="media-interactive"
-						label={ __( 'FlowForms — Flow Form', 'flowforms' ) }
+						label={ __( 'FlowForms — Flow Form', 'formspress' ) }
 						instructions={ __(
 							'Select a flow form in the block settings panel.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				) : (
@@ -76,12 +76,12 @@ const FlowFormBlockEdit = ( { attributes, setAttributes } ) => {
 						<span className="ff-form-block__icon dashicons dashicons-media-interactive" />
 						<strong>
 							{ selectedForm?.title ||
-								__( 'Flow Form #', 'flowforms' ) + formId }
+								__( 'Flow Form #', 'formspress' ) + formId }
 						</strong>
 						<em>
 							{ __(
 								'Conversational flow form — renders on the frontend.',
-								'flowforms'
+								'formspress'
 							) }
 						</em>
 					</div>

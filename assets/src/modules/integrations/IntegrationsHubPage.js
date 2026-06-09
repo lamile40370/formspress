@@ -1,24 +1,26 @@
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { Spinner, ExternalLink } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
+import { Icon, lock } from '@wordpress/icons';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/PageHeader';
 import Badge from '../../components/Badge';
 import Toast from '../../components/Toast';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { get } from '../../api/client';
 import { INTEGRATIONS } from '../../api/endpoints';
 
 const CATEGORY_LABELS = {
-	'email-marketing': __( 'Email marketing', 'flowforms' ),
-	crm: __( 'CRM', 'flowforms' ),
-	payment: __( 'Payments', 'flowforms' ),
-	developer: __( 'Developer', 'flowforms' ),
+	notification: __( 'Notifications', 'formspress' ),
+	workflow: __( 'Workflow', 'formspress' ),
+	'email-marketing': __( 'Email marketing', 'formspress' ),
+	crm: __( 'CRM', 'formspress' ),
+	payment: __( 'Payments', 'formspress' ),
 };
 
-const STATUS_LABELS = {
-	active: __( 'Active', 'flowforms' ),
-	inactive: __( 'Inactive', 'flowforms' ),
+const PLAN_LABELS = {
+	free: __( 'Free', 'formspress' ),
+	pro: __( 'Pro', 'formspress' ),
 };
 
 const DEFAULT_LOGO_SRC = `${
@@ -27,25 +29,50 @@ const DEFAULT_LOGO_SRC = `${
 
 const DEFAULT_GRID_PREVIEW_SIZE = 350;
 
-const IntegrationMedia = ( { item } ) => {
-	if ( item.icon_svg ) {
+const UPGRADE_URL = 'https://example.com/formspress-pro';
+
+const PlanBadge = ( { item } ) => {
+	if ( item.plan === 'pro' ) {
 		return (
-			<div className="formspress-integration-media" aria-hidden="true">
-				<span
-					className="formspress-integration-logo formspress-integration-logo--svg"
-					dangerouslySetInnerHTML={ { __html: item.icon_svg } }
-				/>
-			</div>
+			<span
+				className={ `formspress-integration-plan formspress-integration-plan--pro${
+					item.locked ? ' is-locked' : ''
+				}` }
+			>
+				{ item.locked && <Icon icon={ lock } size={ 14 } /> }
+				{ PLAN_LABELS.pro }
+			</span>
 		);
 	}
 
 	return (
-		<div className="formspress-integration-media" aria-hidden="true">
-			<img
-				className="formspress-integration-logo formspress-integration-logo--default"
-				src={ DEFAULT_LOGO_SRC }
-				alt=""
-			/>
+		<span className="formspress-integration-plan formspress-integration-plan--free">
+			{ PLAN_LABELS.free }
+		</span>
+	);
+};
+
+const IntegrationMedia = ( { item } ) => {
+	return (
+		<div
+			className={ `formspress-integration-media${
+				item.locked ? ' formspress-integration-media--locked' : ''
+			}` }
+			aria-hidden="true"
+		>
+			{ item.plan === 'pro' && <PlanBadge item={ item } /> }
+			{ item.icon_svg ? (
+				<span
+					className="formspress-integration-logo formspress-integration-logo--svg"
+					dangerouslySetInnerHTML={ { __html: item.icon_svg } }
+				/>
+			) : (
+				<img
+					className="formspress-integration-logo formspress-integration-logo--default"
+					src={ DEFAULT_LOGO_SRC }
+					alt=""
+				/>
+			) }
 		</div>
 	);
 };
@@ -59,7 +86,7 @@ const DEFAULT_VIEW = {
 	titleField: 'title',
 	mediaField: 'media',
 	descriptionField: 'description',
-	fields: [ 'category', 'status' ],
+	fields: [ 'plan', 'category' ],
 	layout: {
 		previewSize: DEFAULT_GRID_PREVIEW_SIZE,
 	},
@@ -75,96 +102,76 @@ const IntegrationsHubPage = () => {
 		get( INTEGRATIONS )
 			.then( ( res ) => {
 				const raw = Array.isArray( res?.data ) ? res.data : [];
-				// DataViews wants `title`; the API ships `label`. We also
-				// surface `status` as a derived string so it can be filtered.
+				// DataViews wants `title`; the API ships `label`.
 				setList(
 					raw.map( ( i ) => ( {
 						...i,
 						title: i.label || i.id,
-						status: i.active ? 'active' : 'inactive',
+						plan: i.plan || ( i.pro_feature ? 'pro' : 'free' ),
+						locked: !! i.locked,
 					} ) )
 				);
 			} )
 			.catch( () =>
-				setError( __( 'Could not load integrations.', 'flowforms' ) )
+				setError( __( 'Could not load integrations.', 'formspress' ) )
 			);
 	}, [] );
-
-	// Client-side filter + search (the full integrations list is small,
-	// no need for server pagination).
-	const filtered = useMemo( () => {
-		if ( ! list ) return [];
-		const search = ( view.search || '' ).trim().toLowerCase();
-		const catF = view.filters?.find( ( f ) => 'category' === f.field );
-		const statusF = view.filters?.find( ( f ) => 'status' === f.field );
-		return list.filter( ( i ) => {
-			if ( catF?.value && i.category !== catF.value ) return false;
-			if ( statusF?.value && i.status !== statusF.value ) return false;
-			if ( search ) {
-				const hay = `${ i.title } ${ i.description || '' } ${
-					i.category || ''
-				}`.toLowerCase();
-				if ( ! hay.includes( search ) ) return false;
-			}
-			return true;
-		} );
-	}, [ list, view.search, view.filters ] );
 
 	const fields = useMemo(
 		() => [
 			{
 				id: 'title',
-				label: __( 'Name', 'flowforms' ),
+				label: __( 'Name', 'formspress' ),
 				enableGlobalSearch: true,
 				enableSorting: true,
 			},
 			{
 				id: 'media',
-				label: __( 'Logo', 'flowforms' ),
+				label: __( 'Logo', 'formspress' ),
 				render: ( { item } ) => <IntegrationMedia item={ item } />,
 			},
 			{
 				id: 'description',
-				label: __( 'Description', 'flowforms' ),
+				label: __( 'Description', 'formspress' ),
 				enableGlobalSearch: true,
 				render: ( { item } ) => (
 					<div className="formspress-integration-desc">
 						<p>{ item.description }</p>
-						{ item.docs && (
+						{ item.locked && (
+							<p className="formspress-integration-desc__locked">
+								{ __(
+									'Available as a Pro submission action.',
+									'formspress'
+								) }
+							</p>
+						) }
+						{ item.docs && ! item.locked && (
 							<ExternalLink href={ item.docs }>
-								{ __( 'Documentation', 'flowforms' ) }
+								{ __( 'Documentation', 'formspress' ) }
 							</ExternalLink>
 						) }
 					</div>
 				),
 			},
 			{
+				id: 'plan',
+				label: __( 'Plan', 'formspress' ),
+				filterBy: { operators: [ 'isAny' ] },
+				elements: Object.entries( PLAN_LABELS ).map(
+					( [ value, label ] ) => ( { value, label } )
+				),
+				render: ( { item } ) => <PlanBadge item={ item } />,
+			},
+			{
 				id: 'category',
-				label: __( 'Category', 'flowforms' ),
-				filterBy: { operators: [ 'is' ] },
+				label: __( 'Category', 'formspress' ),
+				filterBy: { operators: [ 'isAny' ] },
 				elements: Object.entries( CATEGORY_LABELS ).map(
 					( [ value, label ] ) => ( { value, label } )
 				),
 				render: ( { item } ) => (
 					<Badge>
 						{ CATEGORY_LABELS[ item.category ] || item.category }
-					</Badge>
-				),
-			},
-			{
-				id: 'status',
-				label: __( 'Status', 'flowforms' ),
-				filterBy: { operators: [ 'is' ] },
-				elements: Object.entries( STATUS_LABELS ).map(
-					( [ value, label ] ) => ( { value, label } )
-				),
-				render: ( { item } ) => (
-					<Badge
-						intent={
-							'active' === item.status ? 'success' : 'default'
-						}
-					>
-						{ STATUS_LABELS[ item.status ] || item.status }
 					</Badge>
 				),
 			},
@@ -176,18 +183,27 @@ const IntegrationsHubPage = () => {
 		() => [
 			{
 				id: 'configure',
-				label: __( 'Configure', 'flowforms' ),
+				label: __( 'Configure', 'formspress' ),
 				isPrimary: true,
-				isEligible: ( item ) => !! item.settings,
+				isEligible: ( item ) => !! item.settings && ! item.locked,
 				callback: ( items ) => {
 					const t = items?.[ 0 ];
 					if ( t?.settings ) navigate( t.settings );
 				},
 			},
 			{
+				id: 'upgrade',
+				label: __( 'Upgrade to Pro', 'formspress' ),
+				isPrimary: true,
+				isEligible: ( item ) => !! item.locked,
+				callback: () => {
+					window.open( UPGRADE_URL, '_blank', 'noopener,noreferrer' );
+				},
+			},
+			{
 				id: 'docs',
-				label: __( 'Documentation', 'flowforms' ),
-				isEligible: ( item ) => !! item.docs,
+				label: __( 'Documentation', 'formspress' ),
+				isEligible: ( item ) => !! item.docs && ! item.locked,
 				callback: ( items ) => {
 					const t = items?.[ 0 ];
 					if ( t?.docs )
@@ -198,6 +214,11 @@ const IntegrationsHubPage = () => {
 		[ navigate ]
 	);
 
+	const { data: shownIntegrations, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( list || [], view, fields ),
+		[ list, view, fields ]
+	);
+
 	if ( null === list && ! error ) {
 		return (
 			<div className="ff-page ff-page--loading">
@@ -206,18 +227,13 @@ const IntegrationsHubPage = () => {
 		);
 	}
 
-	const paginationInfo = {
-		totalItems: filtered.length,
-		totalPages: Math.max( 1, Math.ceil( filtered.length / view.perPage ) ),
-	};
-
 	return (
 		<PageHeader
 			className="ff-page ff-page--dataviews"
-			title={ __( 'Integrations', 'flowforms' ) }
+			title={ __( 'Integrations', 'formspress' ) }
 			description={ __(
-				'Connect FormsPress to your email marketing, CRM and payment stack.',
-				'flowforms'
+				'Submission actions you can add to forms. Free includes email notifications; Pro unlocks redirects, webhooks, payments, and marketing integrations.',
+				'formspress'
 			) }
 		>
 			<div className="ff-page__body">
@@ -227,7 +243,7 @@ const IntegrationsHubPage = () => {
 				/>
 				<div className="ff-dataviews-container ff-integrations-dataviews">
 					<DataViews
-						data={ filtered }
+						data={ shownIntegrations }
 						fields={ fields }
 						view={ view }
 						onChangeView={ setView }
@@ -243,7 +259,13 @@ const IntegrationsHubPage = () => {
 						paginationInfo={ paginationInfo }
 						getItemId={ ( item ) => item.id }
 						onClickItem={ ( item ) => {
-							if ( item.settings ) navigate( item.settings );
+							if ( item.locked )
+								window.open(
+									UPGRADE_URL,
+									'_blank',
+									'noopener,noreferrer'
+								);
+							else if ( item.settings ) navigate( item.settings );
 							else if ( item.docs )
 								window.open(
 									item.docs,

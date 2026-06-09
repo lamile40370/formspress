@@ -2,13 +2,11 @@
 
 namespace FlowForms\Modules\Entries\Services;
 
-use FlowForms\Extensibility\FieldTypes\Calculations\FormulaEvaluator;
 use FlowForms\Extensibility\FieldTypes\FieldTypeRegistry;
 use FlowForms\Extensibility\SpamProviders\SpamProviderRegistry;
 use FlowForms\Extensibility\Validators\ValidatorRegistry;
 use FlowForms\Modules\Actions\Services\ActionRunner;
 use FlowForms\Modules\Entries\Services\Conditional\ConditionEvaluator;
-use FlowForms\Modules\Entries\Services\Quiz\QuizScorer;
 use FlowForms\Modules\Forms\Services\FormRepository;
 
 class EntryProcessor {
@@ -27,7 +25,7 @@ class EntryProcessor {
 		$form = $this->form_repo->get( $form_id );
 
 		if ( ! $form || 'active' !== $form['status'] ) {
-			return [ 'success' => false, 'message' => __( 'This form is not available.', 'flowforms' ) ];
+			return [ 'success' => false, 'message' => __( 'This form is not available.', 'formspress' ) ];
 		}
 
 		if ( ! empty( $form['settings']['honeypot'] ) ) {
@@ -43,10 +41,11 @@ class EntryProcessor {
 			return [ 'success' => false, 'message' => $spam_check ];
 		}
 
-		// Compute which fields are currently "visible" given submitted values.
-		// Validation only runs on visible fields; hidden fields are stripped
-		// from the persisted entry to avoid storing answers the user couldn't see.
-		$visible_field_ids = $this->conditions->visibleFieldIds( $form['fields'], $submitted_values );
+		// Conditional display is a Pro feature. When unavailable, every field
+		// remains active so manually injected conditions cannot bypass validation.
+		$visible_field_ids = apply_filters( 'flowforms_can_use_conditional_logic', false )
+			? $this->conditions->visibleFieldIds( $form['fields'], $submitted_values )
+			: null;
 
 		$validation = $this->validate_fields( $form['fields'], $submitted_values, $visible_field_ids );
 
@@ -56,17 +55,14 @@ class EntryProcessor {
 
 		$entry_values = $this->build_entry_values( $form['fields'], $submitted_values, $visible_field_ids );
 
-		/* Recompute calculation field values server-side from the formula —
-		 * never trust whatever the client posted in the hidden input. */
-		$entry_values = $this->apply_calculations( $form['fields'], $entry_values );
+		$entry_values = apply_filters( 'flowforms_entry_values', $entry_values, $form['fields'], $submitted_values, $form );
 
-		/* Quiz scoring — sum option scores per answer, find matching screen. */
-		$quiz_result = $this->score_quiz( $form, $entry_values );
+		$quiz_result = apply_filters( 'flowforms_entry_quiz_result', null, $form, $entry_values );
 
 		$entry_id = $this->entry_repo->create( $form_id, $entry_values, $request_meta, $quiz_result );
 
 		if ( ! $entry_id ) {
-			return [ 'success' => false, 'message' => __( 'Failed to save submission.', 'flowforms' ) ];
+			return [ 'success' => false, 'message' => __( 'Failed to save submission.', 'formspress' ) ];
 		}
 
 		$entry = $this->entry_repo->get( $entry_id );
@@ -99,79 +95,7 @@ class EntryProcessor {
 			$result['result_screen'] = $quiz_result['result_screen'];
 		}
 
-		return $result;
-	}
-
-	/**
-	 * Walk every calculation field, evaluate its formula using the other
-	 * submitted field values, and overwrite the entry's stored value.
-	 *
-	 * @param array<int,array<string,mixed>> $fields
-	 * @param array<int,array<string,mixed>> $entry_values
-	 * @return array<int,array<string,mixed>>
-	 */
-	private function apply_calculations( array $fields, array $entry_values ): array {
-		$flat = $this->conditions->flattenFields( $fields );
-
-		$calc_fields = array_filter( $flat, fn( $f ) => 'calculation' === ( $f['type'] ?? '' ) );
-		if ( empty( $calc_fields ) ) {
-			return $entry_values;
-		}
-
-		/* Build a quick value map for the evaluator. */
-		$values_map = [];
-		foreach ( $entry_values as $v ) {
-			$values_map[ $v['field_id'] ?? '' ] = $v['field_value'] ?? '';
-		}
-
-		$evaluator = new FormulaEvaluator();
-
-		foreach ( $calc_fields as $field ) {
-			$formula  = (string) ( $field['formula'] ?? '' );
-			$field_id = (string) ( $field['id'] ?? '' );
-			if ( '' === $formula || '' === $field_id ) {
-				continue;
-			}
-			$computed             = $evaluator->evaluate( $formula, $values_map );
-			$values_map[ $field_id ] = $computed; // for downstream calcs that reference earlier calcs
-
-			$replaced = false;
-			foreach ( $entry_values as &$v ) {
-				if ( ( $v['field_id'] ?? '' ) === $field_id ) {
-					$v['field_value'] = (string) $computed;
-					$replaced         = true;
-					break;
-				}
-			}
-			unset( $v );
-
-			if ( ! $replaced ) {
-				$entry_values[] = [
-					'field_id'    => $field_id,
-					'field_label' => $field['label'] ?? $field_id,
-					'field_value' => (string) $computed,
-				];
-			}
-		}
-
-		return $entry_values;
-	}
-
-	/**
-	 * Compute total quiz score + matching result screen. Returns null when
-	 * quiz mode is not enabled on the form.
-	 *
-	 * @param array<string,mixed>           $form
-	 * @param array<int,array<string,mixed>> $entry_values
-	 * @return array{score:float,max_score:float,result_screen:?array<string,mixed>}|null
-	 */
-	private function score_quiz( array $form, array $entry_values ): ?array {
-		$quiz = $form['settings']['quiz'] ?? null;
-		if ( ! is_array( $quiz ) || empty( $quiz['enabled'] ) ) {
-			return null;
-		}
-		$scorer = new QuizScorer();
-		return $scorer->score( $form['fields'] ?? [], $entry_values, $quiz );
+		return apply_filters( 'flowforms_submit_response', $result, $form, $entry );
 	}
 
 	private function verify_spam( array $submitted_values, array $request_meta ): true|string {
@@ -201,14 +125,13 @@ class EntryProcessor {
 				continue;
 			}
 
-			/* Calculation fields are never user-input — never validate "required". */
-			if ( 'calculation' === ( $field['type'] ?? '' ) ) {
+			if ( ! apply_filters( 'flowforms_should_validate_field', true, $field, $value ) ) {
 				continue;
 			}
 
 			if ( ! empty( $field['required'] ) && $this->is_empty( $value ) ) {
 				$errors[ $field_id ] = sprintf(
-					__( '%s is required.', 'flowforms' ),
+					__( '%s is required.', 'formspress' ),
 					$field['label'] ?? $field_id
 				);
 				continue;
@@ -254,6 +177,7 @@ class EntryProcessor {
 		$values = [];
 
 		$flat = $this->conditions->flattenFields( $fields );
+		$checkout_total = $this->compute_checkout_total( $flat, $submitted_values, $visible_field_ids );
 
 		foreach ( $flat as $field ) {
 			$field_id   = $field['id'] ?? '';
@@ -269,7 +193,9 @@ class EntryProcessor {
 				continue;
 			}
 
-			$raw_value = $submitted_values[ $field_id ] ?? '';
+			$raw_value = 'total' === $field_type
+				? number_format( $checkout_total, 2, '.', '' )
+				: ( $submitted_values[ $field_id ] ?? '' );
 
 			if ( $type ) {
 				$value = (string) $type->sanitize( $raw_value, $field );
@@ -289,7 +215,43 @@ class EntryProcessor {
 		return $values;
 	}
 
+	private function compute_checkout_total( array $flat_fields, array $submitted_values, ?array $visible_field_ids = null ): float {
+		$total = 0.0;
+
+		foreach ( $flat_fields as $field ) {
+			if ( 'product' !== ( $field['type'] ?? '' ) ) {
+				continue;
+			}
+
+			$field_id = (string) ( $field['id'] ?? '' );
+			if ( '' === $field_id ) {
+				continue;
+			}
+
+			if ( null !== $visible_field_ids && ! in_array( $field_id, $visible_field_ids, true ) ) {
+				continue;
+			}
+
+			$quantity = is_numeric( $submitted_values[ $field_id ] ?? null )
+				? (float) $submitted_values[ $field_id ]
+				: 0.0;
+			$quantity = max( 0.0, $quantity );
+
+			$min = max( 0.0, (float) ( $field['min_quantity'] ?? 0 ) );
+			$quantity = max( $min, $quantity );
+
+			if ( isset( $field['max_quantity'] ) && null !== $field['max_quantity'] && '' !== $field['max_quantity'] ) {
+				$quantity = min( $quantity, (float) $field['max_quantity'] );
+			}
+
+			$price = max( 0.0, (float) ( $field['price'] ?? 0 ) );
+			$total += $price * $quantity;
+		}
+
+		return round( $total, 2 );
+	}
+
 	private function get_success_message( array $form ): string {
-		return $form['settings']['success_message'] ?? __( 'Thank you! Your submission has been received.', 'flowforms' );
+		return $form['settings']['success_message'] ?? __( 'Thank you! Your submission has been received.', 'formspress' );
 	}
 }

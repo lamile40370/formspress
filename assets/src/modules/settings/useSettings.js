@@ -39,14 +39,14 @@ export default function useSettings() {
 				await put( SETTINGS, payload );
 				setNotice( {
 					type: 'success',
-					message: __( 'Settings saved.', 'flowforms' ),
+					message: __( 'Settings saved.', 'formspress' ),
 				} );
 			} catch ( e ) {
 				setNotice( {
 					type: 'error',
 					message:
 						e.message ||
-						__( 'Could not save settings.', 'flowforms' ),
+						__( 'Could not save settings.', 'formspress' ),
 				} );
 			} finally {
 				setSaving( false );

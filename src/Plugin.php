@@ -8,11 +8,9 @@ use FlowForms\Core\Assets;
 use FlowForms\Core\MigrationRunner;
 use FlowForms\Core\ModuleRegistry;
 use FlowForms\Hooks\HookRegistry;
-use FlowForms\Modules\EmailTemplates\Services\EmailTemplateRepository;
 use FlowForms\Modules\Entries\Services\EntryRepository;
 use FlowForms\Modules\Forms\Services\FormRepository;
 use FlowForms\Modules\Templates\Services\TemplateRegistry;
-use FlowForms\Modules\Webhooks\Services\HeadlessSupport;
 
 final class Plugin {
 
@@ -35,7 +33,9 @@ final class Plugin {
 	public function init(): void {
 		$this->register_core_services();
 
-		load_plugin_textdomain( 'flowforms', false, dirname( FLOWFORMS_BASENAME ) . '/languages' );
+		load_plugin_textdomain( 'formspress', false, dirname( FLOWFORMS_BASENAME ) . '/languages' );
+
+		do_action( 'flowforms_core_services_registered', $this->container );
 
 		$this->container->get( ModuleRegistry::class )->register_modules();
 
@@ -46,8 +46,6 @@ final class Plugin {
 		add_action( 'admin_init', [ $this, 'maybe_run_migrations' ] );
 
 		$this->maybe_register_cli();
-
-		$this->register_headless_support();
 	}
 
 	private function register_core_services(): void {
@@ -145,25 +143,12 @@ final class Plugin {
 			$cmd = new FormsPressCliCommands(
 				$this->container->get( FormRepository::class ),
 				$this->container->get( EntryRepository::class ),
-				$this->container->get( EmailTemplateRepository::class ),
 				$this->container->get( TemplateRegistry::class ),
 			);
 			\WP_CLI::add_command( 'formspress', $cmd );
 		} catch ( \Throwable $e ) {
 			// Soft fail so a missing module doesn't blow up the whole CLI.
 			\WP_CLI::warning( 'FormsPress CLI failed to bootstrap: ' . $e->getMessage() );
-		}
-	}
-
-	/**
-	 * Wire the CORS layer + token-bearer auth used by headless apps.
-	 *
-	 * Both are off unless the `headless_mode` setting is enabled in the
-	 * Settings page (or set via the `flowforms_settings` option directly).
-	 */
-	private function register_headless_support(): void {
-		if ( class_exists( HeadlessSupport::class ) ) {
-			( new HeadlessSupport() )->register();
 		}
 	}
 

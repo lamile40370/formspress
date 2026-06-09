@@ -13,7 +13,7 @@ abstract class AbstractEndpoint {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return new WP_Error(
 				'rest_forbidden',
-				__( 'You do not have permission to access this endpoint.', 'flowforms' ),
+				__( 'You do not have permission to access this endpoint.', 'formspress' ),
 				[ 'status' => 403 ]
 			);
 		}

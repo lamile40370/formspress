@@ -78,7 +78,7 @@ const DashboardPage = () => {
 			.catch( ( err ) =>
 				setError(
 					err.message ||
-						__( 'Failed to load dashboard metrics.', 'flowforms' )
+						__( 'Failed to load dashboard metrics.', 'formspress' )
 				)
 			)
 			.finally( () => setLoading( false ) );
@@ -108,22 +108,22 @@ const DashboardPage = () => {
 
 	return (
 		<PageHeader
-			title={ __( 'Dashboard', 'flowforms' ) }
+			title={ __( 'Dashboard', 'formspress' ) }
 			description={ __(
 				'Track your forms and submissions activity.',
-				'flowforms'
+				'formspress'
 			) }
 			hideBack
 			right={
 				<HStack spacing={ 2 } wrap>
 					<Link to="/forms/new" style={ { textDecoration: 'none' } }>
 						<Button variant="primary">
-							{ __( 'Create Form', 'flowforms' ) }
+							{ __( 'Create Form', 'formspress' ) }
 						</Button>
 					</Link>
 					<Link to="/forms" style={ { textDecoration: 'none' } }>
 						<Button variant="secondary">
-							{ __( 'View All Forms', 'flowforms' ) }
+							{ __( 'View All Forms', 'formspress' ) }
 						</Button>
 					</Link>
 				</HStack>
@@ -148,17 +148,17 @@ const DashboardPage = () => {
 								<KpiTile
 									label={ __(
 										'Submissions This Week',
-										'flowforms'
+										'formspress'
 									) }
 									value={ formatNumber( thisWeek ) }
 									caption={
 										weekDelta === 0
-											? __( 'no change', 'flowforms' )
+											? __( 'no change', 'formspress' )
 											: sprintf(
 													/* translators: %s is the percentage delta vs the previous week */
 													__(
 														'%s vs last week',
-														'flowforms'
+														'formspress'
 													),
 													( weekDelta > 0
 														? '+'
@@ -171,29 +171,29 @@ const DashboardPage = () => {
 								<KpiTile
 									label={ __(
 										'Submissions Today',
-										'flowforms'
+										'formspress'
 									) }
 									value={ formatNumber( today ) }
 									caption={ sprintf(
 										/* translators: %d is the count of yesterday submissions */
-										__( '%d yesterday', 'flowforms' ),
+										__( '%d yesterday', 'formspress' ),
 										stats?.entries_yesterday || 0
 									) }
 								/>
 								<KpiTile
 									label={ __(
 										'Unread Entries',
-										'flowforms'
+										'formspress'
 									) }
 									value={ formatNumber( unread ) }
 									caption={ sprintf(
 										/* translators: %d total entries */
-										__( '%d total entries', 'flowforms' ),
+										__( '%d total entries', 'formspress' ),
 										totalEntries
 									) }
 								/>
 								<KpiTile
-									label={ __( 'Active Forms', 'flowforms' ) }
+									label={ __( 'Active Forms', 'formspress' ) }
 									value={ `${ formatNumber(
 										active
 									) } / ${ formatNumber( total ) }` }
@@ -203,13 +203,13 @@ const DashboardPage = () => {
 													/* translators: %s is the active forms percentage */
 													__(
 														'%s active',
-														'flowforms'
+														'formspress'
 													),
 													formatPercent(
 														( active / total ) * 100
 													)
 											  )
-											: __( 'no forms yet', 'flowforms' )
+											: __( 'no forms yet', 'formspress' )
 									}
 								/>
 							</div>
@@ -221,7 +221,7 @@ const DashboardPage = () => {
 								>
 									<CardHeader>
 										<Heading level={ 4 }>
-											{ __( 'Top Forms', 'flowforms' ) }
+											{ __( 'Top Forms', 'formspress' ) }
 										</Heading>
 									</CardHeader>
 									<CardBody>
@@ -229,7 +229,7 @@ const DashboardPage = () => {
 											<Text variant="muted">
 												{ __(
 													'No forms yet. Create your first form to start collecting submissions.',
-													'flowforms'
+													'formspress'
 												) }
 											</Text>
 										) : (
@@ -261,7 +261,7 @@ const DashboardPage = () => {
 																	{ form.title ||
 																		__(
 																			'(Untitled)',
-																			'flowforms'
+																			'formspress'
 																		) }
 																</Text>
 																<Text
@@ -303,7 +303,7 @@ const DashboardPage = () => {
 											<Heading level={ 4 }>
 												{ __(
 													'Recent Submissions',
-													'flowforms'
+													'formspress'
 												) }
 											</Heading>
 											<Button
@@ -315,7 +315,7 @@ const DashboardPage = () => {
 											>
 												{ __(
 													'View all',
-													'flowforms'
+													'formspress'
 												) }
 											</Button>
 										</HStack>
@@ -325,7 +325,7 @@ const DashboardPage = () => {
 											<Text variant="muted">
 												{ __(
 													'No submissions yet.',
-													'flowforms'
+													'formspress'
 												) }
 											</Text>
 										) : (
@@ -352,7 +352,7 @@ const DashboardPage = () => {
 																	{ entry.form_title ||
 																		__(
 																			'(Deleted form)',
-																			'flowforms'
+																			'formspress'
 																		) }
 																</Text>
 															</button>

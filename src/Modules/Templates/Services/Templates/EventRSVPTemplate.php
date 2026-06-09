@@ -11,11 +11,11 @@ class EventRSVPTemplate extends AbstractTemplate {
 	}
 
 	public function get_label(): string {
-		return __( 'Event RSVP', 'flowforms' );
+		return __( 'Event RSVP', 'formspress' );
 	}
 
 	public function get_description(): string {
-		return __( 'Collect RSVPs, guest counts and dietary requirements for your event.', 'flowforms' );
+		return __( 'Collect RSVPs, guest counts and dietary requirements for your event.', 'formspress' );
 	}
 
 	public function get_category(): string {
@@ -35,33 +35,33 @@ class EventRSVPTemplate extends AbstractTemplate {
 			[
 				'id'       => 'full_name',
 				'type'     => 'text',
-				'label'    => __( 'What is your full name?', 'flowforms' ),
+				'label'    => __( 'What is your full name?', 'formspress' ),
 				'required' => true,
 			],
 			[
 				'id'       => 'email',
 				'type'     => 'email',
-				'label'    => __( 'What is your email?', 'flowforms' ),
+				'label'    => __( 'What is your email?', 'formspress' ),
 				'required' => true,
 			],
 			[
 				'id'        => 'attending',
 				'type'      => 'yes_no',
-				'label'     => __( 'Will you be attending?', 'flowforms' ),
+				'label'     => __( 'Will you be attending?', 'formspress' ),
 				'required'  => true,
-				'yes_label' => __( 'Yes', 'flowforms' ),
-				'no_label'  => __( 'No', 'flowforms' ),
+				'yes_label' => __( 'Yes', 'formspress' ),
+				'no_label'  => __( 'No', 'formspress' ),
 			],
 			[
 				'id'       => 'guests',
 				'type'     => 'number',
-				'label'    => __( 'How many guests will you bring?', 'flowforms' ),
+				'label'    => __( 'How many guests will you bring?', 'formspress' ),
 				'required' => false,
 			],
 			[
 				'id'       => 'dietary',
 				'type'     => 'textarea',
-				'label'    => __( 'Any dietary requirements?', 'flowforms' ),
+				'label'    => __( 'Any dietary requirements?', 'formspress' ),
 				'required' => false,
 			],
 		];
@@ -69,13 +69,13 @@ class EventRSVPTemplate extends AbstractTemplate {
 
 	public function get_settings(): array {
 		return [
-			'welcome_title'       => __( "You're invited!", 'flowforms' ),
-			'welcome_description' => __( 'Let us know if you can make it.', 'flowforms' ),
-			'start_label'         => __( 'RSVP now', 'flowforms' ),
-			'end_title'           => __( 'See you there!', 'flowforms' ),
-			'success_message'     => __( 'Your RSVP has been recorded.', 'flowforms' ),
-			'submit_label'        => __( 'Submit RSVP', 'flowforms' ),
-			'next_label'          => __( 'OK', 'flowforms' ),
+			'welcome_title'       => __( "You're invited!", 'formspress' ),
+			'welcome_description' => __( 'Let us know if you can make it.', 'formspress' ),
+			'start_label'         => __( 'RSVP now', 'formspress' ),
+			'end_title'           => __( 'See you there!', 'formspress' ),
+			'success_message'     => __( 'Your RSVP has been recorded.', 'formspress' ),
+			'submit_label'        => __( 'Submit RSVP', 'formspress' ),
+			'next_label'          => __( 'OK', 'formspress' ),
 		];
 	}
 }

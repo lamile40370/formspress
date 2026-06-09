@@ -16,7 +16,7 @@ class RowFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Columns', 'flowforms' );
+		return __( 'Columns', 'formspress' );
 	}
 
 	public function get_group(): string {

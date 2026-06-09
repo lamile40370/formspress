@@ -14,7 +14,7 @@ class SpamProvidersModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Anti-spam', 'flowforms' );
+		return __( 'Anti-spam', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {

@@ -17,9 +17,9 @@ class PolylangCompat {
 			return;
 		}
 
-		add_action( 'flowforms_register_string', [ $this, 'register_string' ], 10, 3 );
-		add_filter( 'flowforms_translate_string', [ $this, 'translate_string' ], 10, 4 );
-		add_filter( 'flowforms_active_compat_providers', [ $this, 'declare_provider' ] );
+		add_action( 'formspress_register_string', [ $this, 'register_string' ], 10, 3 );
+		add_filter( 'formspress_translate_string', [ $this, 'translate_string' ], 10, 4 );
+		add_filter( 'formspress_active_compat_providers', [ $this, 'declare_provider' ] );
 	}
 
 	public function is_active(): bool {

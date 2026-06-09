@@ -11,7 +11,7 @@ class UrlFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'URL', 'flowforms' );
+		return __( 'URL', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,7 +24,7 @@ class UrlFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'placeholder', 'type' => 'text', 'label' => __( 'Placeholder', 'flowforms' ) ],
+			[ 'key' => 'placeholder', 'type' => 'text', 'label' => __( 'Placeholder', 'formspress' ) ],
 		];
 	}
 
@@ -40,7 +40,7 @@ class UrlFieldType extends AbstractFieldType {
 			return true;
 		}
 		if ( ! filter_var( $value, FILTER_VALIDATE_URL ) ) {
-			return __( 'Please enter a valid URL.', 'flowforms' );
+			return __( 'Please enter a valid URL.', 'formspress' );
 		}
 		return true;
 	}

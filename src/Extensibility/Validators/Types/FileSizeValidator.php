@@ -11,12 +11,12 @@ class FileSizeValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Maximum file size', 'flowforms' );
+		return __( 'Maximum file size', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'max_mb', 'type' => 'number', 'label' => __( 'Max size (MB)', 'flowforms' ), 'default' => 5, 'min' => 1 ],
+			[ 'key' => 'max_mb', 'type' => 'number', 'label' => __( 'Max size (MB)', 'formspress' ), 'default' => 5, 'min' => 1 ],
 		];
 	}
 
@@ -31,7 +31,7 @@ class FileSizeValidator extends AbstractValidator {
 		if ( $size > $limit ) {
 			return sprintf(
 				/* translators: %s is max size in MB */
-				__( 'File must be smaller than %s MB.', 'flowforms' ),
+				__( 'File must be smaller than %s MB.', 'formspress' ),
 				$max_mb
 			);
 		}

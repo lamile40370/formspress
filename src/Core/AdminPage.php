@@ -13,8 +13,8 @@ class AdminPage {
 	#[Action( 'admin_menu' )]
 	public function register_menu(): void {
 		add_menu_page(
-			__( 'FormsPress', 'flowforms' ),
-			__( 'FormsPress', 'flowforms' ),
+			__( 'FormsPress', 'formspress' ),
+			__( 'FormsPress', 'formspress' ),
 			'manage_options',
 			'flowforms',
 			[ $this, 'render_app' ],

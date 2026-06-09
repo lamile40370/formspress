@@ -15,15 +15,15 @@ class PrivacyPolicyContent {
 			return;
 		}
 
-		$content = '<h2>' . __( 'Forms', 'flowforms' ) . '</h2>'
-			. '<p>' . __( 'When you submit a form on this site (built with FormsPress), the data you enter is stored in the site\'s database. The following information is collected:', 'flowforms' ) . '</p>'
+		$content = '<h2>' . __( 'Forms', 'formspress' ) . '</h2>'
+			. '<p>' . __( 'When you submit a form on this site (built with FormsPress), the data you enter is stored in the site\'s database. The following information is collected:', 'formspress' ) . '</p>'
 			. '<ul>'
-			. '<li>' . __( 'All values you typed into the form fields (name, email, message, etc.).', 'flowforms' ) . '</li>'
-			. '<li>' . __( 'Your IP address, used to mitigate spam.', 'flowforms' ) . '</li>'
-			. '<li>' . __( 'Your browser user-agent string, used for security and analytics.', 'flowforms' ) . '</li>'
-			. '<li>' . __( 'The URL of the page where you submitted the form.', 'flowforms' ) . '</li>'
+			. '<li>' . __( 'All values you typed into the form fields (name, email, message, etc.).', 'formspress' ) . '</li>'
+			. '<li>' . __( 'Your IP address, used to mitigate spam.', 'formspress' ) . '</li>'
+			. '<li>' . __( 'Your browser user-agent string, used for security and analytics.', 'formspress' ) . '</li>'
+			. '<li>' . __( 'The URL of the page where you submitted the form.', 'formspress' ) . '</li>'
 			. '</ul>'
-			. '<p>' . __( 'Submissions are retained for the duration set by the site administrator. You can request a copy or deletion of your data via Tools → Export Personal Data and Tools → Erase Personal Data using your email address.', 'flowforms' ) . '</p>';
+			. '<p>' . __( 'Submissions are retained for the duration set by the site administrator. You can request a copy or deletion of your data via Tools → Export Personal Data and Tools → Erase Personal Data using your email address.', 'formspress' ) . '</p>';
 
 		wp_add_privacy_policy_content(
 			'FormsPress',

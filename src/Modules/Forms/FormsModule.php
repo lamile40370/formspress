@@ -13,7 +13,7 @@ class FormsModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Forms', 'flowforms' );
+		return __( 'Forms', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {
@@ -31,19 +31,19 @@ class FormsModule extends AbstractModule {
 	public function get_nav_items(): array {
 		return [
 			[
-				'label'       => __( 'Forms', 'flowforms' ),
+				'label'       => __( 'Forms', 'formspress' ),
 				'path'        => '/forms',
 				'icon'        => 'feedback',
 				'position'    => 20,
-				'description' => __( 'Create and manage your forms.', 'flowforms' ),
+				'description' => __( 'Create and manage your forms.', 'formspress' ),
 				'children'    => [
 					[
-						'label' => __( 'All forms', 'flowforms' ),
+						'label' => __( 'All forms', 'formspress' ),
 						'path'  => '/forms',
 						'icon'  => 'feedback',
 					],
 					[
-						'label' => __( 'Templates', 'flowforms' ),
+						'label' => __( 'Templates', 'formspress' ),
 						'path'  => '/forms/templates',
 						'icon'  => 'list-view',
 					],

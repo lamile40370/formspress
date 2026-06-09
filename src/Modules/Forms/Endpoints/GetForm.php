@@ -15,7 +15,7 @@ class GetForm extends AbstractEndpoint {
 		$form = $this->repo->get( (int) $request->get_param( 'id' ) );
 
 		if ( ! $form ) {
-			return $this->error( __( 'Form not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Form not found.', 'formspress' ), 404 );
 		}
 
 		return $this->success( $form );

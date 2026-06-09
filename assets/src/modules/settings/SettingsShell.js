@@ -42,7 +42,7 @@ const SettingsShell = ( {
 					isBusy={ isSaving }
 					disabled={ isSaving }
 				>
-					{ __( 'Save changes', 'flowforms' ) }
+					{ __( 'Save changes', 'formspress' ) }
 				</Button>
 			}
 		>

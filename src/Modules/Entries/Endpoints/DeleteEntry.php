@@ -15,13 +15,13 @@ class DeleteEntry extends AbstractEndpoint {
 		$id = (int) $request->get_param( 'id' );
 
 		if ( ! $this->repo->get( $id ) ) {
-			return $this->error( __( 'Entry not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Entry not found.', 'formspress' ), 404 );
 		}
 
 		$deleted = $this->repo->delete( $id );
 
 		if ( ! $deleted ) {
-			return $this->error( __( 'Failed to delete entry.', 'flowforms' ), 500 );
+			return $this->error( __( 'Failed to delete entry.', 'formspress' ), 500 );
 		}
 
 		return $this->success( null, 204 );

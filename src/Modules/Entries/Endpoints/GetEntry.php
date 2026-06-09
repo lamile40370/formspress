@@ -15,7 +15,7 @@ class GetEntry extends AbstractEndpoint {
 		$entry = $this->repo->get( (int) $request->get_param( 'id' ) );
 
 		if ( ! $entry ) {
-			return $this->error( __( 'Entry not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Entry not found.', 'formspress' ), 404 );
 		}
 
 		if ( 'unread' === $entry['status'] ) {

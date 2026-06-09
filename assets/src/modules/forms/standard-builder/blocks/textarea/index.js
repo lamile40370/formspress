@@ -9,11 +9,11 @@ export const name = 'formspress/field-textarea';
 
 export const settings = {
 	apiVersion: 3,
-	title: __( 'Textarea', 'flowforms' ),
-	description: __( 'A multi-line text input.', 'flowforms' ),
+	title: __( 'Textarea', 'formspress' ),
+	description: __( 'A multi-line text input.', 'formspress' ),
 	category: 'formspress-fields',
 	icon,
-	keywords: [ __( 'textarea', 'flowforms' ), __( 'paragraph', 'flowforms' ) ],
+	keywords: [ __( 'textarea', 'formspress' ), __( 'paragraph', 'formspress' ) ],
 	supports: FIELD_SUPPORTS,
 	attributes: {
 		fieldId: { type: 'string', default: '' },
@@ -23,6 +23,7 @@ export const settings = {
 		placeholder: { type: 'string', default: '' },
 		defaultValue: { type: 'string', default: '' },
 		inputStyle: INPUT_STYLE_ATTRIBUTE,
+		conditions: { type: 'object' },
 		rows: { type: 'number', default: 4 },
 	},
 	edit: editComponent,

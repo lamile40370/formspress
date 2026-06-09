@@ -11,7 +11,7 @@ class CheckboxFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Checkbox', 'flowforms' );
+		return __( 'Checkbox', 'formspress' );
 	}
 
 	public function get_group(): string {

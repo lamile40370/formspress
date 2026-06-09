@@ -4,12 +4,11 @@ import {
 	TextareaControl,
 	ToggleControl,
 	SelectControl,
-	ColorPalette,
 	FontSizePicker,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalText as Text,
 } from '@wordpress/components';
+import { PanelColorSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -48,15 +47,14 @@ const FormSettings = ( { form, onChange } ) => {
 	};
 
 	// Theme tokens — same source `core/edit-post` reads from.
-	const themePalette = window.flowFormsData?.themePalette || [];
 	const themeFontSizes = window.flowFormsData?.themeFontSizes || [];
 	const themeSpacing =
 		window.flowFormsData?.themeGlobalSettings?.spacing?.spacingSizes || [];
 
 	const spamProviders = window.flowFormsData?.spamProviders || [];
 	const spamOptions = [
-		{ value: '', label: __( 'Use global setting', 'flowforms' ) },
-		{ value: 'none', label: __( 'None (honeypot only)', 'flowforms' ) },
+		{ value: '', label: __( 'Use global setting', 'formspress' ) },
+		{ value: 'none', label: __( 'None (honeypot only)', 'formspress' ) },
 		...spamProviders.map( ( p ) => ( { value: p.id, label: p.label } ) ),
 	];
 
@@ -68,20 +66,20 @@ const FormSettings = ( { form, onChange } ) => {
 	return (
 		<>
 			{ /* ── Summary ───────────────────────────────────────────── */ }
-			<PanelBody title={ __( 'Summary', 'flowforms' ) } initialOpen>
+			<PanelBody title={ __( 'Summary', 'formspress' ) } initialOpen>
 				<TextControl
-					label={ __( 'Title', 'flowforms' ) }
+					label={ __( 'Title', 'formspress' ) }
 					value={ form.title || '' }
 					onChange={ setForm( 'title' ) }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
 				<ToggleControl
-					label={ __( 'Active', 'flowforms' ) }
+					label={ __( 'Active', 'formspress' ) }
 					help={
 						'inactive' === form.status
-							? __( 'Submissions are not accepted.', 'flowforms' )
-							: __( 'Form accepts submissions.', 'flowforms' )
+							? __( 'Submissions are not accepted.', 'formspress' )
+							: __( 'Form accepts submissions.', 'formspress' )
 					}
 					checked={ 'inactive' !== form.status }
 					onChange={ ( v ) =>
@@ -90,7 +88,7 @@ const FormSettings = ( { form, onChange } ) => {
 					__nextHasNoMarginBottom
 				/>
 				<TextareaControl
-					label={ __( 'Description', 'flowforms' ) }
+					label={ __( 'Description', 'formspress' ) }
 					value={ form.description || '' }
 					onChange={ setForm( 'description' ) }
 					rows={ 3 }
@@ -100,14 +98,14 @@ const FormSettings = ( { form, onChange } ) => {
 
 			{ /* ── Submission ────────────────────────────────────────── */ }
 			<PanelBody
-				title={ __( 'Submission', 'flowforms' ) }
+				title={ __( 'Submission', 'formspress' ) }
 				initialOpen={ false }
 			>
 				<TextControl
-					label={ __( 'Submit button label', 'flowforms' ) }
+					label={ __( 'Submit button label', 'formspress' ) }
 					help={ __(
 						'Used by legacy rendered forms. Standard forms should include a Submit button block.',
-						'flowforms'
+						'formspress'
 					) }
 					value={ settings.submit_label || '' }
 					onChange={ setSetting( 'submit_label' ) }
@@ -115,19 +113,19 @@ const FormSettings = ( { form, onChange } ) => {
 					__next40pxDefaultSize
 				/>
 				<SelectControl
-					label={ __( 'After submit', 'flowforms' ) }
+					label={ __( 'After submit', 'formspress' ) }
 					value={ settings.success_action || 'message' }
 					options={ [
 						{
 							value: 'message',
 							label: __(
 								'Show a confirmation message',
-								'flowforms'
+								'formspress'
 							),
 						},
 						{
 							value: 'redirect',
-							label: __( 'Redirect to a URL', 'flowforms' ),
+							label: __( 'Redirect to a URL', 'formspress' ),
 						},
 					] }
 					onChange={ setSetting( 'success_action' ) }
@@ -136,7 +134,7 @@ const FormSettings = ( { form, onChange } ) => {
 				/>
 				{ 'redirect' === ( settings.success_action || 'message' ) ? (
 					<TextControl
-						label={ __( 'Redirect URL', 'flowforms' ) }
+						label={ __( 'Redirect URL', 'formspress' ) }
 						type="url"
 						value={ settings.redirect_url || '' }
 						onChange={ setSetting( 'redirect_url' ) }
@@ -146,7 +144,7 @@ const FormSettings = ( { form, onChange } ) => {
 					/>
 				) : (
 					<TextareaControl
-						label={ __( 'Success message', 'flowforms' ) }
+						label={ __( 'Success message', 'formspress' ) }
 						value={ settings.success_message || '' }
 						onChange={ setSetting( 'success_message' ) }
 						rows={ 3 }
@@ -155,34 +153,128 @@ const FormSettings = ( { form, onChange } ) => {
 				) }
 			</PanelBody>
 
+			<PanelBody
+				title={ __( 'Pagination', 'formspress' ) }
+				initialOpen={ false }
+			>
+				<TextControl
+					label={ __( 'Previous button label', 'formspress' ) }
+					value={ settings.prev_label || '' }
+					placeholder={ __( 'Previous', 'formspress' ) }
+					onChange={ setSetting( 'prev_label' ) }
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+				<TextControl
+					label={ __( 'Next button label', 'formspress' ) }
+					value={ settings.next_label || '' }
+					placeholder={ __( 'Next', 'formspress' ) }
+					onChange={ setSetting( 'next_label' ) }
+					__nextHasNoMarginBottom
+					__next40pxDefaultSize
+				/>
+			</PanelBody>
+
+			<PanelColorSettings
+				title={ __( 'Pagination colors', 'formspress' ) }
+				initialOpen={ false }
+				colorSettings={ [
+					{
+						label: __( 'Progress', 'formspress' ),
+						value: style.progress_fill_color,
+						onChange: setStyle( 'progress_fill_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Progress track', 'formspress' ),
+						value: style.progress_track_color,
+						onChange: setStyle( 'progress_track_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Step text', 'formspress' ),
+						value: style.step_text_color,
+						onChange: setStyle( 'step_text_color' ),
+						clearable: true,
+					},
+				] }
+				__experimentalIsRenderedInSidebar
+				enableAlpha
+			/>
+
+			<PanelColorSettings
+				title={ __( 'Pagination buttons', 'formspress' ) }
+				initialOpen={ false }
+				colorSettings={ [
+					{
+						label: __( 'Next background', 'formspress' ),
+						value: style.next_bg_color,
+						onChange: setStyle( 'next_bg_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Next text', 'formspress' ),
+						value: style.next_text_color,
+						onChange: setStyle( 'next_text_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Next border', 'formspress' ),
+						value: style.next_border_color,
+						onChange: setStyle( 'next_border_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Previous background', 'formspress' ),
+						value: style.prev_bg_color,
+						onChange: setStyle( 'prev_bg_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Previous text', 'formspress' ),
+						value: style.prev_text_color,
+						onChange: setStyle( 'prev_text_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Previous border', 'formspress' ),
+						value: style.prev_border_color,
+						onChange: setStyle( 'prev_border_color' ),
+						clearable: true,
+					},
+				] }
+				__experimentalIsRenderedInSidebar
+				enableAlpha
+			/>
+
 			{ /* ── Fields rendering (native ToolsPanel like core blocks) ─ */ }
 			<ToolsPanel
-				label={ __( 'Fields rendering', 'flowforms' ) }
+				label={ __( 'Fields rendering', 'formspress' ) }
 				resetAll={ () => setSetting( 'style' )( {} ) }
 			>
 				<ToolsPanelItem
 					hasValue={ () =>
 						!! settings.layout && 'stacked' !== settings.layout
 					}
-					label={ __( 'Layout', 'flowforms' ) }
+					label={ __( 'Layout', 'formspress' ) }
 					onDeselect={ () => setSetting( 'layout' )( 'stacked' ) }
 					isShownByDefault
 				>
 					<SelectControl
-						label={ __( 'Layout', 'flowforms' ) }
+						label={ __( 'Layout', 'formspress' ) }
 						value={ settings.layout || 'stacked' }
 						options={ [
 							{
 								value: 'stacked',
-								label: __( 'Stacked', 'flowforms' ),
+								label: __( 'Stacked', 'formspress' ),
 							},
 							{
 								value: 'inline',
-								label: __( 'Inline', 'flowforms' ),
+								label: __( 'Inline', 'formspress' ),
 							},
 							{
 								value: 'placeholder',
-								label: __( 'Placeholder only', 'flowforms' ),
+								label: __( 'Placeholder only', 'formspress' ),
 							},
 						] }
 						onChange={ setSetting( 'layout' ) }
@@ -194,7 +286,7 @@ const FormSettings = ( { form, onChange } ) => {
 				{ themeFontSizes.length > 0 && (
 					<ToolsPanelItem
 						hasValue={ () => null != style.font_size }
-						label={ __( 'Font size', 'flowforms' ) }
+						label={ __( 'Font size', 'formspress' ) }
 						onDeselect={ resetStyle( 'font_size' ) }
 					>
 						<FontSizePicker
@@ -209,12 +301,12 @@ const FormSettings = ( { form, onChange } ) => {
 
 				<ToolsPanelItem
 					hasValue={ () => null != style.field_spacing }
-					label={ __( 'Field spacing', 'flowforms' ) }
+					label={ __( 'Field spacing', 'formspress' ) }
 					onDeselect={ resetStyle( 'field_spacing' ) }
 					isShownByDefault
 				>
 					<SpacingInput
-						label={ __( 'Field spacing', 'flowforms' ) }
+						label={ __( 'Field spacing', 'formspress' ) }
 						value={ style.field_spacing }
 						onChange={ setSpacingValue( 'field_spacing' ) }
 						sizes={ themeSpacing }
@@ -226,20 +318,20 @@ const FormSettings = ( { form, onChange } ) => {
 						null != style.input_padding_x ||
 						null != style.input_padding_y
 					}
-					label={ __( 'Input padding', 'flowforms' ) }
+					label={ __( 'Input padding', 'formspress' ) }
 					onDeselect={ () => {
 						resetStyle( 'input_padding_x' )();
 						resetStyle( 'input_padding_y' )();
 					} }
 				>
 					<SpacingInput
-						label={ __( 'Padding X', 'flowforms' ) }
+						label={ __( 'Padding X', 'formspress' ) }
 						value={ style.input_padding_x }
 						onChange={ setSpacingValue( 'input_padding_x' ) }
 						sizes={ themeSpacing }
 					/>
 					<SpacingInput
-						label={ __( 'Padding Y', 'flowforms' ) }
+						label={ __( 'Padding Y', 'formspress' ) }
 						value={ style.input_padding_y }
 						onChange={ setSpacingValue( 'input_padding_y' ) }
 						sizes={ themeSpacing }
@@ -248,118 +340,72 @@ const FormSettings = ( { form, onChange } ) => {
 
 				<ToolsPanelItem
 					hasValue={ () => null != style.border_radius }
-					label={ __( 'Border radius', 'flowforms' ) }
+					label={ __( 'Border radius', 'formspress' ) }
 					onDeselect={ resetStyle( 'border_radius' ) }
 				>
 					<SpacingInput
-						label={ __( 'Border radius', 'flowforms' ) }
+						label={ __( 'Border radius', 'formspress' ) }
 						value={ style.border_radius }
 						onChange={ setSpacingValue( 'border_radius' ) }
 						sizes={ themeSpacing }
 					/>
 				</ToolsPanelItem>
 
-				<ToolsPanelItem
-					hasValue={ () => !! style.primary_color }
-					label={ __( 'Primary color', 'flowforms' ) }
-					onDeselect={ resetStyle( 'primary_color' ) }
-				>
-					<Text
-						size="small"
-						style={ { display: 'block', marginBottom: 8 } }
-					>
-						{ __( 'Primary color', 'flowforms' ) }
-					</Text>
-					<ColorPalette
-						value={ style.primary_color }
-						onChange={ setStyle( 'primary_color' ) }
-						colors={ themePalette }
-						clearable
-						__experimentalIsRenderedInSidebar
-					/>
-				</ToolsPanelItem>
-
-				<ToolsPanelItem
-					hasValue={ () => !! style.btn_text_color }
-					label={ __( 'Button text color', 'flowforms' ) }
-					onDeselect={ resetStyle( 'btn_text_color' ) }
-				>
-					<Text
-						size="small"
-						style={ { display: 'block', marginBottom: 8 } }
-					>
-						{ __( 'Button text color', 'flowforms' ) }
-					</Text>
-					<ColorPalette
-						value={ style.btn_text_color }
-						onChange={ setStyle( 'btn_text_color' ) }
-						colors={ themePalette }
-						clearable
-						__experimentalIsRenderedInSidebar
-					/>
-				</ToolsPanelItem>
-
-				<ToolsPanelItem
-					hasValue={ () => !! style.label_color }
-					label={ __( 'Label color', 'flowforms' ) }
-					onDeselect={ resetStyle( 'label_color' ) }
-				>
-					<Text
-						size="small"
-						style={ { display: 'block', marginBottom: 8 } }
-					>
-						{ __( 'Label color', 'flowforms' ) }
-					</Text>
-					<ColorPalette
-						value={ style.label_color }
-						onChange={ setStyle( 'label_color' ) }
-						colors={ themePalette }
-						clearable
-						__experimentalIsRenderedInSidebar
-					/>
-				</ToolsPanelItem>
-
-				<ToolsPanelItem
-					hasValue={ () => !! style.border_color }
-					label={ __( 'Input border color', 'flowforms' ) }
-					onDeselect={ resetStyle( 'border_color' ) }
-				>
-					<Text
-						size="small"
-						style={ { display: 'block', marginBottom: 8 } }
-					>
-						{ __( 'Input border color', 'flowforms' ) }
-					</Text>
-					<ColorPalette
-						value={ style.border_color }
-						onChange={ setStyle( 'border_color' ) }
-						colors={ themePalette }
-						clearable
-						__experimentalIsRenderedInSidebar
-					/>
-				</ToolsPanelItem>
 			</ToolsPanel>
+
+			<PanelColorSettings
+				title={ __( 'Field colors', 'formspress' ) }
+				initialOpen={ false }
+				colorSettings={ [
+					{
+						label: __( 'Primary', 'formspress' ),
+						value: style.primary_color,
+						onChange: setStyle( 'primary_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Button text', 'formspress' ),
+						value: style.btn_text_color,
+						onChange: setStyle( 'btn_text_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Label', 'formspress' ),
+						value: style.label_color,
+						onChange: setStyle( 'label_color' ),
+						clearable: true,
+					},
+					{
+						label: __( 'Input border', 'formspress' ),
+						value: style.border_color,
+						onChange: setStyle( 'border_color' ),
+						clearable: true,
+					},
+				] }
+				__experimentalIsRenderedInSidebar
+				enableAlpha
+			/>
 
 			{ /* ── Anti-spam ─────────────────────────────────────────── */ }
 			<PanelBody
-				title={ __( 'Anti-spam', 'flowforms' ) }
+				title={ __( 'Anti-spam', 'formspress' ) }
 				initialOpen={ false }
 			>
 				<ToggleControl
-					label={ __( 'Honeypot', 'flowforms' ) }
+					label={ __( 'Honeypot', 'formspress' ) }
 					help={ __(
 						"Hidden field that bots fill in and humans don't.",
-						'flowforms'
+						'formspress'
 					) }
 					checked={ settings.honeypot !== false }
 					onChange={ setSetting( 'honeypot' ) }
 					__nextHasNoMarginBottom
 				/>
 				<SelectControl
-					label={ __( 'Spam provider', 'flowforms' ) }
+					label={ __( 'Spam provider', 'formspress' ) }
 					help={ __(
 						'Per-form override of the global anti-spam provider.',
-						'flowforms'
+						'formspress'
 					) }
 					value={ settings.spam_provider || '' }
 					options={ spamOptions }
@@ -369,38 +415,6 @@ const FormSettings = ( { form, onChange } ) => {
 				/>
 			</PanelBody>
 
-			{ /* ── Save & resume ─────────────────────────────────────── */ }
-			<PanelBody
-				title={ __( 'Save & resume', 'flowforms' ) }
-				initialOpen={ false }
-			>
-				<ToggleControl
-					label={ __(
-						'Allow visitors to save and resume',
-						'flowforms'
-					) }
-					help={ __(
-						'Adds a "Save and resume later" link below the form; submissions are emailed a magic link.',
-						'flowforms'
-					) }
-					checked={ !! settings.enable_save_resume }
-					onChange={ setSetting( 'enable_save_resume' ) }
-					__nextHasNoMarginBottom
-				/>
-				{ settings.enable_save_resume && (
-					<TextControl
-						label={ __( 'Save link label', 'flowforms' ) }
-						value={ settings.save_resume_label || '' }
-						onChange={ setSetting( 'save_resume_label' ) }
-						placeholder={ __(
-							'Save and resume later',
-							'flowforms'
-						) }
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-					/>
-				) }
-			</PanelBody>
 		</>
 	);
 };
@@ -418,7 +432,7 @@ const SpacingInput = ( { label, value, onChange, sizes } ) => {
 				label={ label }
 				value={ String( value ?? '' ) }
 				options={ [
-					{ value: '', label: __( 'Default', 'flowforms' ) },
+					{ value: '', label: __( 'Default', 'formspress' ) },
 					...sizes.map( ( s ) => ( {
 						value: s.slug
 							? `var(--wp--preset--spacing--${ s.slug })`

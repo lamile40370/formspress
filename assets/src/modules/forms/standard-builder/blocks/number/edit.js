@@ -19,7 +19,7 @@ const Edit = ( props ) => {
 	const extras = (
 		<>
 			<TextControl
-				label={ __( 'Min', 'flowforms' ) }
+				label={ __( 'Min', 'formspress' ) }
 				type="number"
 				value={ min ?? '' }
 				onChange={ ( v ) => setAttributes( { min: parseNum( v ) } ) }
@@ -27,7 +27,7 @@ const Edit = ( props ) => {
 				__next40pxDefaultSize
 			/>
 			<TextControl
-				label={ __( 'Max', 'flowforms' ) }
+				label={ __( 'Max', 'formspress' ) }
 				type="number"
 				value={ max ?? '' }
 				onChange={ ( v ) => setAttributes( { max: parseNum( v ) } ) }
@@ -35,7 +35,7 @@ const Edit = ( props ) => {
 				__next40pxDefaultSize
 			/>
 			<TextControl
-				label={ __( 'Step', 'flowforms' ) }
+				label={ __( 'Step', 'formspress' ) }
 				type="number"
 				value={ step ?? '' }
 				onChange={ ( v ) => setAttributes( { step: parseNum( v ) } ) }

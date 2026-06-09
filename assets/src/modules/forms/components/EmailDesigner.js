@@ -31,11 +31,11 @@ const TEMPLATES_ENDPOINT = '/email-templates';
 const useMergeTags = ( form ) =>
 	useMemo( () => {
 		const tags = [
-			{ value: '{form_title}', label: __( 'Form title', 'flowforms' ) },
-			{ value: '{entry_id}', label: __( 'Entry ID', 'flowforms' ) },
-			{ value: '{entry_date}', label: __( 'Entry date', 'flowforms' ) },
-			{ value: '{site_name}', label: __( 'Site name', 'flowforms' ) },
-			{ value: '{site_url}', label: __( 'Site URL', 'flowforms' ) },
+			{ value: '{form_title}', label: __( 'Form title', 'formspress' ) },
+			{ value: '{entry_id}', label: __( 'Entry ID', 'formspress' ) },
+			{ value: '{entry_date}', label: __( 'Entry date', 'formspress' ) },
+			{ value: '{site_name}', label: __( 'Site name', 'formspress' ) },
+			{ value: '{site_url}', label: __( 'Site URL', 'formspress' ) },
 		];
 
 		const collect = ( arr ) => {
@@ -83,7 +83,7 @@ const renderPreview = ( body, mergeTags, form ) => {
 					}</td>` +
 					`<td style="padding:8px;border:1px solid #ddd">${ __(
 						'Sample value',
-						'flowforms'
+						'formspress'
 					) }</td></tr>`
 			)
 			.join( '' ) +
@@ -200,7 +200,7 @@ const TinyMceEditor = ( { id, value, onChange } ) => {
 				<Notice status="warning" isDismissible={ false }>
 					{ __(
 						'Your WordPress install does not expose the TinyMCE editor. Falling back to a plain textarea — upgrade WordPress to get the rich editor.',
-						'flowforms'
+						'formspress'
 					) }
 				</Notice>
 				<textarea
@@ -281,7 +281,7 @@ const EmailDesigner = ( {
 	const resetDefault = () => {
 		const def = `<p>${ __(
 			'You have a new submission for',
-			'flowforms'
+			'formspress'
 		) } {form_title}.</p>[entry_table]`;
 		onChange( def );
 	};
@@ -319,7 +319,7 @@ const EmailDesigner = ( {
 	);
 
 	return (
-		<Card>
+		<Card className="ff-email-designer">
 			<CardBody>
 				<VStack spacing={ 3 }>
 					{ /* ── Single toolbar row ──────────────────────────
@@ -348,11 +348,11 @@ const EmailDesigner = ( {
 						>
 							<ToggleGroupControlOption
 								value="visual"
-								label={ __( 'Visual', 'flowforms' ) }
+								label={ __( 'Visual', 'formspress' ) }
 							/>
 							<ToggleGroupControlOption
 								value="html"
-								label={ __( 'HTML', 'flowforms' ) }
+								label={ __( 'HTML', 'formspress' ) }
 							/>
 						</ToggleGroupControl>
 
@@ -370,7 +370,7 @@ const EmailDesigner = ( {
 									value: '',
 									label: __(
 										'Insert variable…',
-										'flowforms'
+										'formspress'
 									),
 								},
 								...mergeTags.map( ( t ) => ( {
@@ -385,10 +385,10 @@ const EmailDesigner = ( {
 							variant="secondary"
 							onClick={ insertEntryTable }
 						>
-							{ __( 'Insert entry table', 'flowforms' ) }
+							{ __( 'Insert entry table', 'formspress' ) }
 						</Button>
 						<Button variant="tertiary" onClick={ resetDefault }>
-							{ __( 'Reset to default', 'flowforms' ) }
+							{ __( 'Reset to default', 'formspress' ) }
 						</Button>
 
 						{ /* Flex-grow spacer — pushes trailing controls right. */ }
@@ -404,7 +404,7 @@ const EmailDesigner = ( {
 										value: '',
 										label: __(
 											'Load template…',
-											'flowforms'
+											'formspress'
 										),
 									},
 									...templates.map( ( t ) => ( {
@@ -420,7 +420,7 @@ const EmailDesigner = ( {
 							variant="secondary"
 							onClick={ () => setPreviewOpen( true ) }
 						>
-							{ __( 'Preview', 'flowforms' ) }
+							{ __( 'Preview', 'formspress' ) }
 						</Button>
 					</HStack>
 
@@ -462,7 +462,7 @@ const EmailDesigner = ( {
 									__next40pxDefaultSize
 									placeholder={ __(
 										'Save current body as a reusable template…',
-										'flowforms'
+										'formspress'
 									) }
 									value={ saveAsName }
 									onChange={ setSaveAsName }
@@ -476,7 +476,7 @@ const EmailDesigner = ( {
 									! saveAsName.trim() || savingTemplate
 								}
 							>
-								{ __( 'Save as template', 'flowforms' ) }
+								{ __( 'Save as template', 'formspress' ) }
 							</Button>
 						</HStack>
 					) }
@@ -485,7 +485,7 @@ const EmailDesigner = ( {
 
 			{ previewOpen && (
 				<Modal
-					title={ __( 'Email preview', 'flowforms' ) }
+					title={ __( 'Email preview', 'formspress' ) }
 					onRequestClose={ () => setPreviewOpen( false ) }
 					size="medium"
 				>

@@ -14,12 +14,12 @@ import { TEMPLATES } from '../../api/endpoints';
 import { ICON_OPTIONS } from './icons';
 
 const CATEGORY_OPTIONS = [
-	{ value: 'contact', label: __( 'Contact', 'flowforms' ) },
-	{ value: 'lead-gen', label: __( 'Lead generation', 'flowforms' ) },
-	{ value: 'survey', label: __( 'Survey', 'flowforms' ) },
-	{ value: 'feedback', label: __( 'Feedback', 'flowforms' ) },
-	{ value: 'event', label: __( 'Event', 'flowforms' ) },
-	{ value: 'other', label: __( 'Other', 'flowforms' ) },
+	{ value: 'contact', label: __( 'Contact', 'formspress' ) },
+	{ value: 'lead-gen', label: __( 'Lead generation', 'formspress' ) },
+	{ value: 'survey', label: __( 'Survey', 'formspress' ) },
+	{ value: 'feedback', label: __( 'Feedback', 'formspress' ) },
+	{ value: 'event', label: __( 'Event', 'formspress' ) },
+	{ value: 'other', label: __( 'Other', 'formspress' ) },
 ];
 
 const SaveAsTemplateModal = ( {
@@ -50,7 +50,7 @@ const SaveAsTemplateModal = ( {
 			onClose();
 		} catch ( e ) {
 			setError(
-				e.message || __( 'Failed to save template.', 'flowforms' )
+				e.message || __( 'Failed to save template.', 'formspress' )
 			);
 		} finally {
 			setSaving( false );
@@ -59,7 +59,7 @@ const SaveAsTemplateModal = ( {
 
 	return (
 		<Modal
-			title={ __( 'Save as template', 'flowforms' ) }
+			title={ __( 'Save as template', 'formspress' ) }
 			onRequestClose={ onClose }
 			size="medium"
 		>
@@ -69,22 +69,22 @@ const SaveAsTemplateModal = ( {
 					onRemove={ () => setError( null ) }
 				/>
 				<TextControl
-					label={ __( 'Label', 'flowforms' ) }
+					label={ __( 'Label', 'formspress' ) }
 					value={ label }
 					onChange={ setLabel }
-					placeholder={ __( 'e.g. Contact form', 'flowforms' ) }
+					placeholder={ __( 'e.g. Contact form', 'formspress' ) }
 					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
 				<TextareaControl
-					label={ __( 'Description', 'flowforms' ) }
+					label={ __( 'Description', 'formspress' ) }
 					value={ description }
 					onChange={ setDescription }
 					rows={ 3 }
 					__nextHasNoMarginBottom
 				/>
 				<SelectControl
-					label={ __( 'Category', 'flowforms' ) }
+					label={ __( 'Category', 'formspress' ) }
 					value={ category }
 					options={ CATEGORY_OPTIONS }
 					onChange={ setCategory }
@@ -92,7 +92,7 @@ const SaveAsTemplateModal = ( {
 					__next40pxDefaultSize
 				/>
 				<SelectControl
-					label={ __( 'Icon', 'flowforms' ) }
+					label={ __( 'Icon', 'formspress' ) }
 					value={ icon }
 					options={ ICON_OPTIONS }
 					onChange={ setIcon }
@@ -107,7 +107,7 @@ const SaveAsTemplateModal = ( {
 					} }
 				>
 					<Button variant="tertiary" onClick={ onClose }>
-						{ __( 'Cancel', 'flowforms' ) }
+						{ __( 'Cancel', 'formspress' ) }
 					</Button>
 					<Button
 						variant="primary"
@@ -115,7 +115,7 @@ const SaveAsTemplateModal = ( {
 						isBusy={ isSaving }
 						disabled={ isSaving || ! label.trim() }
 					>
-						{ __( 'Save template', 'flowforms' ) }
+						{ __( 'Save template', 'formspress' ) }
 					</Button>
 				</div>
 			</VStack>

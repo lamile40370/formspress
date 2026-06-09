@@ -117,8 +117,21 @@ class FieldsParser {
 			'default'      => (string) ( $attrs['defaultValue'] ?? '' ),
 		];
 
+		if ( ! empty( $attrs['conditions'] ) && is_array( $attrs['conditions'] ) ) {
+			$base['conditions'] = $attrs['conditions'];
+		}
+
 		// Per-block extras.
 		switch ( $type ) {
+			case 'total':
+				if ( '' === $base['id'] ) {
+					$base['id'] = 'total';
+				}
+				if ( '' === $base['label'] ) {
+					$base['label'] = __( 'Total', 'formspress' );
+				}
+				$base['currency'] = (string) ( $attrs['currency'] ?? 'EUR' );
+				break;
 			case 'textarea':
 				if ( isset( $attrs['rows'] ) ) {
 					$base['rows'] = (int) $attrs['rows'];
@@ -146,6 +159,20 @@ class FieldsParser {
 					},
 					$opts
 				);
+				break;
+			case 'product':
+				$base['product_name']  = (string) ( $attrs['productName'] ?? $base['label'] );
+				if ( '' === $base['label'] ) {
+					$base['label'] = '' !== $base['product_name'] ? $base['product_name'] : __( 'Product', 'formspress' );
+				}
+				$base['price']         = isset( $attrs['price'] ) ? (float) $attrs['price'] : 0.0;
+				$base['currency']      = (string) ( $attrs['currency'] ?? 'EUR' );
+				$base['min_quantity']  = isset( $attrs['minQuantity'] ) ? (float) $attrs['minQuantity'] : 0.0;
+				$base['max_quantity']  = isset( $attrs['maxQuantity'] ) ? (float) $attrs['maxQuantity'] : null;
+				$base['step_quantity'] = isset( $attrs['stepQuantity'] ) ? (float) $attrs['stepQuantity'] : 1.0;
+				break;
+			case 'page-break':
+				$base['type'] = 'page_break';
 				break;
 			case 'submit':
 				// The submit block isn't a "field" in the legacy sense — it
@@ -306,7 +333,7 @@ class FieldsParser {
 			}
 			$btn = is_array( $child['attrs'] ?? null ) ? $child['attrs'] : [];
 			return [
-				'buttonText' => (string) ( $btn['text']   ?? __( 'Submit', 'flowforms' ) ),
+				'buttonText' => (string) ( $btn['text']   ?? __( 'Submit', 'formspress' ) ),
 				'alignment'  => (string) ( $attrs['align'] ?? '' ),
 				// Pass through the full button attributes + the parsed
 				// innerHTML so the renderer can mirror the native button
@@ -319,7 +346,7 @@ class FieldsParser {
 
 		// Legacy shape: wrapper carries the attributes directly.
 		return [
-			'buttonText' => (string) ( $attrs['buttonText'] ?? __( 'Submit', 'flowforms' ) ),
+			'buttonText' => (string) ( $attrs['buttonText'] ?? __( 'Submit', 'formspress' ) ),
 			'alignment'  => (string) ( $attrs['alignment']  ?? '' ),
 		];
 	}

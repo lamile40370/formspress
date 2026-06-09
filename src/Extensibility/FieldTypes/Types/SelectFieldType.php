@@ -11,7 +11,7 @@ class SelectFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Dropdown', 'flowforms' );
+		return __( 'Dropdown', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -25,7 +25,7 @@ class SelectFieldType extends AbstractFieldType {
 	public function render_frontend( array $field ): string {
 		$id   = esc_attr( $field['id'] ?? '' );
 		$req  = ! empty( $field['required'] ) ? 'required' : '';
-		$opts = '<option value="">' . esc_html__( 'Select…', 'flowforms' ) . '</option>';
+		$opts = '<option value="">' . esc_html__( 'Select…', 'formspress' ) . '</option>';
 		foreach ( $field['options'] ?? [] as $opt ) {
 			$opts .= '<option value="' . esc_attr( $opt ) . '">' . esc_html( $opt ) . '</option>';
 		}

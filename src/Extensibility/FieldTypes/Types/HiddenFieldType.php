@@ -11,7 +11,7 @@ class HiddenFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Hidden', 'flowforms' );
+		return __( 'Hidden', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,7 +24,7 @@ class HiddenFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'default_value', 'type' => 'text', 'label' => __( 'Value', 'flowforms' ), 'help' => __( 'Supports {user_email}, {user_id}, {site_url}', 'flowforms' ) ],
+			[ 'key' => 'default_value', 'type' => 'text', 'label' => __( 'Value', 'formspress' ), 'help' => __( 'Supports {user_email}, {user_id}, {site_url}', 'formspress' ) ],
 		];
 	}
 

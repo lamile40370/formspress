@@ -7,8 +7,8 @@ use FlowForms\Core\AbstractModule;
 /**
  * Tools parent — nav-only.
  *
- * Houses the operational pages that don't fit under Forms / Submissions /
- * Settings: email templates, delivery logs, import / export, privacy.
+ * Houses operational pages that don't fit under Forms / Submissions /
+ * Settings.
  */
 class ToolsModule extends AbstractModule {
 
@@ -17,35 +17,35 @@ class ToolsModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Tools', 'flowforms' );
+		return __( 'Tools', 'formspress' );
 	}
 
 	public function get_nav_items(): array {
 		return [
 			[
-				'label'       => __( 'Tools', 'flowforms' ),
+				'label'       => __( 'Tools', 'formspress' ),
 				'path'        => '/tools',
 				'icon'        => 'admin-tools',
 				'position'    => 80,
-				'description' => __( 'Email templates, delivery logs, imports and data exports.', 'flowforms' ),
+				'description' => __( 'Imports, exports and data privacy tools.', 'formspress' ),
 				'children'    => [
 					[
-						'label' => __( 'Email templates', 'flowforms' ),
+						'label' => __( 'Email templates', 'formspress' ),
 						'path'  => '/tools/email-templates',
 						'icon'  => 'email-alt',
 					],
 					[
-						'label' => __( 'Logs', 'flowforms' ),
+						'label' => __( 'Logs', 'formspress' ),
 						'path'  => '/tools/logs',
 						'icon'  => 'list-view',
 					],
 					[
-						'label' => __( 'Import / Export', 'flowforms' ),
+						'label' => __( 'Import / Export', 'formspress' ),
 						'path'  => '/tools/import-export',
 						'icon'  => 'post-list',
 					],
 					[
-						'label' => __( 'Data privacy', 'flowforms' ),
+						'label' => __( 'Data privacy', 'formspress' ),
 						'path'  => '/tools/privacy',
 						'icon'  => 'admin-generic',
 					],

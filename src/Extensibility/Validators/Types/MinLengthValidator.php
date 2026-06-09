@@ -11,12 +11,12 @@ class MinLengthValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Minimum length', 'flowforms' );
+		return __( 'Minimum length', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'min', 'type' => 'number', 'label' => __( 'Minimum characters', 'flowforms' ), 'default' => 1, 'min' => 0 ],
+			[ 'key' => 'min', 'type' => 'number', 'label' => __( 'Minimum characters', 'formspress' ), 'default' => 1, 'min' => 0 ],
 		];
 	}
 
@@ -28,7 +28,7 @@ class MinLengthValidator extends AbstractValidator {
 		if ( mb_strlen( (string) $value ) < $min ) {
 			return sprintf(
 				/* translators: %d is minimum length */
-				__( 'Must be at least %d characters.', 'flowforms' ),
+				__( 'Must be at least %d characters.', 'formspress' ),
 				$min
 			);
 		}

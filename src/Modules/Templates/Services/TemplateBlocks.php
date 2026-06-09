@@ -60,6 +60,10 @@ class TemplateBlocks {
 			$classes[] = 'has-background';
 			$styles[]  = 'background-color:' . $style['color']['background'];
 		}
+		if ( ! empty( $style['color']['gradient'] ) ) {
+			$classes[] = 'has-background';
+			$styles[]  = 'background:' . $style['color']['gradient'];
+		}
 
 		// Border
 		if ( ! empty( $style['border']['color'] ) ) {
@@ -110,6 +114,7 @@ class TemplateBlocks {
 
 	public static function group( array $args ): string {
 		$bg          = $args['bg']          ?? null;
+		$gradient    = $args['gradient']    ?? null;
 		$fg          = $args['fg']          ?? null;
 		$radius      = $args['radius']      ?? null;
 		$padding     = $args['padding']     ?? null;
@@ -133,6 +138,7 @@ class TemplateBlocks {
 			$style['border'] = $border_style;
 		}
 		if ( $bg ) $style['color']['background'] = $bg;
+		if ( $gradient ) $style['color']['gradient'] = $gradient;
 		if ( $fg ) $style['color']['text']       = $fg;
 
 		$attrs = [ 'tagName' => 'div' ];
@@ -337,7 +343,7 @@ class TemplateBlocks {
 	}
 
 	public static function submit_button( array $args = [] ): string {
-		$text   = (string) ( $args['text'] ?? __( 'Submit', 'flowforms' ) );
+		$text   = (string) ( $args['text'] ?? __( 'Submit', 'formspress' ) );
 		$bg     = (string) ( $args['bg']   ?? '#111827' );
 		$fg     = (string) ( $args['fg']   ?? '#ffffff' );
 		$radius = (string) ( $args['radius'] ?? '10px' );
@@ -428,7 +434,7 @@ class TemplateBlocks {
 
 		if ( '' !== $label ) {
 			$blocks[] = sprintf(
-				"<!-- wp:paragraph {\"className\":\"ff-field-label\"} -->\n<p class=\"ff-field-label\">%s</p>\n<!-- /wp:paragraph -->",
+				"<!-- wp:paragraph {\"className\":\"ff-field-label\",\"fontSize\":\"small\"} -->\n<p class=\"ff-field-label has-small-font-size\">%s</p>\n<!-- /wp:paragraph -->",
 				esc_html( $label )
 			);
 		}

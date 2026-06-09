@@ -15,7 +15,7 @@ import coverHero from './cover-hero';
  */
 export const PATTERN_CATEGORY = {
 	name: 'formspress',
-	label: __( 'Forms', 'flowforms' ),
+	label: __( 'Forms', 'formspress' ),
 };
 
 /**

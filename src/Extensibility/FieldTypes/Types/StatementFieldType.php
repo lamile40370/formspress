@@ -11,7 +11,7 @@ class StatementFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Statement', 'flowforms' );
+		return __( 'Statement', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,7 +24,7 @@ class StatementFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'content', 'type' => 'textarea', 'label' => __( 'Statement content', 'flowforms' ), 'rows' => 3 ],
+			[ 'key' => 'content', 'type' => 'textarea', 'label' => __( 'Statement content', 'formspress' ), 'rows' => 3 ],
 		];
 	}
 

@@ -13,8 +13,8 @@ const useConfirmDialog = () => {
 	const confirm = useCallback(
 		( {
 			message,
-			confirmButtonText = __( 'Confirm', 'flowforms' ),
-			cancelButtonText = __( 'Cancel', 'flowforms' ),
+			confirmButtonText = __( 'Confirm', 'formspress' ),
+			cancelButtonText = __( 'Cancel', 'formspress' ),
 		} ) =>
 			new Promise( ( resolve ) => {
 				setState( {
@@ -39,7 +39,7 @@ const useConfirmDialog = () => {
 
 	const confirmDialog = state ? (
 		<Modal
-			title={ __( 'Confirm', 'flowforms' ) }
+			title={ __( 'Confirm', 'formspress' ) }
 			onRequestClose={ handleCancel }
 			size="small"
 		>

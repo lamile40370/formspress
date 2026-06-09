@@ -33,7 +33,7 @@ const SUBMIT_TEMPLATE = [
 			[
 				'core/button',
 				{
-					text: __( 'Submit', 'flowforms' ),
+					text: __( 'Submit', 'formspress' ),
 					tagName: 'button',
 					type: 'submit',
 					lock: { remove: true, move: true },

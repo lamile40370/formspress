@@ -11,7 +11,7 @@ class RadioFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Radio', 'flowforms' );
+		return __( 'Radio', 'formspress' );
 	}
 
 	public function get_group(): string {

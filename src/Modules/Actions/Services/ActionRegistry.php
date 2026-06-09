@@ -3,15 +3,6 @@
 namespace FlowForms\Modules\Actions\Services;
 
 use FlowForms\Modules\Actions\Services\Actions\EmailAction;
-use FlowForms\Modules\Actions\Services\Actions\RedirectAction;
-use FlowForms\Modules\Actions\Services\Actions\StripePaymentAction;
-use FlowForms\Modules\Actions\Services\Actions\WebhookAction;
-use FlowForms\Modules\Actions\Services\Actions\Integrations\ActiveCampaignAction;
-use FlowForms\Modules\Actions\Services\Actions\Integrations\BrevoAction;
-use FlowForms\Modules\Actions\Services\Actions\Integrations\ConvertKitAction;
-use FlowForms\Modules\Actions\Services\Actions\Integrations\HubSpotAction;
-use FlowForms\Modules\Actions\Services\Actions\Integrations\MailchimpAction;
-use FlowForms\Modules\Actions\Services\Actions\Integrations\MailerPressAction;
 
 class ActionRegistry {
 
@@ -20,15 +11,6 @@ class ActionRegistry {
 
 	public function __construct() {
 		$this->register( new EmailAction() );
-		$this->register( new WebhookAction() );
-		$this->register( new RedirectAction() );
-		$this->register( new StripePaymentAction() );
-		$this->register( new MailchimpAction() );
-		$this->register( new ConvertKitAction() );
-		$this->register( new ActiveCampaignAction() );
-		$this->register( new HubSpotAction() );
-		$this->register( new BrevoAction() );
-		$this->register( new MailerPressAction() );
 
 		/**
 		 * Allow third-party plugins to register their own FormsPress actions.

@@ -11,7 +11,7 @@ class TextFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Text', 'flowforms' );
+		return __( 'Text', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,8 +24,8 @@ class TextFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'placeholder', 'type' => 'text',   'label' => __( 'Placeholder', 'flowforms' ) ],
-			[ 'key' => 'max_length',  'type' => 'number', 'label' => __( 'Max length', 'flowforms' ), 'min' => 0 ],
+			[ 'key' => 'placeholder', 'type' => 'text',   'label' => __( 'Placeholder', 'formspress' ) ],
+			[ 'key' => 'max_length',  'type' => 'number', 'label' => __( 'Max length', 'formspress' ), 'min' => 0 ],
 		];
 	}
 

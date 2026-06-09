@@ -9,11 +9,11 @@ export const name = 'formspress/field-email';
 
 export const settings = {
 	apiVersion: 3,
-	title: __( 'Email field', 'flowforms' ),
-	description: __( 'Collect an email address.', 'flowforms' ),
+	title: __( 'Email field', 'formspress' ),
+	description: __( 'Collect an email address.', 'formspress' ),
 	category: 'formspress-fields',
 	icon,
-	keywords: [ __( 'email', 'flowforms' ), __( 'address', 'flowforms' ) ],
+	keywords: [ __( 'email', 'formspress' ), __( 'address', 'formspress' ) ],
 	supports: FIELD_SUPPORTS,
 	attributes: {
 		fieldId: { type: 'string', default: '' },
@@ -23,6 +23,7 @@ export const settings = {
 		placeholder: { type: 'string', default: '' },
 		defaultValue: { type: 'string', default: '' },
 		inputStyle: INPUT_STYLE_ATTRIBUTE,
+		conditions: { type: 'object' },
 	},
 	edit: editComponent,
 	save: saveInnerBlocks,

@@ -46,12 +46,12 @@ const ImportExportPage = () => {
 			URL.revokeObjectURL( url );
 			setNotice( {
 				type: 'success',
-				message: __( 'Export started.', 'flowforms' ),
+				message: __( 'Export started.', 'formspress' ),
 			} );
 		} catch ( e ) {
 			setNotice( {
 				type: 'error',
-				message: e.message || __( 'Could not export.', 'flowforms' ),
+				message: e.message || __( 'Could not export.', 'formspress' ),
 			} );
 		} finally {
 			setBusy( false );
@@ -69,7 +69,7 @@ const ImportExportPage = () => {
 				throw new Error(
 					__(
 						'Invalid export file — missing "forms" array.',
-						'flowforms'
+						'formspress'
 					)
 				);
 			}
@@ -84,7 +84,7 @@ const ImportExportPage = () => {
 			}
 			setNotice( {
 				type: 'success',
-				message: __( 'Imported %d form(s).', 'flowforms' ).replace(
+				message: __( 'Imported %d form(s).', 'formspress' ).replace(
 					'%d',
 					String( ok )
 				),
@@ -92,7 +92,7 @@ const ImportExportPage = () => {
 		} catch ( e ) {
 			setNotice( {
 				type: 'error',
-				message: e.message || __( 'Could not import.', 'flowforms' ),
+				message: e.message || __( 'Could not import.', 'formspress' ),
 			} );
 		} finally {
 			setBusy( false );
@@ -101,10 +101,10 @@ const ImportExportPage = () => {
 
 	return (
 		<PageHeader
-			title={ __( 'Import / Export', 'flowforms' ) }
+			title={ __( 'Import / Export', 'formspress' ) }
 			description={ __(
 				'Move forms between sites with a JSON file — fields, settings, actions and conditions are preserved.',
-				'flowforms'
+				'formspress'
 			) }
 		>
 			<div className="ff-page__body">
@@ -118,12 +118,12 @@ const ImportExportPage = () => {
 						<CardBody>
 							<VStack spacing={ 2 }>
 								<Heading level={ 3 }>
-									{ __( 'Export', 'flowforms' ) }
+									{ __( 'Export', 'formspress' ) }
 								</Heading>
 								<Text size="small" variant="muted">
 									{ __(
 										'Download every form on this site as a single JSON file.',
-										'flowforms'
+										'formspress'
 									) }
 								</Text>
 							</VStack>
@@ -134,7 +134,7 @@ const ImportExportPage = () => {
 								isBusy={ busy }
 								onClick={ onExport }
 							>
-								{ __( 'Download JSON', 'flowforms' ) }
+								{ __( 'Download JSON', 'formspress' ) }
 							</Button>
 						</CardFooter>
 					</Card>
@@ -143,12 +143,12 @@ const ImportExportPage = () => {
 						<CardBody>
 							<VStack spacing={ 2 }>
 								<Heading level={ 3 }>
-									{ __( 'Import', 'flowforms' ) }
+									{ __( 'Import', 'formspress' ) }
 								</Heading>
 								<Text size="small" variant="muted">
 									{ __(
 										'Upload a JSON file produced by Export above. Forms are created as new — no overwrites.',
-										'flowforms'
+										'formspress'
 									) }
 								</Text>
 							</VStack>
@@ -162,7 +162,7 @@ const ImportExportPage = () => {
 									}
 								>
 									<Button variant="secondary" isBusy={ busy }>
-										{ __( 'Pick a file', 'flowforms' ) }
+										{ __( 'Pick a file', 'formspress' ) }
 									</Button>
 								</FormFileUpload>
 							</HStack>

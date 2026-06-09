@@ -11,7 +11,7 @@ class NumberFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Number', 'flowforms' );
+		return __( 'Number', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,9 +24,9 @@ class NumberFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'placeholder', 'type' => 'text',   'label' => __( 'Placeholder', 'flowforms' ) ],
-			[ 'key' => 'min',         'type' => 'number', 'label' => __( 'Minimum value', 'flowforms' ) ],
-			[ 'key' => 'max',         'type' => 'number', 'label' => __( 'Maximum value', 'flowforms' ) ],
+			[ 'key' => 'placeholder', 'type' => 'text',   'label' => __( 'Placeholder', 'formspress' ) ],
+			[ 'key' => 'min',         'type' => 'number', 'label' => __( 'Minimum value', 'formspress' ) ],
+			[ 'key' => 'max',         'type' => 'number', 'label' => __( 'Maximum value', 'formspress' ) ],
 		];
 	}
 
@@ -42,7 +42,7 @@ class NumberFieldType extends AbstractFieldType {
 			return true;
 		}
 		if ( ! is_numeric( $value ) ) {
-			return __( 'Please enter a valid number.', 'flowforms' );
+			return __( 'Please enter a valid number.', 'formspress' );
 		}
 		return true;
 	}

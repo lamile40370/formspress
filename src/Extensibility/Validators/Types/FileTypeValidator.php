@@ -11,12 +11,12 @@ class FileTypeValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Allowed file types', 'flowforms' );
+		return __( 'Allowed file types', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'extensions', 'type' => 'text', 'label' => __( 'Allowed extensions', 'flowforms' ), 'placeholder' => 'jpg,png,pdf', 'help' => __( 'Comma-separated list, no leading dots.', 'flowforms' ) ],
+			[ 'key' => 'extensions', 'type' => 'text', 'label' => __( 'Allowed extensions', 'formspress' ), 'placeholder' => 'jpg,png,pdf', 'help' => __( 'Comma-separated list, no leading dots.', 'formspress' ) ],
 		];
 	}
 
@@ -36,7 +36,7 @@ class FileTypeValidator extends AbstractValidator {
 		if ( $ext === '' || ! in_array( $ext, $allowed, true ) ) {
 			return sprintf(
 				/* translators: %s is comma-separated extensions */
-				__( 'Allowed file types: %s.', 'flowforms' ),
+				__( 'Allowed file types: %s.', 'formspress' ),
 				$exts_raw
 			);
 		}

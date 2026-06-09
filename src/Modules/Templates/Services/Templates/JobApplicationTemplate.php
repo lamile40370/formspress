@@ -13,20 +13,20 @@ use FlowForms\Modules\Templates\Services\TemplateBlocks as TB;
 class JobApplicationTemplate extends AbstractTemplate {
 
 	public function get_id(): string          { return 'job-application'; }
-	public function get_label(): string       { return __( 'Job application', 'flowforms' ); }
-	public function get_description(): string { return __( 'Two-column hero — intro + photo on the left, application form on the right.', 'flowforms' ); }
+	public function get_label(): string       { return __( 'Job application', 'formspress' ); }
+	public function get_description(): string { return __( 'Two-column hero — intro + photo on the left, application form on the right.', 'formspress' ); }
 	public function get_category(): string    { return 'careers'; }
 	public function get_type(): string        { return 'standard'; }
 	public function get_icon(): string        { return 'businessperson'; }
 
 	public function get_fields(): array {
 		return [
-			[ 'id' => 'full_name',    'type' => 'text',     'label' => __( 'Full name', 'flowforms' ),       'required' => true ],
-			[ 'id' => 'email',        'type' => 'email',    'label' => __( 'Email', 'flowforms' ),           'required' => true ],
-			[ 'id' => 'phone',        'type' => 'phone',    'label' => __( 'Phone', 'flowforms' ) ],
-			[ 'id' => 'position',     'type' => 'text',     'label' => __( 'Position you are applying for', 'flowforms' ), 'required' => true ],
-			[ 'id' => 'experience',   'type' => 'number',   'label' => __( 'Years of experience', 'flowforms' ) ],
-			[ 'id' => 'cover_letter', 'type' => 'textarea', 'label' => __( 'Cover letter', 'flowforms' ),    'required' => true ],
+			[ 'id' => 'full_name',    'type' => 'text',     'label' => __( 'Full name', 'formspress' ),       'required' => true ],
+			[ 'id' => 'email',        'type' => 'email',    'label' => __( 'Email', 'formspress' ),           'required' => true ],
+			[ 'id' => 'phone',        'type' => 'phone',    'label' => __( 'Phone', 'formspress' ) ],
+			[ 'id' => 'position',     'type' => 'text',     'label' => __( 'Position you are applying for', 'formspress' ), 'required' => true ],
+			[ 'id' => 'experience',   'type' => 'number',   'label' => __( 'Years of experience', 'formspress' ) ],
+			[ 'id' => 'cover_letter', 'type' => 'textarea', 'label' => __( 'Cover letter', 'formspress' ),    'required' => true ],
 		];
 	}
 
@@ -36,7 +36,7 @@ class JobApplicationTemplate extends AbstractTemplate {
 				'type'     => 'email',
 				'enabled'  => true,
 				'to'       => get_option( 'admin_email', '' ),
-				'subject'  => sprintf( __( 'New application: %s', 'flowforms' ), '{field:position}' ),
+				'subject'  => sprintf( __( 'New application: %s', 'formspress' ), '{field:position}' ),
 				'body'     => '',
 				'reply_to' => '{field:email}',
 			],
@@ -48,9 +48,9 @@ class JobApplicationTemplate extends AbstractTemplate {
 
 		// Left column — image + intro text.
 		$left = implode( "\n", [
-			TB::image( $image_url, __( 'Our team', 'flowforms' ), [ 'radius' => '12px' ] ),
+			TB::image( $image_url, __( 'Our team', 'formspress' ), [ 'radius' => '12px' ] ),
 			TB::heading( [
-				'text'         => __( 'Join our team', 'flowforms' ),
+				'text'         => __( 'Join our team', 'formspress' ),
 				'level'        => 2,
 				'size'         => '32px',
 				'weight'       => '800',
@@ -58,7 +58,7 @@ class JobApplicationTemplate extends AbstractTemplate {
 				'marginBottom' => '8px',
 			] ),
 			TB::description( [
-				'text'         => __( 'We hire for curiosity and craft. Tell us about the work you are proud of — we read every application.', 'flowforms' ),
+				'text'         => __( 'We hire for curiosity and craft. Tell us about the work you are proud of — we read every application.', 'formspress' ),
 				'color'        => '#475569',
 				'size'         => '15px',
 				'marginBottom' => '0',
@@ -67,13 +67,13 @@ class JobApplicationTemplate extends AbstractTemplate {
 
 		// Right column — form fields.
 		$right = implode( "\n", [
-			TB::field_text(     [ 'fieldId' => 'full_name',    'label' => __( 'Full name', 'flowforms' ), 'required' => true, 'placeholder' => __( 'Jane Doe', 'flowforms' ) ] ),
-			TB::field_email(    [ 'fieldId' => 'email',        'label' => __( 'Email', 'flowforms' ),     'required' => true, 'placeholder' => 'jane@example.com' ] ),
-			TB::field_text(     [ 'fieldId' => 'phone',        'label' => __( 'Phone', 'flowforms' ),     'placeholder' => '+1 (555) 123-4567' ] ),
-			TB::field_text(     [ 'fieldId' => 'position',     'label' => __( 'Position you are applying for', 'flowforms' ), 'required' => true, 'placeholder' => __( 'Senior Engineer', 'flowforms' ) ] ),
-			TB::field_number(   [ 'fieldId' => 'experience',   'label' => __( 'Years of experience', 'flowforms' ), 'min' => 0, 'max' => 50 ] ),
-			TB::field_textarea( [ 'fieldId' => 'cover_letter', 'label' => __( 'Cover letter', 'flowforms' ), 'rows' => 6, 'required' => true ] ),
-			TB::submit_button(  [ 'text' => __( 'Submit application', 'flowforms' ), 'bg' => '#4f46e5' ] ),
+			TB::field_text(     [ 'fieldId' => 'full_name',    'label' => __( 'Full name', 'formspress' ), 'required' => true, 'placeholder' => __( 'Jane Doe', 'formspress' ) ] ),
+			TB::field_email(    [ 'fieldId' => 'email',        'label' => __( 'Email', 'formspress' ),     'required' => true, 'placeholder' => 'jane@example.com' ] ),
+			TB::field_text(     [ 'fieldId' => 'phone',        'label' => __( 'Phone', 'formspress' ),     'placeholder' => '+1 (555) 123-4567' ] ),
+			TB::field_text(     [ 'fieldId' => 'position',     'label' => __( 'Position you are applying for', 'formspress' ), 'required' => true, 'placeholder' => __( 'Senior Engineer', 'formspress' ) ] ),
+			TB::field_number(   [ 'fieldId' => 'experience',   'label' => __( 'Years of experience', 'formspress' ), 'min' => 0, 'max' => 50 ] ),
+			TB::field_textarea( [ 'fieldId' => 'cover_letter', 'label' => __( 'Cover letter', 'formspress' ), 'rows' => 6, 'required' => true ] ),
+			TB::submit_button(  [ 'text' => __( 'Submit application', 'formspress' ), 'bg' => '#4f46e5' ] ),
 		] );
 
 		return TB::group( [

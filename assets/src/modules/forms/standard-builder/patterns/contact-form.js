@@ -14,42 +14,42 @@ import {
  * default. Sober typography, dark filled submit. Works on every theme.
  */
 export default {
-	title: __( 'Contact form', 'flowforms' ),
+	title: __( 'Contact form', 'formspress' ),
 	description: __(
 		'Classic name + email + subject + message — clean white card.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [ 'contact', 'form', 'support', 'message' ],
 	content: styledGroup( {
 		inner: [
-			heading( { text: __( 'Contact us', 'flowforms' ), size: '28px' } ),
+			heading( { text: __( 'Contact us', 'formspress' ), size: '28px' } ),
 			description( {
 				text: __(
 					'We typically reply within one business day.',
-					'flowforms'
+					'formspress'
 				),
 				marginBottom: '20px',
 			} ),
 			fieldText( {
-				label: __( 'Your name', 'flowforms' ),
+				label: __( 'Your name', 'formspress' ),
 				required: true,
-				placeholder: __( 'Jane Doe', 'flowforms' ),
+				placeholder: __( 'Jane Doe', 'formspress' ),
 			} ),
 			fieldEmail( {
-				label: __( 'Email', 'flowforms' ),
+				label: __( 'Email', 'formspress' ),
 				required: true,
 				placeholder: 'you@example.com',
 			} ),
 			fieldText( {
-				label: __( 'Subject', 'flowforms' ),
-				placeholder: __( 'How can we help?', 'flowforms' ),
+				label: __( 'Subject', 'formspress' ),
+				placeholder: __( 'How can we help?', 'formspress' ),
 			} ),
 			fieldTextarea( {
-				label: __( 'Message', 'flowforms' ),
+				label: __( 'Message', 'formspress' ),
 				required: true,
 				rows: 6,
 			} ),
-			submitButton( { text: __( 'Send message', 'flowforms' ) } ),
+			submitButton( { text: __( 'Send message', 'formspress' ) } ),
 		].join( '\n' ),
 	} ),
 };

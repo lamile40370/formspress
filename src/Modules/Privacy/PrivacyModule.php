@@ -25,7 +25,7 @@ class PrivacyModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Privacy', 'flowforms' );
+		return __( 'Privacy', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {

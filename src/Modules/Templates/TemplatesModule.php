@@ -13,7 +13,7 @@ class TemplatesModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Templates', 'flowforms' );
+		return __( 'Templates', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {

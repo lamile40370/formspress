@@ -11,7 +11,7 @@ class PhoneFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Phone', 'flowforms' );
+		return __( 'Phone', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,7 +24,7 @@ class PhoneFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'placeholder', 'type' => 'text', 'label' => __( 'Placeholder', 'flowforms' ) ],
+			[ 'key' => 'placeholder', 'type' => 'text', 'label' => __( 'Placeholder', 'formspress' ) ],
 		];
 	}
 
@@ -40,7 +40,7 @@ class PhoneFieldType extends AbstractFieldType {
 			return true;
 		}
 		if ( ! preg_match( '/^[\d\s+\-().]{6,}$/', (string) $value ) ) {
-			return __( 'Please enter a valid phone number.', 'flowforms' );
+			return __( 'Please enter a valid phone number.', 'formspress' );
 		}
 		return true;
 	}

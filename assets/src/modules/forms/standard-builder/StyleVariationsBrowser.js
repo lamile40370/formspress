@@ -50,7 +50,7 @@ const VariationCard = ( { variation, isSelected, isDefault, onSelect } ) => {
 	const fontFamily = variation?.fontFamily || 'inherit';
 	const title =
 		variation?.title ||
-		( isDefault ? __( 'Default', 'flowforms' ) : variation?.slug );
+		( isDefault ? __( 'Default', 'formspress' ) : variation?.slug );
 
 	return (
 		<button
@@ -100,7 +100,7 @@ const StyleVariationsBrowser = ( { value, onChange } ) => {
 		() => [
 			{
 				slug: '',
-				title: __( 'Default', 'flowforms' ),
+				title: __( 'Default', 'formspress' ),
 				palette: [],
 				fontFamily: '',
 				isDefault: true,
@@ -120,7 +120,7 @@ const StyleVariationsBrowser = ( { value, onChange } ) => {
 				>
 					{ __(
 						'Your active theme does not ship any FSE style variations. Switch to a modern FSE theme (Twenty Twenty-Four, Twenty Twenty-Five, etc.) to unlock this.',
-						'flowforms'
+						'formspress'
 					) }
 				</Text>
 			</div>
@@ -136,7 +136,7 @@ const StyleVariationsBrowser = ( { value, onChange } ) => {
 			>
 				{ __(
 					'Apply a variation from your active FSE theme. The form inherits its palette, typography, spacing and layout tokens.',
-					'flowforms'
+					'formspress'
 				) }
 			</Text>
 			<div className="ff-std-variations__grid">

@@ -11,12 +11,12 @@ class MaxValueValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Maximum value', 'flowforms' );
+		return __( 'Maximum value', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'max', 'type' => 'number', 'label' => __( 'Maximum value', 'flowforms' ), 'default' => 100 ],
+			[ 'key' => 'max', 'type' => 'number', 'label' => __( 'Maximum value', 'formspress' ), 'default' => 100 ],
 		];
 	}
 
@@ -25,13 +25,13 @@ class MaxValueValidator extends AbstractValidator {
 			return true;
 		}
 		if ( ! is_numeric( $value ) ) {
-			return __( 'Please enter a valid number.', 'flowforms' );
+			return __( 'Please enter a valid number.', 'formspress' );
 		}
 		$max = (float) ( $config['max'] ?? 0 );
 		if ( (float) $value > $max ) {
 			return sprintf(
 				/* translators: %s is maximum value */
-				__( 'Value must be no more than %s.', 'flowforms' ),
+				__( 'Value must be no more than %s.', 'formspress' ),
 				$max
 			);
 		}

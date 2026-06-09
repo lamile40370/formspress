@@ -9,11 +9,11 @@ export const name = 'formspress/field-select';
 
 export const settings = {
 	apiVersion: 3,
-	title: __( 'Select', 'flowforms' ),
-	description: __( 'A dropdown of selectable options.', 'flowforms' ),
+	title: __( 'Select', 'formspress' ),
+	description: __( 'A dropdown of selectable options.', 'formspress' ),
 	category: 'formspress-fields',
 	icon,
-	keywords: [ __( 'select', 'flowforms' ), __( 'dropdown', 'flowforms' ) ],
+	keywords: [ __( 'select', 'formspress' ), __( 'dropdown', 'formspress' ) ],
 	supports: FIELD_SUPPORTS,
 	attributes: {
 		fieldId: { type: 'string', default: '' },
@@ -23,6 +23,7 @@ export const settings = {
 		placeholder: { type: 'string', default: '' },
 		defaultValue: { type: 'string', default: '' },
 		inputStyle: INPUT_STYLE_ATTRIBUTE,
+		conditions: { type: 'object' },
 		options: { type: 'array', default: [] },
 	},
 	edit: editComponent,

@@ -56,6 +56,7 @@ class FormRenderer {
 		// pagination split), regardless of which render path is taken.
 		$row['fields']   = FieldsParser::to_schema( $raw_fields );
 		$row['settings'] = json_decode( $row['settings'] ?? '{}', true ) ?: [];
+		$row['variants'] = json_decode( $row['variants'] ?? '[]', true ) ?: [];
 		return $row;
 	}
 
@@ -195,8 +196,7 @@ class FormRenderer {
 				id="ff-form-<?php echo esc_attr( $form_id ); ?>"
 				data-form-id="<?php echo esc_attr( $form_id ); ?>"
 				data-type="standard"
-				data-fields-schema="<?php echo esc_attr( wp_json_encode( self::extract_field_schema( $form['fields'] ) ) ); ?>"
-				data-form-settings="<?php echo esc_attr( wp_json_encode( [ 'enable_save_resume' => ! empty( $form['settings']['enable_save_resume'] ), 'save_resume_label' => $form['settings']['save_resume_label'] ?? __( 'Save and resume later', 'flowforms' ) ] ) ); ?>"
+				<?php if ( ! empty( $form['variant_id'] ) ) : ?>data-variant-id="<?php echo esc_attr( $form['variant_id'] ); ?>"<?php endif; ?>
 				novalidate
 				data-wp-on--submit="actions.submit"
 				data-wp-class--is-submitting="context.isSubmitting"
@@ -225,8 +225,9 @@ class FormRenderer {
 				//
 				// Legacy schema-only forms keep the old paginated
 				// per-field renderer.
+				$markup_total_pages = 1;
 				if ( ! empty( $form['is_markup'] ) && ! empty( $form['fields_markup'] ) ) {
-					echo do_blocks( $form['fields_markup'] ); // phpcs:ignore WordPress.Security.EscapeOutput
+					$markup_total_pages = self::render_paged_markup( $form['fields_markup'], $form['settings'] );
 				} else {
 					self::render_paged_fields( $form['fields'], $form['settings'] );
 				}
@@ -249,6 +250,8 @@ class FormRenderer {
 				// the auto-generated pagination + submit footer.
 				if ( empty( $form['is_markup'] ) ) {
 					self::render_pagination_bar( $form['fields'], $form['settings'] );
+				} elseif ( $markup_total_pages > 1 ) {
+					self::render_markup_pagination_bar( $markup_total_pages, $form['settings'] );
 				}
 				?>
 
@@ -312,6 +315,7 @@ class FormRenderer {
 				data-form-id="<?php echo esc_attr( $form_id ); ?>"
 				data-form-title="<?php echo esc_attr( $form['title'] ); ?>"
 				data-type="flow"
+				<?php if ( ! empty( $form['variant_id'] ) ) : ?>data-variant-id="<?php echo esc_attr( $form['variant_id'] ); ?>"<?php endif; ?>
 				data-fields="<?php echo esc_attr( wp_json_encode( $form['fields'] ) ); ?>"
 				data-settings="<?php echo esc_attr( wp_json_encode( $settings ) ); ?>"
 				<?php if ( $theme_style ) : ?>style="<?php echo esc_attr( $theme_style ); ?>"<?php endif; ?>
@@ -361,6 +365,161 @@ class FormRenderer {
 	}
 
 	/**
+	 * Render block-markup forms split by page-break blocks.
+	 *
+	 * @return int Number of rendered pages.
+	 */
+	private static function render_paged_markup( string $markup, array $settings ): int {
+		$pages       = self::split_markup_pages( \parse_blocks( $markup ) );
+		$total_pages = count( $pages );
+
+		if ( $total_pages <= 1 ) {
+			echo do_blocks( $markup ); // phpcs:ignore WordPress.Security.EscapeOutput
+			return 1;
+		}
+
+		self::render_step_progress( $total_pages );
+
+		foreach ( $pages as $page_index => $page_blocks ) {
+			$is_first = ( 0 === $page_index );
+			printf(
+				'<fieldset class="ff-form__page" data-page-index="%d"%s>',
+				(int) $page_index,
+				$is_first ? '' : ' hidden'
+			);
+			echo do_blocks( serialize_blocks( $page_blocks ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+			echo '</fieldset>';
+		}
+
+		printf(
+			'<input type="hidden" name="_ff_total_pages" value="%d" />',
+			(int) $total_pages
+		);
+
+		return $total_pages;
+	}
+
+	/**
+	 * Split top-level block markup at page-break boundaries.
+	 *
+	 * @param array<int,array<string,mixed>> $blocks
+	 * @return array<int,array<int,array<string,mixed>>>
+	 */
+	private static function split_markup_pages( array $blocks ): array {
+		$pages   = [ [] ];
+		$current = 0;
+
+		foreach ( $blocks as $block ) {
+			foreach ( self::split_markup_block_segments( $block ) as $segment ) {
+				if ( ! empty( $segment['break'] ) ) {
+					$current++;
+					$pages[ $current ] = [];
+					continue;
+				}
+
+				if ( ! empty( $segment['block'] ) ) {
+					$pages[ $current ][] = $segment['block'];
+				}
+			}
+		}
+
+		return array_values( array_filter( $pages, static fn( array $page ): bool => ! empty( $page ) ) ) ?: [ [] ];
+	}
+
+	/**
+	 * Split one parsed block into page-sized block segments.
+	 *
+	 * @param array<string,mixed> $block
+	 * @return array<int,array{block?:array<string,mixed>,break?:bool}>
+	 */
+	private static function split_markup_block_segments( array $block ): array {
+		if ( 'formspress/field-page-break' === ( $block['blockName'] ?? '' ) ) {
+			return [ [ 'break' => true ] ];
+		}
+
+		$inner_blocks = is_array( $block['innerBlocks'] ?? null ) ? $block['innerBlocks'] : [];
+		if ( empty( $inner_blocks ) ) {
+			return empty( $block['blockName'] ) ? [] : [ [ 'block' => $block ] ];
+		}
+
+		$segments = [];
+		$current  = [];
+
+		foreach ( $inner_blocks as $inner_block ) {
+			foreach ( self::split_markup_block_segments( $inner_block ) as $inner_segment ) {
+				if ( ! empty( $inner_segment['break'] ) ) {
+					if ( ! empty( $current ) ) {
+						$segments[] = [ 'block' => self::clone_block_with_inner_blocks( $block, $current ) ];
+						$current    = [];
+					}
+					$segments[] = [ 'break' => true ];
+					continue;
+				}
+
+				if ( ! empty( $inner_segment['block'] ) ) {
+					$current[] = $inner_segment['block'];
+				}
+			}
+		}
+
+		if ( ! empty( $current ) ) {
+			$segments[] = [ 'block' => self::clone_block_with_inner_blocks( $block, $current ) ];
+		}
+
+		return $segments;
+	}
+
+	/**
+	 * Keep a container block's attributes while replacing its children.
+	 *
+	 * @param array<string,mixed>            $block
+	 * @param array<int,array<string,mixed>> $inner_blocks
+	 * @return array<string,mixed>
+	 */
+	private static function clone_block_with_inner_blocks( array $block, array $inner_blocks ): array {
+		$clone         = $block;
+		$inner_content = is_array( $block['innerContent'] ?? null ) ? $block['innerContent'] : [];
+		$null_indexes  = array_keys( array_filter( $inner_content, static fn( $part ): bool => null === $part ) );
+		$opening       = '';
+		$closing       = '';
+
+		if ( ! empty( $null_indexes ) ) {
+			$first_null = (int) reset( $null_indexes );
+			$last_null  = (int) end( $null_indexes );
+			$opening    = implode( '', array_filter( array_slice( $inner_content, 0, $first_null ), 'is_string' ) );
+			$closing    = implode( '', array_filter( array_slice( $inner_content, $last_null + 1 ), 'is_string' ) );
+		}
+
+		$clone['innerBlocks']  = $inner_blocks;
+		$clone['innerContent'] = array_merge( [ $opening ], array_fill( 0, count( $inner_blocks ), null ), [ $closing ] );
+		$clone['innerHTML']    = $opening . $closing;
+		return $clone;
+	}
+
+	private static function render_step_progress( int $total_pages ): void {
+		$template  = __( 'Step %1$d of %2$d', 'formspress' );
+		$step_text = sprintf(
+			/* translators: 1: current page number, 2: total page count. */
+			$template,
+			1,
+			$total_pages
+		);
+		?>
+		<div
+			class="ff-form__step-counter"
+			data-step-template="<?php echo esc_attr( $template ); ?>"
+			aria-live="polite"
+		><?php echo esc_html( $step_text ); ?></div>
+		<div class="ff-form__progress" aria-hidden="true">
+			<div
+				class="ff-form__progress-bar"
+				style="width: <?php echo esc_attr( (int) round( 100 / $total_pages ) ); ?>%"
+			></div>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Split a flat field list by `page_break` boundaries.
 	 *
 	 * @param array<int,array<string,mixed>> $fields
@@ -392,9 +551,9 @@ class FormRenderer {
 	private static function render_pagination_bar( array $fields, array $settings ): void {
 		$pages        = self::split_pages( $fields );
 		$total_pages  = count( $pages );
-		$submit_label = $settings['submit_label']        ?? __( 'Submit', 'flowforms' );
-		$prev_label   = $settings['prev_label']          ?? __( 'Previous', 'flowforms' );
-		$next_label   = $settings['next_label']          ?? __( 'Next', 'flowforms' );
+		$submit_label = $settings['submit_label']        ?? __( 'Submit', 'formspress' );
+		$prev_label   = $settings['prev_label']          ?? __( 'Previous', 'formspress' );
+		$next_label   = $settings['next_label']          ?? __( 'Next', 'formspress' );
 		?>
 		<div class="ff-form__pagination" data-total-pages="<?php echo esc_attr( $total_pages ); ?>">
 			<?php if ( $total_pages > 1 ) : ?>
@@ -421,6 +580,23 @@ class FormRenderer {
 						<?php echo esc_html( $submit_label ); ?>
 					</button>
 				<?php endif; ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	private static function render_markup_pagination_bar( int $total_pages, array $settings ): void {
+		$prev_label = $settings['prev_label'] ?? __( 'Previous', 'formspress' );
+		$next_label = $settings['next_label'] ?? __( 'Next', 'formspress' );
+		?>
+		<div class="ff-form__pagination" data-total-pages="<?php echo esc_attr( $total_pages ); ?>">
+			<div class="ff-form__footer">
+				<button type="button" class="ff-form__prev" hidden>
+					<?php echo esc_html( $prev_label ); ?>
+				</button>
+				<button type="button" class="ff-form__next">
+					<?php echo esc_html( $next_label ); ?>
+				</button>
 			</div>
 		</div>
 		<?php
@@ -474,7 +650,7 @@ class FormRenderer {
 		$required = ! empty( $field['required'] );
 		$req_attr = $required ? 'required aria-required="true"' : '';
 		$req_mark = $required
-			? ' <span class="ff-form__required" aria-hidden="true">*</span><span class="screen-reader-text">' . esc_html__( '(required)', 'flowforms' ) . '</span>'
+			? ' <span class="ff-form__required" aria-hidden="true">*</span><span class="screen-reader-text">' . esc_html__( '(required)', 'formspress' ) . '</span>'
 			: '';
 
 		// a11y: link inputs to description + error region.
@@ -486,8 +662,17 @@ class FormRenderer {
 		$invalid_attr  = ' aria-invalid="false"';
 
 		$conditions_attr = '';
-		if ( ! empty( $field['conditions'] ) && is_array( $field['conditions'] ) && ! empty( $field['conditions']['rules'] ) ) {
+		$initial_hidden_attr = '';
+		if (
+			! empty( $field['conditions'] )
+			&& is_array( $field['conditions'] )
+			&& ! empty( $field['conditions']['rules'] )
+			&& apply_filters( 'flowforms_can_use_conditional_logic', false )
+		) {
 			$conditions_attr = sprintf( ' data-conditions="%s"', esc_attr( wp_json_encode( $field['conditions'] ) ) );
+			if ( 'show' === ( $field['conditions']['action'] ?? 'show' ) ) {
+				$initial_hidden_attr = ' hidden aria-hidden="true"';
+			}
 		}
 
 		if ( $type === 'row' ) {
@@ -505,7 +690,7 @@ class FormRenderer {
 		}
 
 		if ( $type === 'section' ) : ?>
-			<div class="ff-form__section" data-field-id="<?php echo $id; ?>"<?php echo $conditions_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+			<div class="ff-form__section" data-field-id="<?php echo $id; ?>"<?php echo $conditions_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo $initial_hidden_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 				<p class="ff-form__section-title"><?php echo $label; ?></p>
 				<?php if ( ! empty( $field['content'] ) ) : ?><p><?php echo esc_html( $field['content'] ); ?></p><?php endif; ?>
 			</div>
@@ -528,7 +713,7 @@ class FormRenderer {
 			$registry = self::field_types();
 			$type_obj = $registry ? $registry->get( $type ) : null;
 			if ( $type_obj ) {
-				echo '<div class="ff-form__field" id="ff-field-wrap-' . $id . '" data-field-id="' . $id . '"' . $conditions_attr . '>'; // phpcs:ignore WordPress.Security.EscapeOutput
+				echo '<div class="ff-form__field" id="ff-field-wrap-' . $id . '" data-field-id="' . $id . '"' . $conditions_attr . $initial_hidden_attr . '>'; // phpcs:ignore WordPress.Security.EscapeOutput
 				echo '<label for="ff-field-' . $id . '" class="ff-form__label">' . $label . $req_mark . '</label>'; // phpcs:ignore WordPress.Security.EscapeOutput
 				if ( ! empty( $field['description'] ) ) {
 					echo '<p class="ff-form__description-text" id="ff-desc-' . $id . '">' . esc_html( $field['description'] ) . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput
@@ -540,7 +725,7 @@ class FormRenderer {
 			}
 		}
 		?>
-		<div class="ff-form__field" id="ff-field-wrap-<?php echo $id; ?>" data-field-id="<?php echo $id; ?>"<?php echo $conditions_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+		<div class="ff-form__field" id="ff-field-wrap-<?php echo $id; ?>" data-field-id="<?php echo $id; ?>"<?php echo $conditions_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo $initial_hidden_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 			<?php
 			// Radio + checkbox groups: use fieldset/legend so the group has a
 			// proper accessible name for screen readers (WCAG 1.3.1, 4.1.2).
@@ -574,7 +759,7 @@ class FormRenderer {
 
 			<?php elseif ( $type === 'select' ) : ?>
 				<select name="<?php echo $id; ?>" id="ff-field-<?php echo $id; ?>" class="ff-form__select" <?php echo $req_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo $desc_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?><?php echo $invalid_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-					<option value=""><?php esc_html_e( 'Select…', 'flowforms' ); ?></option>
+					<option value=""><?php esc_html_e( 'Select…', 'formspress' ); ?></option>
 					<?php foreach ( $field['options'] ?? [] as $opt ) : ?>
 						<option value="<?php echo esc_attr( $opt ); ?>"><?php echo esc_html( $opt ); ?></option>
 					<?php endforeach; ?>
@@ -617,7 +802,7 @@ class FormRenderer {
 				<div
 					class="ff-form__rating"
 					role="radiogroup"
-					aria-label="<?php echo esc_attr( $field['label'] ?? __( 'Rating', 'flowforms' ) ); ?>"
+					aria-label="<?php echo esc_attr( $field['label'] ?? __( 'Rating', 'formspress' ) ); ?>"
 					<?php echo $desc_attr; // phpcs:ignore WordPress.Security.EscapeOutput ?>
 					data-max="<?php echo esc_attr( $max ); ?>"
 				>
@@ -634,7 +819,7 @@ class FormRenderer {
 							data-wp-on--keydown="actions.rateStarKey"
 							aria-label="<?php echo esc_attr( sprintf(
 								/* translators: 1: current star, 2: total stars. */
-								__( '%1$d out of %2$d', 'flowforms' ),
+								__( '%1$d out of %2$d', 'formspress' ),
 								$i,
 								$max
 							) ); ?>"
@@ -737,8 +922,9 @@ class FormRenderer {
 		$body_bg     = ! empty( $theme['bg'] ) ? sanitize_hex_color( $theme['bg'] ) : '#ffffff';
 		$is_flow     = 'flow' === $form['type'];
 
-		$css_url = esc_url( FLOWFORMS_URL . 'assets/frontend/forms.css' ) . '?v=' . FLOWFORMS_VERSION;
-		$js_url  = esc_url( FLOWFORMS_URL . 'assets/frontend/forms.js' )  . '?v=' . FLOWFORMS_VERSION;
+		$core_blocks_css_url = esc_url( includes_url( 'css/dist/block-library/style.min.css' ) );
+		$css_url             = esc_url( FLOWFORMS_URL . 'assets/frontend/forms.css' ) . '?v=' . FLOWFORMS_VERSION;
+		$js_url              = esc_url( FLOWFORMS_URL . 'assets/frontend/forms.js' )  . '?v=' . FLOWFORMS_VERSION;
 
 		$ff_data = wp_json_encode( [
 			'apiRoot' => esc_url_raw( rest_url( 'flowforms/v1' ) ),
@@ -754,6 +940,7 @@ class FormRenderer {
 <meta charset="<?php bloginfo( 'charset' ); ?>">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?php echo esc_html( $form['title'] ); ?></title>
+<link rel="stylesheet" href="<?php echo $core_blocks_css_url; ?>">
 <link rel="stylesheet" href="<?php echo $css_url; ?>">
 <style>
 *, *::before, *::after { box-sizing: border-box; }
@@ -771,6 +958,7 @@ html, body { margin: 0; padding: 0; min-height: 100vh; background: <?php echo es
 		data-form-id="<?php echo esc_attr( $form_id ); ?>"
 		data-form-title="<?php echo esc_attr( $form['title'] ); ?>"
 		data-type="flow"
+		<?php if ( ! empty( $form['variant_id'] ) ) : ?>data-variant-id="<?php echo esc_attr( $form['variant_id'] ); ?>"<?php endif; ?>
 		data-fields="<?php echo esc_attr( wp_json_encode( $form['fields'] ) ); ?>"
 		data-settings="<?php echo esc_attr( wp_json_encode( $settings ) ); ?>"
 		<?php if ( $theme_style ) : ?>style="<?php echo esc_attr( $theme_style ); ?>"<?php endif; ?>
@@ -782,18 +970,18 @@ html, body { margin: 0; padding: 0; min-height: 100vh; background: <?php echo es
 		id="ff-form-<?php echo esc_attr( $form_id ); ?>"
 		data-form-id="<?php echo esc_attr( $form_id ); ?>"
 		data-type="standard"
-		data-fields-schema="<?php echo esc_attr( wp_json_encode( self::extract_field_schema( $form['fields'] ) ) ); ?>"
-		data-form-settings="<?php echo esc_attr( wp_json_encode( [ 'enable_save_resume' => ! empty( $settings['enable_save_resume'] ), 'save_resume_label' => $settings['save_resume_label'] ?? __( 'Save and resume later', 'flowforms' ) ] ) ); ?>"
+		<?php if ( ! empty( $form['variant_id'] ) ) : ?>data-variant-id="<?php echo esc_attr( $form['variant_id'] ); ?>"<?php endif; ?>
 		novalidate
 		<?php echo self::spam_data_attrs(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 		<?php if ( $std_style ) : ?>style="<?php echo esc_attr( $std_style ); ?>"<?php endif; ?>
 	>
 		<?php
-		// Same branching as `render_standard_form` — markup forms go
-		// through `do_blocks()` so the Gutenberg content reaches the
-		// page; legacy schema forms keep the per-field renderer.
+		// Same branching as `render_standard_form` — markup forms need
+		// the page-break aware renderer, while legacy schema forms keep
+		// the per-field renderer.
+		$markup_total_pages = 1;
 		if ( ! empty( $form['is_markup'] ) && ! empty( $form['fields_markup'] ) ) {
-			echo do_blocks( $form['fields_markup'] ); // phpcs:ignore WordPress.Security.EscapeOutput
+			$markup_total_pages = self::render_paged_markup( $form['fields_markup'], $form['settings'] );
 		} else {
 			self::render_paged_fields( $form['fields'], $form['settings'] );
 		}
@@ -812,6 +1000,8 @@ html, body { margin: 0; padding: 0; min-height: 100vh; background: <?php echo es
 		<?php
 		if ( empty( $form['is_markup'] ) ) {
 			self::render_pagination_bar( $form['fields'], $form['settings'] );
+		} elseif ( $markup_total_pages > 1 ) {
+			self::render_markup_pagination_bar( $markup_total_pages, $form['settings'] );
 		}
 		?>
 
@@ -865,6 +1055,26 @@ html, body { margin: 0; padding: 0; min-height: 100vh; background: <?php echo es
 			'--ff-label-color:var(--wp--preset--color--contrast, #1d2327)',
 			'--ff-font-family:var(--wp--preset--font-family--body, inherit)',
 		];
+
+		$pagination_color_map = [
+			'progress_fill_color' => '--ff-progress-fill',
+			'progress_track_color' => '--ff-progress-track',
+			'step_text_color'     => '--ff-step-text',
+			'next_bg_color'       => '--ff-next-bg',
+			'next_text_color'     => '--ff-next-text',
+			'next_border_color'   => '--ff-next-border-color',
+			'prev_bg_color'       => '--ff-prev-bg',
+			'prev_text_color'     => '--ff-prev-text',
+			'prev_border_color'   => '--ff-prev-border-color',
+		];
+		foreach ( $pagination_color_map as $key => $var ) {
+			if ( ! empty( $style[ $key ] ) ) {
+				$color = sanitize_hex_color( $style[ $key ] );
+				if ( $color ) {
+					$parts[] = $var . ':' . $color;
+				}
+			}
+		}
 
 		/* Layout-only knobs still apply (radii / spacing / borders). */
 		if ( isset( $style['border_radius'] ) ) {
@@ -938,12 +1148,21 @@ html, body { margin: 0; padding: 0; min-height: 100vh; background: <?php echo es
 		$parts = [];
 
 		$color_map = [
-			'primary_color'  => '--ff-primary',
-			'btn_text_color' => '--ff-btn-text',
-			'bg_color'       => '--ff-bg',
-			'text_color'     => '--ff-text',
-			'border_color'   => '--ff-color-border',
-			'label_color'    => '--ff-label-color',
+			'primary_color'        => '--ff-primary',
+			'btn_text_color'       => '--ff-btn-text',
+			'bg_color'             => '--ff-bg',
+			'text_color'           => '--ff-text',
+			'border_color'         => '--ff-color-border',
+			'label_color'          => '--ff-label-color',
+			'progress_fill_color'  => '--ff-progress-fill',
+			'progress_track_color' => '--ff-progress-track',
+			'step_text_color'      => '--ff-step-text',
+			'next_bg_color'        => '--ff-next-bg',
+			'next_text_color'      => '--ff-next-text',
+			'next_border_color'    => '--ff-next-border-color',
+			'prev_bg_color'        => '--ff-prev-bg',
+			'prev_text_color'      => '--ff-prev-text',
+			'prev_border_color'    => '--ff-prev-border-color',
 		];
 		foreach ( $color_map as $key => $var ) {
 			if ( ! empty( $style[ $key ] ) ) {
@@ -1103,5 +1322,7 @@ html, body { margin: 0; padding: 0; min-height: 100vh; background: <?php echo es
 			'apiRoot'  => esc_url_raw( rest_url( 'flowforms/v1' ) ),
 			'nonce'    => wp_create_nonce( 'wp_rest' ),
 		] );
+
+		do_action( 'flowforms_frontend_assets_enqueued' );
 	}
 }

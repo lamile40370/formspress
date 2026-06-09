@@ -14,23 +14,23 @@ use FlowForms\Modules\Templates\Services\TemplateBlocks as TB;
 class HeroCoverSignupTemplate extends AbstractTemplate {
 
 	public function get_id(): string          { return 'hero-cover-signup'; }
-	public function get_label(): string       { return __( 'Hero cover signup', 'flowforms' ); }
-	public function get_description(): string { return __( 'Full-bleed cover with background image + dark overlay. Hero headline, two-field signup.', 'flowforms' ); }
+	public function get_label(): string       { return __( 'Hero cover signup', 'formspress' ); }
+	public function get_description(): string { return __( 'Full-bleed cover with background image + dark overlay. Hero headline, two-field signup.', 'formspress' ); }
 	public function get_category(): string    { return 'lead-gen'; }
 	public function get_type(): string        { return 'standard'; }
 	public function get_icon(): string        { return 'cover-image'; }
 
 	public function get_fields(): array {
 		return [
-			[ 'id' => 'name',  'type' => 'text',  'label' => __( 'Full name', 'flowforms' ),  'required' => true ],
-			[ 'id' => 'email', 'type' => 'email', 'label' => __( 'Work email', 'flowforms' ), 'required' => true ],
+			[ 'id' => 'name',  'type' => 'text',  'label' => __( 'Full name', 'formspress' ),  'required' => true ],
+			[ 'id' => 'email', 'type' => 'email', 'label' => __( 'Work email', 'formspress' ), 'required' => true ],
 		];
 	}
 
 	public function get_settings(): array {
 		return [
-			'submit_label'    => __( 'Start free trial', 'flowforms' ),
-			'success_message' => __( 'Welcome aboard — check your inbox to confirm.', 'flowforms' ),
+			'submit_label'    => __( 'Start free trial', 'formspress' ),
+			'success_message' => __( 'Welcome aboard — check your inbox to confirm.', 'formspress' ),
 		];
 	}
 
@@ -39,7 +39,7 @@ class HeroCoverSignupTemplate extends AbstractTemplate {
 
 		$inner = implode( "\n", [
 			TB::heading( [
-				'text'         => __( 'Start your free trial', 'flowforms' ),
+				'text'         => __( 'Start your free trial', 'formspress' ),
 				'level'        => 2,
 				'size'         => '44px',
 				'weight'       => '800',
@@ -48,16 +48,16 @@ class HeroCoverSignupTemplate extends AbstractTemplate {
 				'marginBottom' => '8px',
 			] ),
 			TB::description( [
-				'text'         => __( 'No credit card required. 14 days, full access, cancel anytime.', 'flowforms' ),
+				'text'         => __( 'No credit card required. 14 days, full access, cancel anytime.', 'formspress' ),
 				'color'        => '#e2e8f0',
 				'size'         => '17px',
 				'align'        => 'center',
 				'marginBottom' => '32px',
 			] ),
-			TB::field_text(  [ 'fieldId' => 'name',  'label' => __( 'Full name', 'flowforms' ),  'required' => true, 'placeholder' => __( 'Jane Doe', 'flowforms' ) ] ),
-			TB::field_email( [ 'fieldId' => 'email', 'label' => __( 'Work email', 'flowforms' ), 'required' => true, 'placeholder' => 'jane@company.com' ] ),
+			TB::field_text(  [ 'fieldId' => 'name',  'label' => __( 'Full name', 'formspress' ),  'required' => true, 'placeholder' => __( 'Jane Doe', 'formspress' ) ] ),
+			TB::field_email( [ 'fieldId' => 'email', 'label' => __( 'Work email', 'formspress' ), 'required' => true, 'placeholder' => 'jane@company.com' ] ),
 			TB::submit_button( [
-				'text' => __( 'Get started — it\'s free', 'flowforms' ),
+				'text' => __( 'Get started — it\'s free', 'formspress' ),
 				'bg'   => '#ffffff',
 				'fg'   => '#0f172a',
 				'full' => true,

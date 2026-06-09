@@ -31,7 +31,7 @@ const Edit = ( props ) => {
 				>
 					<option value="">
 						{ attributes.placeholder ||
-							__( 'Select an option', 'flowforms' ) }
+							__( 'Select an option', 'formspress' ) }
 					</option>
 					{ options.map( ( opt, index ) => (
 						<option key={ index } value={ opt.value || '' }>

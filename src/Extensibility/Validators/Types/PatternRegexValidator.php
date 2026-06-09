@@ -11,13 +11,13 @@ class PatternRegexValidator extends AbstractValidator {
 	}
 
 	public function get_label(): string {
-		return __( 'Pattern (regex)', 'flowforms' );
+		return __( 'Pattern (regex)', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'pattern',     'type' => 'text', 'label' => __( 'Regular expression', 'flowforms' ), 'help' => __( 'PHP/PCRE pattern without delimiters. Example: ^[A-Z]{2,3}-\d{4}$', 'flowforms' ) ],
-			[ 'key' => 'error_message', 'type' => 'text', 'label' => __( 'Error message', 'flowforms' ), 'default' => __( 'Invalid format.', 'flowforms' ) ],
+			[ 'key' => 'pattern',     'type' => 'text', 'label' => __( 'Regular expression', 'formspress' ), 'help' => __( 'PHP/PCRE pattern without delimiters. Example: ^[A-Z]{2,3}-\d{4}$', 'formspress' ) ],
+			[ 'key' => 'error_message', 'type' => 'text', 'label' => __( 'Error message', 'formspress' ), 'default' => __( 'Invalid format.', 'formspress' ) ],
 		];
 	}
 
@@ -33,7 +33,7 @@ class PatternRegexValidator extends AbstractValidator {
 		/* Suppress warning on bad regex; treat invalid pattern as "matches everything". */
 		$result = @preg_match( $delimited, (string) $value );
 		if ( 1 !== $result ) {
-			return (string) ( $config['error_message'] ?? __( 'Invalid format.', 'flowforms' ) );
+			return (string) ( $config['error_message'] ?? __( 'Invalid format.', 'formspress' ) );
 		}
 		return true;
 	}

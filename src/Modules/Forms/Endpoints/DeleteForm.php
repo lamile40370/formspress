@@ -15,13 +15,13 @@ class DeleteForm extends AbstractEndpoint {
 		$id = (int) $request->get_param( 'id' );
 
 		if ( ! $this->repo->get( $id ) ) {
-			return $this->error( __( 'Form not found.', 'flowforms' ), 404 );
+			return $this->error( __( 'Form not found.', 'formspress' ), 404 );
 		}
 
 		$deleted = $this->repo->delete( $id );
 
 		if ( ! $deleted ) {
-			return $this->error( __( 'Failed to delete form.', 'flowforms' ), 500 );
+			return $this->error( __( 'Failed to delete form.', 'formspress' ), 500 );
 		}
 
 		return $this->success( null, 204 );

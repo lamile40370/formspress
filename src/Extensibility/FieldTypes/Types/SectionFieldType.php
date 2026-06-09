@@ -11,7 +11,7 @@ class SectionFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Section', 'flowforms' );
+		return __( 'Section', 'formspress' );
 	}
 
 	public function get_group(): string {
@@ -24,7 +24,7 @@ class SectionFieldType extends AbstractFieldType {
 
 	public function get_settings_schema(): array {
 		return [
-			[ 'key' => 'content', 'type' => 'textarea', 'label' => __( 'Section description', 'flowforms' ), 'rows' => 3 ],
+			[ 'key' => 'content', 'type' => 'textarea', 'label' => __( 'Section description', 'formspress' ), 'rows' => 3 ],
 		];
 	}
 

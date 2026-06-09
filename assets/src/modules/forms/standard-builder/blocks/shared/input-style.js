@@ -201,16 +201,16 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 	return (
 		<InspectorControls group="styles">
 			<PanelColorSettings
-				title={ __( 'Input color', 'flowforms' ) }
+				title={ __( 'Input color', 'formspress' ) }
 				colorSettings={ [
 					{
-						label: __( 'Text', 'flowforms' ),
+						label: __( 'Text', 'formspress' ),
 						value: inputStyle.textColor,
 						onChange: setStyle( 'textColor' ),
 						clearable: true,
 					},
 					{
-						label: __( 'Background', 'flowforms' ),
+						label: __( 'Background', 'formspress' ),
 						value: inputStyle.backgroundColor,
 						onChange: setStyle( 'backgroundColor' ),
 						clearable: true,
@@ -221,7 +221,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 			/>
 
 			<ToolsPanel
-				label={ __( 'Input typography', 'flowforms' ) }
+				label={ __( 'Input typography', 'formspress' ) }
 				resetAll={ () =>
 					setInputStyle(
 						clearKeys( inputStyle, [ 'fontSize', 'lineHeight' ] )
@@ -229,7 +229,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 				}
 			>
 				<ToolsPanelItem
-					label={ __( 'Font size', 'flowforms' ) }
+					label={ __( 'Font size', 'formspress' ) }
 					hasValue={ () => !! inputStyle.fontSize }
 					onDeselect={ () => setStyle( 'fontSize' )( undefined ) }
 					isShownByDefault
@@ -241,7 +241,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 					/>
 				</ToolsPanelItem>
 				<ToolsPanelItem
-					label={ __( 'Line height', 'flowforms' ) }
+					label={ __( 'Line height', 'formspress' ) }
 					hasValue={ () => !! inputStyle.lineHeight }
 					onDeselect={ () => setStyle( 'lineHeight' )( undefined ) }
 				>
@@ -254,7 +254,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 			</ToolsPanel>
 
 			<ToolsPanel
-				label={ __( 'Input dimensions', 'flowforms' ) }
+				label={ __( 'Input dimensions', 'formspress' ) }
 				resetAll={ () =>
 					setInputStyle(
 						clearKeys( setPaddingValue( inputStyle, {} ), [
@@ -264,14 +264,14 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 				}
 			>
 				<ToolsPanelItem
-					label={ __( 'Width', 'flowforms' ) }
+					label={ __( 'Width', 'formspress' ) }
 					hasValue={ () => hasStyleValue( inputStyle.width ) }
 					onDeselect={ () => setStyle( 'width' )( undefined ) }
 					isShownByDefault
 				>
 					<UnitControl
 						__next40pxDefaultSize
-						label={ __( 'Width', 'flowforms' ) }
+						label={ __( 'Width', 'formspress' ) }
 						value={ getStyleValue( inputStyle.width, '' ) }
 						onChange={ setStyle( 'width' ) }
 						units={ LENGTH_UNITS }
@@ -280,7 +280,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 					/>
 				</ToolsPanelItem>
 				<ToolsPanelItem
-					label={ __( 'Padding', 'flowforms' ) }
+					label={ __( 'Padding', 'formspress' ) }
 					hasValue={ () =>
 						[
 							'paddingX',
@@ -298,7 +298,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 				>
 					<BoxControl
 						__next40pxDefaultSize
-						label={ __( 'Padding', 'flowforms' ) }
+						label={ __( 'Padding', 'formspress' ) }
 						values={ getPaddingValue( inputStyle ) }
 						onChange={ ( value ) =>
 							setInputStyle(
@@ -312,7 +312,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 			</ToolsPanel>
 
 			<ToolsPanel
-				label={ __( 'Input border & shadow', 'flowforms' ) }
+				label={ __( 'Input border & shadow', 'formspress' ) }
 				resetAll={ () =>
 					setInputStyle(
 						clearKeys( inputStyle, [ 'border', 'borderRadius' ] )
@@ -320,7 +320,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 				}
 			>
 				<ToolsPanelItem
-					label={ __( 'Border', 'flowforms' ) }
+					label={ __( 'Border', 'formspress' ) }
 					hasValue={ () =>
 						!! inputStyle.border ||
 						!! inputStyle.borderColor ||
@@ -334,7 +334,7 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 				>
 					<BorderBoxControl
 						__next40pxDefaultSize
-						label={ __( 'Border', 'flowforms' ) }
+						label={ __( 'Border', 'formspress' ) }
 						value={ getBorderValue( inputStyle ) }
 						colors={ getThemePalette() }
 						enableStyle
@@ -346,13 +346,13 @@ const InputStyleInspector = ( { attributes, setAttributes } ) => {
 					/>
 				</ToolsPanelItem>
 				<ToolsPanelItem
-					label={ __( 'Radius', 'flowforms' ) }
+					label={ __( 'Radius', 'formspress' ) }
 					hasValue={ () => !! inputStyle.borderRadius }
 					onDeselect={ () => setStyle( 'borderRadius' )( undefined ) }
 				>
 					<UnitControl
 						__next40pxDefaultSize
-						label={ __( 'Radius', 'flowforms' ) }
+						label={ __( 'Radius', 'formspress' ) }
 						value={ getStyleValue( inputStyle.borderRadius, '' ) }
 						onChange={ setStyle( 'borderRadius' ) }
 						units={ LENGTH_UNITS }

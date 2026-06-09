@@ -56,8 +56,8 @@ const Row = ( { label, value, helpText } ) => {
 					onFinishCopy={ () => setCopied( false ) }
 				>
 					{ copied
-						? __( 'Copied!', 'flowforms' )
-						: __( 'Copy', 'flowforms' ) }
+						? __( 'Copied!', 'formspress' )
+						: __( 'Copy', 'formspress' ) }
 				</ClipboardButton>
 			</HStack>
 			{ helpText && (
@@ -84,7 +84,7 @@ const EmbedShareModal = ( { form, onClose } ) => {
 
 	return (
 		<Modal
-			title={ __( 'Embed this form', 'flowforms' ) }
+			title={ __( 'Embed this form', 'formspress' ) }
 			onRequestClose={ onClose }
 			size="medium"
 		>
@@ -92,25 +92,25 @@ const EmbedShareModal = ( { form, onClose } ) => {
 				<Text>
 					{ __(
 						'Drop this form into any post, page or template — Gutenberg block, shortcode (works with every page builder), or a direct fullscreen link.',
-						'flowforms'
+						'formspress'
 					) }
 				</Text>
 
 				<Row
-					label={ __( 'Shortcode', 'flowforms' ) }
+					label={ __( 'Shortcode', 'formspress' ) }
 					value={ shortcode }
 					helpText={ __(
 						'Universal fallback — works in the classic editor and every page builder (Elementor, Bricks, Divi, Beaver Builder, Oxygen…) via their shortcode widget.',
-						'flowforms'
+						'formspress'
 					) }
 				/>
 
 				<Row
-					label={ __( 'Gutenberg block', 'flowforms' ) }
+					label={ __( 'Gutenberg block', 'formspress' ) }
 					value={ block }
 					helpText={ __(
 						'Paste this block-comment into the Gutenberg code editor to insert the form. The visual inserter ("FormsPress Form" block) is the recommended way for normal use.',
-						'flowforms'
+						'formspress'
 					) }
 				/>
 
@@ -118,26 +118,26 @@ const EmbedShareModal = ( { form, onClose } ) => {
 					<Notice status="warning" isDismissible={ false }>
 						{ __(
 							'This direct link is available as an admin preview while editing, but it becomes public only after the form is published.',
-							'flowforms'
+							'formspress'
 						) }
 					</Notice>
 				) }
 
 				<Row
-					label={ __( 'Direct link', 'flowforms' ) }
+					label={ __( 'Direct link', 'formspress' ) }
 					value={ directUrl }
 					helpText={ __(
 						'A standalone fullscreen page hosting this form — great for sharing a link in email or social, without embedding in an existing page.',
-						'flowforms'
+						'formspress'
 					) }
 				/>
 
 				<HStack justify="flex-end">
 					<ExternalLink href={ directUrl }>
-						{ __( 'Open the direct link', 'flowforms' ) }
+						{ __( 'Open the direct link', 'formspress' ) }
 					</ExternalLink>
 					<Button variant="primary" onClick={ onClose }>
-						{ __( 'Done', 'flowforms' ) }
+						{ __( 'Done', 'formspress' ) }
 					</Button>
 				</HStack>
 			</VStack>

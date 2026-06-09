@@ -25,7 +25,7 @@ class BindingsModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Bindings', 'flowforms' );
+		return __( 'Bindings', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {
@@ -73,7 +73,7 @@ class BindingsModule extends AbstractModule {
 		}
 
 		register_block_bindings_source( 'formspress/option', [
-			'label'              => __( 'FormsPress option', 'flowforms' ),
+			'label'              => __( 'FormsPress option', 'formspress' ),
 			'get_value_callback' => static function ( array $source_args ): string {
 				$key = sanitize_key( $source_args['key'] ?? '' );
 				if ( '' === $key ) {

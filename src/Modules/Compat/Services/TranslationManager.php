@@ -7,10 +7,10 @@ namespace FlowForms\Modules\Compat\Services;
  * string needs to be displayed.
  *
  * Each compat provider (WPML, Polylang, ...) registers a callable via
- * `flowforms_translate_string` filter. The first non-null return wins.
+ * `formspress_translate_string` filter. The first non-null return wins.
  *
  * The `$context` argument follows WPML's convention — `domain` + `name`.
- * Example: TranslationManager::translate( 'My label', 'flowforms-form-123', 'field_email_label' )
+ * Example: TranslationManager::translate( 'My label', 'formspress-form-123', 'field_email_label' )
  */
 class TranslationManager {
 
@@ -32,7 +32,7 @@ class TranslationManager {
 		 * @param string      $domain     Translation domain.
 		 * @param string      $name       Unique string name within the domain.
 		 */
-		$translated = apply_filters( 'flowforms_translate_string', null, $value, $domain, $name );
+		$translated = apply_filters( 'formspress_translate_string', null, $value, $domain, $name );
 
 		if ( is_string( $translated ) && '' !== $translated ) {
 			return $translated;
@@ -57,7 +57,7 @@ class TranslationManager {
 		 * @param string $domain Translation domain.
 		 * @param string $name   Unique string name within the domain.
 		 */
-		do_action( 'flowforms_register_string', $value, $domain, $name );
+		do_action( 'formspress_register_string', $value, $domain, $name );
 	}
 
 	/**
@@ -72,7 +72,7 @@ class TranslationManager {
 			return;
 		}
 
-		$domain = 'flowforms-form-' . $form_id;
+		$domain = 'formspress-form-' . $form_id;
 
 		if ( ! empty( $form['title'] ) ) {
 			self::register( (string) $form['title'], $domain, 'form_title' );
@@ -150,7 +150,7 @@ class TranslationManager {
 			return $form;
 		}
 
-		$domain = 'flowforms-form-' . $form_id;
+		$domain = 'formspress-form-' . $form_id;
 
 		if ( ! empty( $form['title'] ) && is_string( $form['title'] ) ) {
 			$form['title'] = self::translate( $form['title'], $domain, 'form_title' );

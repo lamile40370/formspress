@@ -11,11 +11,11 @@ class CustomerSurveyTemplate extends AbstractTemplate {
 	}
 
 	public function get_label(): string {
-		return __( 'Customer survey', 'flowforms' );
+		return __( 'Customer survey', 'formspress' );
 	}
 
 	public function get_description(): string {
-		return __( 'Collect customer satisfaction, NPS and qualitative feedback.', 'flowforms' );
+		return __( 'Collect customer satisfaction, NPS and qualitative feedback.', 'formspress' );
 	}
 
 	public function get_category(): string {
@@ -35,28 +35,28 @@ class CustomerSurveyTemplate extends AbstractTemplate {
 			[
 				'id'       => 'rating',
 				'type'     => 'rating',
-				'label'    => __( 'How would you rate your experience?', 'flowforms' ),
+				'label'    => __( 'How would you rate your experience?', 'formspress' ),
 				'required' => true,
 				'max'      => 5,
 			],
 			[
 				'id'           => 'nps',
 				'type'         => 'nps',
-				'label'        => __( 'How likely are you to recommend us to a friend?', 'flowforms' ),
+				'label'        => __( 'How likely are you to recommend us to a friend?', 'formspress' ),
 				'required'     => true,
-				'nps_min_label'=> __( 'Not at all likely', 'flowforms' ),
-				'nps_max_label'=> __( 'Extremely likely', 'flowforms' ),
+				'nps_min_label'=> __( 'Not at all likely', 'formspress' ),
+				'nps_max_label'=> __( 'Extremely likely', 'formspress' ),
 			],
 			[
 				'id'       => 'liked',
 				'type'     => 'textarea',
-				'label'    => __( 'What did you like the most?', 'flowforms' ),
+				'label'    => __( 'What did you like the most?', 'formspress' ),
 				'required' => false,
 			],
 			[
 				'id'       => 'improve',
 				'type'     => 'textarea',
-				'label'    => __( 'What can we improve?', 'flowforms' ),
+				'label'    => __( 'What can we improve?', 'formspress' ),
 				'required' => false,
 			],
 		];
@@ -64,13 +64,13 @@ class CustomerSurveyTemplate extends AbstractTemplate {
 
 	public function get_settings(): array {
 		return [
-			'welcome_title'       => __( "We'd love your feedback", 'flowforms' ),
-			'welcome_description' => __( 'Just a few quick questions — under a minute.', 'flowforms' ),
-			'start_label'         => __( 'Start', 'flowforms' ),
-			'end_title'           => __( 'Thank you!', 'flowforms' ),
-			'success_message'     => __( 'Your feedback helps us improve.', 'flowforms' ),
-			'submit_label'        => __( 'Submit', 'flowforms' ),
-			'next_label'          => __( 'OK', 'flowforms' ),
+			'welcome_title'       => __( "We'd love your feedback", 'formspress' ),
+			'welcome_description' => __( 'Just a few quick questions — under a minute.', 'formspress' ),
+			'start_label'         => __( 'Start', 'formspress' ),
+			'end_title'           => __( 'Thank you!', 'formspress' ),
+			'success_message'     => __( 'Your feedback helps us improve.', 'formspress' ),
+			'submit_label'        => __( 'Submit', 'formspress' ),
+			'next_label'          => __( 'OK', 'formspress' ),
 		];
 	}
 }

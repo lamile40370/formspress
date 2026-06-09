@@ -26,7 +26,7 @@ const FormBlockEdit = ( { attributes, setAttributes } ) => {
 	}, [] );
 
 	const formOptions = [
-		{ value: 0, label: __( '— Select a form —', 'flowforms' ) },
+		{ value: 0, label: __( '— Select a form —', 'formspress' ) },
 		...forms.map( ( f ) => ( { value: f.id, label: f.title } ) ),
 	];
 
@@ -35,12 +35,12 @@ const FormBlockEdit = ( { attributes, setAttributes } ) => {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Form Settings', 'flowforms' ) }>
+				<PanelBody title={ __( 'Form Settings', 'formspress' ) }>
 					{ isLoading ? (
 						<Spinner />
 					) : (
 						<SelectControl
-							label={ __( 'Select Form', 'flowforms' ) }
+							label={ __( 'Select Form', 'formspress' ) }
 							value={ formId }
 							options={ formOptions }
 							onChange={ ( v ) =>
@@ -51,7 +51,7 @@ const FormBlockEdit = ( { attributes, setAttributes } ) => {
 						/>
 					) }
 					<ToggleControl
-						label={ __( 'Display Form Title', 'flowforms' ) }
+						label={ __( 'Display Form Title', 'formspress' ) }
 						checked={ displayTitle }
 						onChange={ ( v ) =>
 							setAttributes( { displayTitle: v } )
@@ -59,7 +59,7 @@ const FormBlockEdit = ( { attributes, setAttributes } ) => {
 						__nextHasNoMarginBottom
 					/>
 					<ToggleControl
-						label={ __( 'Display Description', 'flowforms' ) }
+						label={ __( 'Display Description', 'formspress' ) }
 						checked={ displayDescription }
 						onChange={ ( v ) =>
 							setAttributes( { displayDescription: v } )
@@ -73,10 +73,10 @@ const FormBlockEdit = ( { attributes, setAttributes } ) => {
 				{ ! formId ? (
 					<Placeholder
 						icon="feedback"
-						label={ __( 'FlowForms — Standard Form', 'flowforms' ) }
+						label={ __( 'FlowForms — Standard Form', 'formspress' ) }
 						instructions={ __(
 							'Select a form in the block settings panel.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				) : (
@@ -84,12 +84,12 @@ const FormBlockEdit = ( { attributes, setAttributes } ) => {
 						<span className="ff-form-block__icon dashicons dashicons-feedback" />
 						<strong>
 							{ selectedForm?.title ||
-								__( 'Form #', 'flowforms' ) + formId }
+								__( 'Form #', 'formspress' ) + formId }
 						</strong>
 						<em>
 							{ __(
 								'Form will render on the frontend.',
-								'flowforms'
+								'formspress'
 							) }
 						</em>
 					</div>

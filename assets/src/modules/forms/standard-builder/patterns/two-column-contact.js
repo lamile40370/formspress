@@ -20,18 +20,18 @@ const sideBySideNames = `<!-- wp:columns {"style":{"spacing":{"blockGap":{"left"
 <!-- wp:column -->
 <div class="wp-block-column">
 ${ fieldText( {
-	label: __( 'First name', 'flowforms' ),
+	label: __( 'First name', 'formspress' ),
 	required: true,
-	placeholder: __( 'Jane', 'flowforms' ),
+	placeholder: __( 'Jane', 'formspress' ),
 } ) }
 </div>
 <!-- /wp:column -->
 <!-- wp:column -->
 <div class="wp-block-column">
 ${ fieldText( {
-	label: __( 'Last name', 'flowforms' ),
+	label: __( 'Last name', 'formspress' ),
 	required: true,
-	placeholder: __( 'Doe', 'flowforms' ),
+	placeholder: __( 'Doe', 'formspress' ),
 } ) }
 </div>
 <!-- /wp:column -->
@@ -39,10 +39,10 @@ ${ fieldText( {
 <!-- /wp:columns -->`;
 
 export default {
-	title: __( 'Two-column contact form', 'flowforms' ),
+	title: __( 'Two-column contact form', 'formspress' ),
 	description: __(
 		'Compact layout with side-by-side first / last name columns.',
-		'flowforms'
+		'formspress'
 	),
 	keywords: [ 'columns', 'contact', 'compact', 'inline' ],
 	content: styledGroup( {
@@ -53,7 +53,7 @@ export default {
 		maxWidth: '640px',
 		inner: [
 			heading( {
-				text: __( 'Get in touch', 'flowforms' ),
+				text: __( 'Get in touch', 'formspress' ),
 				size: '26px',
 				weight: '700',
 				color: '#111827',
@@ -61,7 +61,7 @@ export default {
 			description( {
 				text: __(
 					'Drop us a line — we read every message.',
-					'flowforms'
+					'formspress'
 				),
 				color: '#6b7280',
 				size: '14px',
@@ -69,16 +69,16 @@ export default {
 			} ),
 			sideBySideNames,
 			fieldEmail( {
-				label: __( 'Email', 'flowforms' ),
+				label: __( 'Email', 'formspress' ),
 				required: true,
 				placeholder: 'you@example.com',
 			} ),
 			fieldTextarea( {
-				label: __( 'Message', 'flowforms' ),
+				label: __( 'Message', 'formspress' ),
 				rows: 5,
 				required: true,
 			} ),
-			submitButton( { text: __( 'Send message', 'flowforms' ) } ),
+			submitButton( { text: __( 'Send message', 'formspress' ) } ),
 		].join( '\n' ),
 	} ),
 };

@@ -25,22 +25,25 @@ namespace FlowForms\Modules\Blocks;
  *     border, layout) — Gutenberg renders that natively
  *   - their headings / paragraphs / columns / dividers — also native
  *   - their custom `core/button` styling on the submit — also native
- *   - all the front-end JS (validation, save-and-resume, conditional
- *     logic, Interactivity API state) — unchanged because the field
- *     HTML shape is identical to the legacy renderer
+ *   - all the front-end JS (validation, conditional logic,
+ *     Interactivity API state) — unchanged because the field HTML
+ *     shape is identical to the legacy renderer
  */
 class StandardFieldsRenderer {
 
 	/** @var array<string, callable> Block name → render callback. */
 	private const RENDERERS = [
-		'formspress/field-text'     => 'render_text',
-		'formspress/field-email'    => 'render_email',
-		'formspress/field-textarea' => 'render_textarea',
-		'formspress/field-number'   => 'render_number',
-		'formspress/field-select'   => 'render_select',
-		'formspress/field-radio'    => 'render_radio',
-		'formspress/field-checkbox' => 'render_checkbox',
-		'formspress/field-submit'   => 'render_submit',
+		'formspress/field-text'       => 'render_text',
+		'formspress/field-email'      => 'render_email',
+		'formspress/field-textarea'   => 'render_textarea',
+		'formspress/field-number'     => 'render_number',
+		'formspress/field-select'     => 'render_select',
+		'formspress/field-radio'      => 'render_radio',
+		'formspress/field-checkbox'   => 'render_checkbox',
+		'formspress/field-product'    => 'render_product',
+		'formspress/field-total'      => 'render_total',
+		'formspress/field-page-break' => 'render_page_break',
+		'formspress/field-submit'     => 'render_submit',
 	];
 
 	/**
@@ -57,6 +60,7 @@ class StandardFieldsRenderer {
 			'placeholder'  => [ 'type' => 'string',  'default' => '' ],
 			'defaultValue' => [ 'type' => 'string',  'default' => '' ],
 			'inputStyle'   => [ 'type' => 'object',  'default' => [] ],
+			'conditions'   => [ 'type' => 'object' ],
 		];
 
 		$options_attr = [
@@ -77,14 +81,42 @@ class StandardFieldsRenderer {
 		];
 
 		$blocks_config = [
-			'formspress/field-text'     => [ 'attrs' => $shared_attrs,                       'supports' => $supports_full ],
-			'formspress/field-email'    => [ 'attrs' => $shared_attrs,                       'supports' => $supports_full ],
-			'formspress/field-textarea' => [ 'attrs' => $shared_attrs + [ 'rows' => [ 'type' => 'number', 'default' => 4 ] ], 'supports' => $supports_full ],
-			'formspress/field-number'   => [ 'attrs' => $shared_attrs + [ 'min' => [ 'type' => 'number' ], 'max' => [ 'type' => 'number' ], 'step' => [ 'type' => 'number' ] ], 'supports' => $supports_full ],
-			'formspress/field-select'   => [ 'attrs' => $shared_attrs + $options_attr,       'supports' => $supports_full ],
-			'formspress/field-radio'    => [ 'attrs' => $shared_attrs + $options_attr,       'supports' => $supports_full ],
-			'formspress/field-checkbox' => [ 'attrs' => $shared_attrs + $options_attr,       'supports' => $supports_full ],
-			'formspress/field-submit'   => [ 'attrs' => [], 'supports' => [ 'html' => false, 'reusable' => false, 'align' => [ 'wide', 'full' ] ] ],
+			'formspress/field-text'       => [ 'attrs' => $shared_attrs,                       'supports' => $supports_full ],
+			'formspress/field-email'      => [ 'attrs' => $shared_attrs,                       'supports' => $supports_full ],
+			'formspress/field-textarea'   => [ 'attrs' => $shared_attrs + [ 'rows' => [ 'type' => 'number', 'default' => 4 ] ], 'supports' => $supports_full ],
+			'formspress/field-number'     => [ 'attrs' => $shared_attrs + [ 'min' => [ 'type' => 'number' ], 'max' => [ 'type' => 'number' ], 'step' => [ 'type' => 'number' ] ], 'supports' => $supports_full ],
+			'formspress/field-select'     => [ 'attrs' => $shared_attrs + $options_attr,       'supports' => $supports_full ],
+			'formspress/field-radio'      => [ 'attrs' => $shared_attrs + $options_attr,       'supports' => $supports_full ],
+			'formspress/field-checkbox'   => [ 'attrs' => $shared_attrs + $options_attr,       'supports' => $supports_full ],
+			'formspress/field-product'    => [
+				'attrs' => $shared_attrs + [
+					'productName'  => [ 'type' => 'string', 'default' => '' ],
+					'price'        => [ 'type' => 'number', 'default' => 0 ],
+					'currency'     => [ 'type' => 'string', 'default' => 'EUR' ],
+					'minQuantity'  => [ 'type' => 'number', 'default' => 0 ],
+					'maxQuantity'  => [ 'type' => 'number' ],
+					'stepQuantity' => [ 'type' => 'number', 'default' => 1 ],
+					'productLayout' => [ 'type' => 'string', 'default' => 'stacked' ],
+					'showProductName' => [ 'type' => 'boolean', 'default' => true ],
+					'showUnitPrice' => [ 'type' => 'boolean', 'default' => true ],
+					'showQuantityLabel' => [ 'type' => 'boolean', 'default' => true ],
+					'showLineTotal' => [ 'type' => 'boolean', 'default' => true ],
+					'quantityLabel' => [ 'type' => 'string', 'default' => 'Quantity' ],
+				],
+				'supports' => $supports_full,
+			],
+			'formspress/field-total'      => [
+				'attrs' => $shared_attrs + [
+					'fieldId'  => [ 'type' => 'string', 'default' => 'total' ],
+					'label'    => [ 'type' => 'string', 'default' => 'Total' ],
+					'currency' => [ 'type' => 'string', 'default' => 'EUR' ],
+					'totalLayout' => [ 'type' => 'string', 'default' => 'inline' ],
+					'showLabel' => [ 'type' => 'boolean', 'default' => true ],
+				],
+				'supports' => $supports_full,
+			],
+			'formspress/field-page-break' => [ 'attrs' => [], 'supports' => [ 'html' => false, 'reusable' => false ] ],
+			'formspress/field-submit'     => [ 'attrs' => [], 'supports' => [ 'html' => false, 'reusable' => false, 'align' => [ 'wide', 'full' ] ] ],
 		];
 
 		foreach ( $blocks_config as $name => $config ) {
@@ -116,8 +148,20 @@ class StandardFieldsRenderer {
 	 * required runtime hooks (the `.ff-form__field` wrapper class +
 	 * `data-field-id` + conditional-logic data attr).
 	 */
-	private static function wrapper_attrs( string $field_id, array $extra_classes = [], array $extra_attrs = [] ): string {
+	private static function wrapper_attrs( string $field_id, array $extra_classes = [], array $extra_attrs = [], array $attrs = [] ): string {
 		$classes = array_merge( [ 'ff-form__field' ], $extra_classes );
+		$conditions = is_array( $attrs['conditions'] ?? null ) ? $attrs['conditions'] : [];
+		if (
+			! empty( $conditions['rules'] )
+			&& apply_filters( 'flowforms_can_use_conditional_logic', false )
+		) {
+			$extra_attrs['data-conditions'] = wp_json_encode( $conditions );
+			if ( 'show' === ( $conditions['action'] ?? 'show' ) ) {
+				$extra_attrs['hidden'] = '';
+				$extra_attrs['aria-hidden'] = 'true';
+			}
+		}
+
 		return get_block_wrapper_attributes( array_merge( [
 			'class'         => implode( ' ', $classes ),
 			'id'            => 'ff-field-wrap-' . $field_id,
@@ -128,7 +172,7 @@ class StandardFieldsRenderer {
 	private static function label_html( string $field_id, string $label, bool $required ): string {
 		$mark = $required
 			? ' <span class="ff-form__required" aria-hidden="true">*</span>'
-			. '<span class="screen-reader-text">' . esc_html__( '(required)', 'flowforms' ) . '</span>'
+			. '<span class="screen-reader-text">' . esc_html__( '(required)', 'formspress' ) . '</span>'
 			: '';
 		return sprintf(
 			'<label for="ff-field-%1$s" class="ff-form__label">%2$s%3$s</label>',
@@ -158,7 +202,7 @@ class StandardFieldsRenderer {
 		}
 
 		$mark = $required
-			? '<span class="screen-reader-text">' . esc_html__( '(required)', 'flowforms' ) . '</span>'
+			? '<span class="screen-reader-text">' . esc_html__( '(required)', 'formspress' ) . '</span>'
 			: '';
 
 		return sprintf(
@@ -324,6 +368,23 @@ class StandardFieldsRenderer {
 		return sanitize_html_class( $attrs['fieldId'] ?? '' );
 	}
 
+	private static function currency_code( string $currency ): string {
+		$currency = strtoupper( sanitize_key( $currency ) );
+		return preg_match( '/^[A-Z]{3}$/', $currency ) ? $currency : 'EUR';
+	}
+
+	private static function decimal_value( float $value ): string {
+		return rtrim( rtrim( number_format( $value, 4, '.', '' ), '0' ), '.' ) ?: '0';
+	}
+
+	private static function format_money( float $amount, string $currency ): string {
+		return number_format_i18n( $amount, 2 ) . ' ' . self::currency_code( $currency );
+	}
+
+	private static function layout_choice( string $layout, array $allowed, string $fallback ): string {
+		return in_array( $layout, $allowed, true ) ? $layout : $fallback;
+	}
+
 	/* ---------------------------------------------------------------
 	 * Per-block renderers
 	 * ------------------------------------------------------------- */
@@ -349,7 +410,7 @@ class StandardFieldsRenderer {
 
 		return sprintf(
 			'<div %1$s>%2$s%3$s<input type="number" name="%4$s" id="ff-field-%4$s" class="ff-form__input" value="%5$s" placeholder="%6$s"%7$s%8$s %9$s />%10$s</div>',
-			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [] ),
+			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [], [], $attrs ),
 			self::field_content_html( $id, $attrs, $content, $required ),
 			'',
 			esc_attr( $id ),
@@ -371,7 +432,7 @@ class StandardFieldsRenderer {
 
 		return sprintf(
 			'<div %1$s>%2$s%3$s<input type="%4$s" name="%5$s" id="ff-field-%5$s" class="ff-form__input" value="%6$s" placeholder="%7$s"%8$s%9$s %10$s />%11$s</div>',
-			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [] ),
+			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [], [], $attrs ),
 			self::field_content_html( $id, $attrs, $content, $required ),
 			'',
 			esc_attr( $type ),
@@ -394,7 +455,7 @@ class StandardFieldsRenderer {
 
 		return sprintf(
 			'<div %1$s>%2$s%3$s<textarea name="%4$s" id="ff-field-%4$s" class="ff-form__textarea" rows="%5$d" placeholder="%6$s"%7$s %8$s>%9$s</textarea>%10$s</div>',
-			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [] ),
+			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [], [], $attrs ),
 			self::field_content_html( $id, $attrs, $content, $required ),
 			'',
 			esc_attr( $id ),
@@ -415,7 +476,7 @@ class StandardFieldsRenderer {
 		$selected = (string) ( $attrs['defaultValue'] ?? '' );
 		$has_inner_content = self::has_inner_content( $content );
 
-		$opts_html = '<option value="">' . esc_html__( 'Select…', 'flowforms' ) . '</option>';
+		$opts_html = '<option value="">' . esc_html__( 'Select…', 'formspress' ) . '</option>';
 		foreach ( $options as $opt ) {
 			$val = (string) ( $opt['value'] ?? '' );
 			$lbl = (string) ( $opt['label'] ?? $val );
@@ -429,7 +490,7 @@ class StandardFieldsRenderer {
 
 		return sprintf(
 			'<div %1$s>%2$s%3$s<select name="%4$s" id="ff-field-%4$s" class="ff-form__select"%5$s %6$s>%7$s</select>%8$s</div>',
-			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [] ),
+			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [], [], $attrs ),
 			self::field_content_html( $id, $attrs, $content, $required ),
 			'',
 			esc_attr( $id ),
@@ -446,6 +507,94 @@ class StandardFieldsRenderer {
 
 	public static function render_checkbox( array $attrs, string $content = '' ): string {
 		return self::render_choice_group( $attrs, 'checkbox', $content );
+	}
+
+	public static function render_product( array $attrs, string $content = '' ): string {
+		$id        = self::field_id( $attrs );
+		$required  = ! empty( $attrs['required'] );
+		$help      = (string) ( $attrs['help'] ?? '' );
+		$price     = max( 0, (float) ( $attrs['price'] ?? 0 ) );
+		$currency  = self::currency_code( (string) ( $attrs['currency'] ?? 'EUR' ) );
+		$layout    = self::layout_choice( (string) ( $attrs['productLayout'] ?? 'stacked' ), [ 'stacked', 'inline', 'split' ], 'stacked' );
+		$quantity_label = (string) ( $attrs['quantityLabel'] ?? __( 'Quantity', 'formspress' ) );
+		$min       = max( 0, (float) ( $attrs['minQuantity'] ?? 0 ) );
+		$max       = isset( $attrs['maxQuantity'] ) ? max( $min, (float) $attrs['maxQuantity'] ) : null;
+		$step      = max( 0.0001, (float) ( $attrs['stepQuantity'] ?? 1 ) );
+		$default   = is_numeric( $attrs['defaultValue'] ?? null ) ? (float) $attrs['defaultValue'] : $min;
+		$default   = max( $min, $default );
+		$default   = null === $max ? $default : min( $max, $default );
+		$line      = $price * $default;
+		$has_inner_content = self::has_inner_content( $content );
+		$intro     = $has_inner_content
+			? self::field_content_html( $id, $attrs, $content, $required )
+			: self::help_html( $id, $help );
+		$max_attr  = null === $max ? '' : ' max="' . esc_attr( $max ) . '"';
+		$product   = (string) ( $attrs['productName'] ?? $attrs['label'] ?? '' );
+		$product   = '' !== $product ? $product : ( $has_inner_content ? '' : __( 'Product', 'formspress' ) );
+		$product_summary = '';
+		if ( '' !== $product && ( ! isset( $attrs['showProductName'] ) || (bool) $attrs['showProductName'] ) ) {
+			$product_summary .= '<strong class="ff-form__product-name">' . esc_html( $product ) . '</strong>';
+		}
+		if ( ! isset( $attrs['showUnitPrice'] ) || (bool) $attrs['showUnitPrice'] ) {
+			$product_summary .= '<span class="ff-form__product-price">' . esc_html( self::format_money( $price, $currency ) ) . '</span>';
+		}
+		$quantity_label_class = ( isset( $attrs['showQuantityLabel'] ) && ! (bool) $attrs['showQuantityLabel'] )
+			? 'ff-form__product-quantity-label screen-reader-text'
+			: 'ff-form__product-quantity-label';
+		$line_total = ( ! isset( $attrs['showLineTotal'] ) || (bool) $attrs['showLineTotal'] )
+			? '<div class="ff-form__product-line-total" data-ff-product-line-total>' . esc_html( sprintf( __( 'Line total: %s', 'formspress' ), self::format_money( $line, $currency ) ) ) . '</div>'
+			: '';
+
+		return sprintf(
+			'<div %1$s data-ff-product="1" data-product-price="%2$s" data-product-currency="%3$s" data-product-name="%4$s">%5$s<div class="ff-form__product-row"><div class="ff-form__product-summary">%6$s</div><div class="ff-form__product-quantity-control"><label class="%7$s" for="ff-field-%8$s">%9$s</label><input type="number" name="%8$s" id="ff-field-%8$s" class="ff-form__input ff-form__product-quantity" value="%10$s" min="%11$s"%12$s step="%13$s" data-ff-product-quantity="1" data-price="%2$s" data-currency="%3$s"%14$s %15$s /></div></div>%16$s%17$s</div>',
+			self::wrapper_attrs( $id, array_merge( [ 'ff-form__product', 'ff-form__product--' . $layout ], $required ? [ 'is-required' ] : [] ), [], $attrs ),
+			esc_attr( self::decimal_value( $price ) ),
+			esc_attr( $currency ),
+			esc_attr( $product ),
+			$intro, // phpcs:ignore WordPress.Security.EscapeOutput
+			$product_summary, // phpcs:ignore WordPress.Security.EscapeOutput
+			esc_attr( $quantity_label_class ),
+			esc_attr( $id ),
+			esc_html( '' !== $quantity_label ? $quantity_label : __( 'Quantity', 'formspress' ) ),
+			esc_attr( self::decimal_value( $default ) ),
+			esc_attr( self::decimal_value( $min ) ),
+			$max_attr, // phpcs:ignore WordPress.Security.EscapeOutput
+			esc_attr( self::decimal_value( $step ) ),
+			self::control_style_attr( $attrs ), // phpcs:ignore WordPress.Security.EscapeOutput
+			self::input_aria_attrs( $id, $required, ! $has_inner_content && '' !== $help, $has_inner_content ), // phpcs:ignore WordPress.Security.EscapeOutput
+			$line_total, // phpcs:ignore WordPress.Security.EscapeOutput
+			self::error_slot( $id )
+		);
+	}
+
+	public static function render_total( array $attrs, string $content = '' ): string {
+		$id       = self::field_id( $attrs ) ?: 'total';
+		$currency = self::currency_code( (string) ( $attrs['currency'] ?? 'EUR' ) );
+		$label    = (string) ( $attrs['label'] ?? __( 'Total', 'formspress' ) );
+		$layout   = self::layout_choice( (string) ( $attrs['totalLayout'] ?? 'inline' ), [ 'inline', 'stacked', 'split' ], 'inline' );
+		$has_inner_content = self::has_inner_content( $content );
+		$intro    = $has_inner_content
+			? self::field_content_html( $id, $attrs, $content, false )
+			: '';
+		$label    = '' !== $label ? $label : ( $has_inner_content ? '' : __( 'Total', 'formspress' ) );
+		$label_html = ( ! isset( $attrs['showLabel'] ) || (bool) $attrs['showLabel'] )
+			&& '' !== $label
+			? '<span class="ff-form__total-label">' . esc_html( $label ) . '</span>'
+			: '';
+
+		return sprintf(
+			'<div %1$s data-ff-total="1" data-total-currency="%2$s">%3$s<div class="ff-form__total-row">%4$s<strong class="ff-form__total-amount" data-ff-total-amount>%5$s</strong></div><input type="hidden" name="%6$s" id="ff-field-%6$s" value="0" data-ff-total-input="1" /></div>',
+			self::wrapper_attrs( $id, [ 'ff-form__total', 'ff-form__total--' . $layout ], [], $attrs ),
+			esc_attr( $currency ),
+			$intro, // phpcs:ignore WordPress.Security.EscapeOutput
+			$label_html, // phpcs:ignore WordPress.Security.EscapeOutput
+			esc_html( self::format_money( 0, $currency ) ),
+			esc_attr( $id )
+		);
+	}
+
+	public static function render_page_break( array $attrs = [], string $content = '' ): string {
+		return '<hr class="ff-form__page-break" data-ff-page-break="1" aria-hidden="true" />';
 	}
 
 	private static function render_choice_group( array $attrs, string $type, string $content = '' ): string {
@@ -480,13 +629,13 @@ class StandardFieldsRenderer {
 
 		return sprintf(
 			'<div %1$s>%2$s<fieldset class="ff-form__fieldset" %3$s><legend class="%4$s">%5$s%6$s</legend>%7$s<div class="ff-form__choices"%8$s>%9$s</div>%10$s</fieldset></div>',
-			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [] ),
+			self::wrapper_attrs( $id, $required ? [ 'is-required' ] : [], [], $attrs ),
 			$has_inner_content ? self::field_content_html( $id, $attrs, $content, $required ) : '',
 			$fieldset_attrs, // phpcs:ignore WordPress.Security.EscapeOutput
 			$has_inner_content ? 'screen-reader-text' : 'ff-form__label',
 			esc_html( (string) ( $attrs['label'] ?? '' ) ),
 			$required
-				? ' <span class="ff-form__required" aria-hidden="true">*</span><span class="screen-reader-text">' . esc_html__( '(required)', 'flowforms' ) . '</span>'
+				? ' <span class="ff-form__required" aria-hidden="true">*</span><span class="screen-reader-text">' . esc_html__( '(required)', 'formspress' ) . '</span>'
 				: '',
 			$has_inner_content ? '' : self::help_html( $id, $help ),
 			self::control_style_attr( $attrs ), // phpcs:ignore WordPress.Security.EscapeOutput
@@ -506,7 +655,7 @@ class StandardFieldsRenderer {
 	 */
 	public static function render_submit( array $attrs, string $content ): string {
 		if ( ! self::has_inner_content( $content ) ) {
-			$content = '<div class="wp-block-button"><button class="wp-block-button__link wp-element-button">' . esc_html__( 'Submit', 'flowforms' ) . '</button></div>';
+			$content = '<div class="wp-block-button"><button class="wp-block-button__link wp-element-button">' . esc_html__( 'Submit', 'formspress' ) . '</button></div>';
 		}
 
 		// Force `type="submit"` and add the `ff-form__submit` class to

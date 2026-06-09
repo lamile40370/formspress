@@ -185,11 +185,11 @@ const SidebarContent = ( { allItems, currentPath, onNavigate, adminUrl } ) => {
 							icon={ chevronLeftSmall }
 							iconSize={ 24 }
 							size="compact"
-							label={ __( 'Back to WP Admin', 'flowforms' ) }
+							label={ __( 'Back to WP Admin', 'formspress' ) }
 						/>
 						<span className="ff-sidebar__subscreen-title">
 							{ activeRootItem?.label ||
-								__( 'FormsPress', 'flowforms' ) }
+								__( 'FormsPress', 'formspress' ) }
 						</span>
 					</div>
 					{ activeRootItem?.description && (
@@ -345,16 +345,16 @@ const Sidebar = ( {
 				<a
 					href={ adminUrl }
 					className="ff-sidebar__brand-link"
-					aria-label={ __( 'Open WP Admin', 'flowforms' ) }
+					aria-label={ __( 'Open WP Admin', 'formspress' ) }
 				>
 					<Logo size={ 36 } className="ff-sidebar__brand-icon" />
 				</a>
 				<span className="ff-sidebar__brand-title">
-					{ __( 'FormsPress', 'flowforms' ) }
+					{ __( 'FormsPress', 'formspress' ) }
 				</span>
 				<Button
 					icon={ search }
-					label={ __( 'Search', 'flowforms' ) }
+					label={ __( 'Search', 'formspress' ) }
 					className="ff-sidebar__search-btn"
 					size="compact"
 					onClick={ onOpenSearch }
@@ -376,7 +376,7 @@ const Sidebar = ( {
 			<div className="ff-sidebar__global-footer">
 				<a href={ adminUrl } className="ff-sidebar__wp-admin-link">
 					<Icon icon={ wordpress } size={ 20 } />
-					<span>{ __( 'Open WP Admin', 'flowforms' ) }</span>
+					<span>{ __( 'Open WP Admin', 'formspress' ) }</span>
 				</a>
 			</div>
 		</aside>

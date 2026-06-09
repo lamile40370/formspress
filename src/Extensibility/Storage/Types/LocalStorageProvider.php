@@ -11,7 +11,7 @@ class LocalStorageProvider extends AbstractStorageProvider {
 	}
 
 	public function get_label(): string {
-		return __( 'Local uploads folder', 'flowforms' );
+		return __( 'Local uploads folder', 'formspress' );
 	}
 
 	public function get_settings_schema(): array {

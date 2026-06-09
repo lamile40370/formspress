@@ -5,17 +5,18 @@ import {
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
 import PageHeader from '../../components/PageHeader';
 import Toast from '../../components/Toast';
 import Badge from '../../components/Badge';
 import EmptyState from '../../components/EmptyState';
+import { DataViews } from '@wordpress/dataviews';
 import { get, del } from '../../api/client';
 import { ENTRIES, FORMS, entry as entryEndpoint } from '../../api/endpoints';
 import EntryDetailModal from './EntryDetailModal';
 import useConfirmDialog from '../../hooks/useConfirmDialog';
 import useDataViewPreferences from '../../hooks/useDataViewPreferences';
+import { setFilterParam } from '../../utils/dataviewsFilters';
 
 const DEFAULT_VIEW = {
 	type: 'list',
@@ -31,10 +32,10 @@ const DEFAULT_VIEW = {
 };
 
 const STATUS_LABELS = {
-	unread: __( 'Unread', 'flowforms' ),
-	read: __( 'Read', 'flowforms' ),
-	starred: __( 'Starred', 'flowforms' ),
-	spam: __( 'Spam', 'flowforms' ),
+	unread: __( 'Unread', 'formspress' ),
+	read: __( 'Read', 'formspress' ),
+	starred: __( 'Starred', 'formspress' ),
+	spam: __( 'Spam', 'formspress' ),
 };
 
 const STATUS_INTENTS = {
@@ -78,8 +79,8 @@ const AllEntriesPage = () => {
 				( filter ) => filter.field === 'status'
 			);
 
-			if ( formFilter?.value ) params.form_id = formFilter.value;
-			if ( statusFilter?.value ) params.status = statusFilter.value;
+			setFilterParam( params, 'form_id', formFilter );
+			setFilterParam( params, 'status', statusFilter );
 			if ( view.search ) params.search = view.search;
 			if ( view.sort?.field ) {
 				params.sort = view.sort.field;
@@ -92,7 +93,7 @@ const AllEntriesPage = () => {
 			setError( null );
 		} catch ( e ) {
 			setError(
-				e.message || __( 'Could not load submissions.', 'flowforms' )
+				e.message || __( 'Could not load submissions.', 'formspress' )
 			);
 		} finally {
 			setLoading( false );
@@ -111,16 +112,16 @@ const AllEntriesPage = () => {
 					count === 1
 						? __(
 								'Delete this submission permanently?',
-								'flowforms'
+								'formspress'
 						  )
 						: sprintf(
 								__(
 									'Delete %d submissions permanently?',
-									'flowforms'
+									'formspress'
 								),
 								count
 						  ),
-				confirmButtonText: __( 'Delete', 'flowforms' ),
+				confirmButtonText: __( 'Delete', 'formspress' ),
 			} );
 
 			if ( ! confirmed ) return;
@@ -138,11 +139,11 @@ const AllEntriesPage = () => {
 					type: 'success',
 					message:
 						count === 1
-							? __( 'Submission deleted.', 'flowforms' )
+							? __( 'Submission deleted.', 'formspress' )
 							: sprintf(
 									__(
 										'%d submissions deleted.',
-										'flowforms'
+										'formspress'
 									),
 									count
 							  ),
@@ -150,7 +151,7 @@ const AllEntriesPage = () => {
 			} catch ( e ) {
 				setError(
 					e.message ||
-						__( 'Failed to delete submissions.', 'flowforms' )
+						__( 'Failed to delete submissions.', 'formspress' )
 				);
 			}
 		},
@@ -163,7 +164,7 @@ const AllEntriesPage = () => {
 				value: String( form.id ),
 				label:
 					form.title ||
-					sprintf( __( 'Form #%d', 'flowforms' ), form.id ),
+					sprintf( __( 'Form #%d', 'formspress' ), form.id ),
 			} ) ),
 		[ forms ]
 	);
@@ -172,7 +173,7 @@ const AllEntriesPage = () => {
 		() => [
 			{
 				id: 'id',
-				label: __( 'Submission', 'flowforms' ),
+				label: __( 'Submission', 'formspress' ),
 				enableSorting: true,
 				enableGlobalSearch: true,
 				render: ( { item } ) => (
@@ -182,18 +183,18 @@ const AllEntriesPage = () => {
 							onClick={ () => setSelectedEntry( item.id ) }
 							style={ { fontWeight: 500 } }
 						>
-							{ sprintf( __( '#%d', 'flowforms' ), item.id ) }
+							{ sprintf( __( '#%d', 'formspress' ), item.id ) }
 						</Button>
 						<Text variant="muted" size="small">
 							{ item.form_title ||
-								__( 'Unknown form', 'flowforms' ) }
+								__( 'Unknown form', 'formspress' ) }
 						</Text>
 					</VStack>
 				),
 			},
 			{
 				id: 'submitted_summary',
-				label: __( 'Submitted', 'flowforms' ),
+				label: __( 'Submitted', 'formspress' ),
 				render: ( { item } ) => (
 					<Text variant="muted">
 						{ new Date( item.created_at ).toLocaleString() }
@@ -202,23 +203,23 @@ const AllEntriesPage = () => {
 			},
 			{
 				id: 'form_title',
-				label: __( 'Form', 'flowforms' ),
+				label: __( 'Form', 'formspress' ),
 				enableSorting: true,
 				render: ( { item } ) => (
 					<Text>
-						{ item.form_title || __( 'Unknown form', 'flowforms' ) }
+						{ item.form_title || __( 'Unknown form', 'formspress' ) }
 					</Text>
 				),
 			},
 			{
 				id: 'form_id',
-				label: __( 'Form', 'flowforms' ),
-				filterBy: { operators: [ 'is' ], isPrimary: true },
+				label: __( 'Form', 'formspress' ),
+				filterBy: { operators: [ 'isAny' ], isPrimary: true },
 				elements: formElements,
 			},
 			{
 				id: 'created_at',
-				label: __( 'Submitted', 'flowforms' ),
+				label: __( 'Submitted', 'formspress' ),
 				enableSorting: true,
 				render: ( { item } ) => (
 					<Text>
@@ -228,9 +229,9 @@ const AllEntriesPage = () => {
 			},
 			{
 				id: 'status',
-				label: __( 'Status', 'flowforms' ),
+				label: __( 'Status', 'formspress' ),
 				enableSorting: true,
-				filterBy: { operators: [ 'is' ], isPrimary: true },
+				filterBy: { operators: [ 'isAny' ], isPrimary: true },
 				elements: Object.entries( STATUS_LABELS ).map(
 					( [ value, label ] ) => ( { value, label } )
 				),
@@ -244,12 +245,12 @@ const AllEntriesPage = () => {
 			},
 			{
 				id: 'ip_address',
-				label: __( 'IP', 'flowforms' ),
+				label: __( 'IP', 'formspress' ),
 				render: ( { item } ) => <Text>{ item.ip_address || '—' }</Text>,
 			},
 			{
 				id: 'source_url',
-				label: __( 'Source', 'flowforms' ),
+				label: __( 'Source', 'formspress' ),
 				enableGlobalSearch: true,
 				render: ( { item } ) => (
 					<Text
@@ -272,13 +273,13 @@ const AllEntriesPage = () => {
 		() => [
 			{
 				id: 'view',
-				label: __( 'View', 'flowforms' ),
+				label: __( 'View', 'formspress' ),
 				isPrimary: true,
 				callback: ( [ item ] ) => setSelectedEntry( item.id ),
 			},
 			{
 				id: 'delete',
-				label: __( 'Delete', 'flowforms' ),
+				label: __( 'Delete', 'formspress' ),
 				isDestructive: true,
 				supportsBulk: true,
 				callback: handleDelete,
@@ -295,16 +296,16 @@ const AllEntriesPage = () => {
 	return (
 		<PageHeader
 			className="ff-page ff-page--dataviews"
-			title={ __( 'All submissions', 'flowforms' ) }
+			title={ __( 'All submissions', 'formspress' ) }
 			description={ __(
 				'Browse, filter and review entries across every form.',
-				'flowforms'
+				'formspress'
 			) }
 			hideBack
 			right={
 				<HStack spacing={ 2 }>
 					<Badge intent="info">
-						{ sprintf( __( '%d total', 'flowforms' ), total ) }
+						{ sprintf( __( '%d total', 'formspress' ), total ) }
 					</Badge>
 				</HStack>
 			}
@@ -323,10 +324,10 @@ const AllEntriesPage = () => {
 				{ showEmpty ? (
 					<EmptyState
 						icon="feedback"
-						title={ __( 'No submissions yet', 'flowforms' ) }
+						title={ __( 'No submissions yet', 'formspress' ) }
 						description={ __(
 							'Submissions will appear here as soon as visitors send a form.',
-							'flowforms'
+							'formspress'
 						) }
 					/>
 				) : (
@@ -349,7 +350,7 @@ const AllEntriesPage = () => {
 							isLoading={ isLoading }
 							empty={ __(
 								'No submissions match these filters.',
-								'flowforms'
+								'formspress'
 							) }
 						/>
 					</div>

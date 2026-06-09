@@ -17,14 +17,14 @@ export const name = 'formspress/field-submit';
  */
 export const settings = {
 	apiVersion: 3,
-	title: __( 'Submit button', 'flowforms' ),
+	title: __( 'Submit button', 'formspress' ),
 	description: __(
 		'Submits the form. Inherits all native WordPress button styling.',
-		'flowforms'
+		'formspress'
 	),
 	category: 'formspress-fields',
 	icon,
-	keywords: [ __( 'submit', 'flowforms' ), __( 'button', 'flowforms' ) ],
+	keywords: [ __( 'submit', 'formspress' ), __( 'button', 'formspress' ) ],
 	supports: {
 		html: false,
 		reusable: false,

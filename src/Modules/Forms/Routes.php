@@ -12,8 +12,8 @@ class Routes extends AbstractRoutes {
 			'page'     => [ 'type' => 'integer', 'default' => 1 ],
 			'per_page' => [ 'type' => 'integer', 'default' => 20 ],
 			'search'   => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
-			'status'   => [ 'type' => 'string', 'enum' => [ 'active', 'inactive', 'draft' ] ],
-			'type'     => [ 'type' => 'string', 'enum' => [ 'standard', 'flow' ] ],
+			'status'   => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
+			'type'     => [ 'type' => 'string', 'sanitize_callback' => 'sanitize_text_field' ],
 		] );
 
 		$this->route( '/forms', WP_REST_Server::CREATABLE, Endpoints\CreateForm::class, [

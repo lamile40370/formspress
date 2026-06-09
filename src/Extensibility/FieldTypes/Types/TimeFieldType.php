@@ -11,7 +11,7 @@ class TimeFieldType extends AbstractFieldType {
 	}
 
 	public function get_label(): string {
-		return __( 'Time', 'flowforms' );
+		return __( 'Time', 'formspress' );
 	}
 
 	public function get_group(): string {

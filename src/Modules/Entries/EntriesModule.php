@@ -16,7 +16,7 @@ class EntriesModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Entries', 'flowforms' );
+		return __( 'Entries', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {
@@ -48,19 +48,19 @@ class EntriesModule extends AbstractModule {
 	public function get_nav_items(): array {
 		return [
 			[
-				'label'       => __( 'Submissions', 'flowforms' ),
+				'label'       => __( 'Submissions', 'formspress' ),
 				'path'        => '/entries',
 				'icon'        => 'post-list',
 				'position'    => 30,
-				'description' => __( 'Browse and export every submission across your forms.', 'flowforms' ),
+				'description' => __( 'Browse and export every submission across your forms.', 'formspress' ),
 				'children'    => [
 					[
-						'label' => __( 'All submissions', 'flowforms' ),
+						'label' => __( 'All submissions', 'formspress' ),
 						'path'  => '/entries',
 						'icon'  => 'post-list',
 					],
 					[
-						'label' => __( 'Exports', 'flowforms' ),
+						'label' => __( 'Exports', 'formspress' ),
 						'path'  => '/entries/exports',
 						'icon'  => 'list-view',
 					],

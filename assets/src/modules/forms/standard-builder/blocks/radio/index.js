@@ -9,11 +9,11 @@ export const name = 'formspress/field-radio';
 
 export const settings = {
 	apiVersion: 3,
-	title: __( 'Radio buttons', 'flowforms' ),
-	description: __( 'A single choice from a list of options.', 'flowforms' ),
+	title: __( 'Radio buttons', 'formspress' ),
+	description: __( 'A single choice from a list of options.', 'formspress' ),
 	category: 'formspress-fields',
 	icon,
-	keywords: [ __( 'radio', 'flowforms' ), __( 'choice', 'flowforms' ) ],
+	keywords: [ __( 'radio', 'formspress' ), __( 'choice', 'formspress' ) ],
 	supports: FIELD_SUPPORTS,
 	attributes: {
 		fieldId: { type: 'string', default: '' },
@@ -23,6 +23,7 @@ export const settings = {
 		placeholder: { type: 'string', default: '' },
 		defaultValue: { type: 'string', default: '' },
 		inputStyle: INPUT_STYLE_ATTRIBUTE,
+		conditions: { type: 'object' },
 		options: { type: 'array', default: [] },
 	},
 	edit: editComponent,

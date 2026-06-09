@@ -90,7 +90,7 @@ const ValidatorsPanel = ( { validators = [], onChange } ) => {
 
 	return (
 		<PanelBody
-			title={ __( 'Validation', 'flowforms' ) }
+			title={ __( 'Validation', 'formspress' ) }
 			initialOpen={ false }
 		>
 			<VStack spacing={ 4 }>
@@ -98,7 +98,7 @@ const ValidatorsPanel = ( { validators = [], onChange } ) => {
 					<p style={ { margin: 0, color: '#757575', fontSize: 13 } }>
 						{ __(
 							'Add validators to enforce input rules (min length, regex pattern, …).',
-							'flowforms'
+							'formspress'
 						) }
 					</p>
 				) }
@@ -118,7 +118,7 @@ const ValidatorsPanel = ( { validators = [], onChange } ) => {
 						>
 							<VStack spacing={ 3 }>
 								<SelectControl
-									label={ __( 'Rule', 'flowforms' ) }
+									label={ __( 'Rule', 'formspress' ) }
 									value={ v.id }
 									options={ available.map( ( a ) => ( {
 										value: a.id,
@@ -152,7 +152,7 @@ const ValidatorsPanel = ( { validators = [], onChange } ) => {
 									icon={ trash }
 									onClick={ () => removeAt( i ) }
 								>
-									{ __( 'Remove rule', 'flowforms' ) }
+									{ __( 'Remove rule', 'formspress' ) }
 								</Button>
 							</VStack>
 						</div>
@@ -165,7 +165,7 @@ const ValidatorsPanel = ( { validators = [], onChange } ) => {
 						icon={ plus }
 						onClick={ addValidator }
 					>
-						{ __( 'Add validation rule', 'flowforms' ) }
+						{ __( 'Add validation rule', 'formspress' ) }
 					</Button>
 				) }
 			</VStack>

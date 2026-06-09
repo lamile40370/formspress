@@ -26,9 +26,9 @@ import {
 import Logo from '../../../components/Logo';
 
 const PREVIEW_VIEWPORTS = [
-	{ id: 'desktop', icon: desktopIcon, label: __( 'Desktop', 'flowforms' ) },
-	{ id: 'tablet', icon: tabletIcon, label: __( 'Tablet', 'flowforms' ) },
-	{ id: 'mobile', icon: mobileIcon, label: __( 'Mobile', 'flowforms' ) },
+	{ id: 'desktop', icon: desktopIcon, label: __( 'Desktop', 'formspress' ) },
+	{ id: 'tablet', icon: tabletIcon, label: __( 'Tablet', 'formspress' ) },
+	{ id: 'mobile', icon: mobileIcon, label: __( 'Mobile', 'formspress' ) },
 ];
 
 /* ── Title pill (Gutenberg post-title control) ──────────────────────── */
@@ -79,7 +79,7 @@ const EditorSkeleton = ( {
 	isDirty = false, // Drives the "Saved" / "Modifications…" indicator
 
 	/* Title pill */
-	titlePlaceholder = __( 'Untitled form', 'flowforms' ),
+	titlePlaceholder = __( 'Untitled form', 'formspress' ),
 
 	/* History */
 	canUndo = false,
@@ -90,7 +90,7 @@ const EditorSkeleton = ( {
 	/* Left sidebar */
 	showLeftSidebar = false,
 	onToggleLeftSidebar = null,
-	leftSidebarLabel = __( 'List view', 'flowforms' ),
+	leftSidebarLabel = __( 'List view', 'formspress' ),
 	leftSidebarIcon = listView,
 	leftSidebar = null,
 	/* Optional extra toolbar items rendered after the left-sidebar
@@ -105,14 +105,14 @@ const EditorSkeleton = ( {
 
 	/* Preview */
 	onTogglePreview = null,
-	previewTooltip = __( 'Preview', 'flowforms' ),
+	previewTooltip = __( 'Preview', 'formspress' ),
 	previewViewport = null,
 	onPreviewViewportChange = null,
 
 	/* Share */
 	onToggleShare = null,
 	isShareActive = false,
-	shareTooltip = __( 'Share', 'flowforms' ),
+	shareTooltip = __( 'Share', 'formspress' ),
 
 	/* More menu */
 	moreMenuControls = null,
@@ -154,7 +154,7 @@ const EditorSkeleton = ( {
 								{
 									title: __(
 										'Preview in new tab',
-										'flowforms'
+										'formspress'
 									),
 									icon: externalIcon,
 									onClick: onTogglePreview,
@@ -174,19 +174,19 @@ const EditorSkeleton = ( {
 						type="button"
 						className="ff-gb-topbar__logo"
 						onClick={ onClose }
-						aria-label={ __( 'Back to forms', 'flowforms' ) }
+						aria-label={ __( 'Back to forms', 'formspress' ) }
 					>
 						<Logo size={ 36 } />
 					</button>
 					<Button
 						icon={ undoIcon }
-						label={ __( 'Undo', 'flowforms' ) }
+						label={ __( 'Undo', 'formspress' ) }
 						disabled={ ! canUndo }
 						onClick={ onUndo }
 					/>
 					<Button
 						icon={ redoIcon }
-						label={ __( 'Redo', 'flowforms' ) }
+						label={ __( 'Redo', 'formspress' ) }
 						disabled={ ! canRedo }
 						onClick={ onRedo }
 					/>
@@ -216,23 +216,23 @@ const EditorSkeleton = ( {
 					{ ! isDirty && ! isSaving && ! isDraftSaving && (
 						<span className="ff-gb-topbar__saved">
 							<Icon icon={ checkIcon } size={ 16 } />
-							<span>{ __( 'Saved', 'flowforms' ) }</span>
+							<span>{ __( 'Saved', 'formspress' ) }</span>
 						</span>
 					) }
 
 					{ /* "Save draft" — tertiary, only when the parent
 					     opted in (typical on screens with a real
-					     draft → publish flow). Matches the native
-					     "Enregistrer le brouillon" affordance. */ }
-					{ onSaveDraft && (
+					     draft → publish flow) and only while there is an
+					     unsaved diff. */ }
+					{ onSaveDraft && isDirty && (
 						<Button
 							variant="tertiary"
 							onClick={ onSaveDraft }
 							isBusy={ isDraftSaving }
-							disabled={ isDraftSaving || isSaving || ! isDirty }
+							disabled={ isDraftSaving || isSaving }
 							shortcut={ saveDraftShortcut }
 						>
-							{ __( 'Save draft', 'flowforms' ) }
+							{ __( 'Save draft', 'formspress' ) }
 						</Button>
 					) }
 
@@ -241,7 +241,7 @@ const EditorSkeleton = ( {
 					{ onPreviewViewportChange && (
 						<DropdownMenu
 							icon={ currentViewport.icon }
-							label={ __( 'Preview viewport', 'flowforms' ) }
+							label={ __( 'Preview viewport', 'formspress' ) }
 							controls={ previewControls }
 							toggleProps={ {
 								isPressed: 'desktop' !== currentViewport.id,
@@ -250,10 +250,12 @@ const EditorSkeleton = ( {
 					) }
 					{ onTogglePreview && ! onPreviewViewportChange && (
 						<Button
-							icon={ desktopIcon }
+							icon={ externalIcon }
 							label={ previewTooltip }
 							onClick={ onTogglePreview }
-						/>
+						>
+							{ __( 'Preview', 'formspress' ) }
+						</Button>
 					) }
 					{ onToggleShare && (
 						<Button
@@ -266,7 +268,7 @@ const EditorSkeleton = ( {
 					{ onToggleRightSidebar && (
 						<Button
 							icon={ sidebarIcon }
-							label={ __( 'Toggle settings', 'flowforms' ) }
+							label={ __( 'Toggle settings', 'formspress' ) }
 							isPressed={ showRightSidebar }
 							onClick={ onToggleRightSidebar }
 						/>
@@ -279,13 +281,13 @@ const EditorSkeleton = ( {
 							disabled={ isSaving || saveDisabled }
 							shortcut={ saveShortcut }
 						>
-							{ saveLabel || __( 'Save', 'flowforms' ) }
+							{ saveLabel || __( 'Save', 'formspress' ) }
 						</Button>
 					) }
 					{ moreMenuControls && moreMenuControls.length > 0 && (
 						<DropdownMenu
 							icon={ moreVertical }
-							label={ __( 'Options', 'flowforms' ) }
+							label={ __( 'Options', 'formspress' ) }
 							controls={ moreMenuControls }
 						/>
 					) }

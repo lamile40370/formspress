@@ -14,7 +14,7 @@ class ActionsModule extends AbstractModule {
 	}
 
 	public function get_name(): string {
-		return __( 'Actions', 'flowforms' );
+		return __( 'Actions', 'formspress' );
 	}
 
 	public function register_services( Container $container ): void {

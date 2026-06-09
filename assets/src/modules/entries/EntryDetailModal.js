@@ -14,11 +14,11 @@ import { get, patch } from '../../api/client';
 import { entry as entryEndpoint, entryStatus } from '../../api/endpoints';
 
 const STATUS_OPTIONS = [
-	{ value: 'read', label: __( 'Read', 'flowforms' ) },
-	{ value: 'unread', label: __( 'Unread', 'flowforms' ) },
-	{ value: 'starred', label: __( 'Starred', 'flowforms' ) },
-	{ value: 'spam', label: __( 'Spam', 'flowforms' ) },
-	{ value: 'trash', label: __( 'Trash', 'flowforms' ) },
+	{ value: 'read', label: __( 'Read', 'formspress' ) },
+	{ value: 'unread', label: __( 'Unread', 'formspress' ) },
+	{ value: 'starred', label: __( 'Starred', 'formspress' ) },
+	{ value: 'spam', label: __( 'Spam', 'formspress' ) },
+	{ value: 'trash', label: __( 'Trash', 'formspress' ) },
 ];
 
 const EntryDetailModal = ( { entryId, onClose, onStatusChange } ) => {
@@ -48,7 +48,7 @@ const EntryDetailModal = ( { entryId, onClose, onStatusChange } ) => {
 
 	return (
 		<Modal
-			title={ sprintf( __( 'Entry #%d', 'flowforms' ), entryId ) }
+			title={ sprintf( __( 'Entry #%d', 'formspress' ), entryId ) }
 			onRequestClose={ onClose }
 			size="medium"
 		>
@@ -60,18 +60,18 @@ const EntryDetailModal = ( { entryId, onClose, onStatusChange } ) => {
 				<VStack spacing={ 4 }>
 					<HStack spacing={ 4 } style={ { flexWrap: 'wrap' } }>
 						<Text variant="muted" size="small">
-							{ __( 'Date:', 'flowforms' ) }{ ' ' }
+							{ __( 'Date:', 'formspress' ) }{ ' ' }
 							{ new Date( entry?.created_at ).toLocaleString() }
 						</Text>
 						{ entry?.ip_address && (
 							<Text variant="muted" size="small">
-								{ __( 'IP:', 'flowforms' ) }{ ' ' }
+								{ __( 'IP:', 'formspress' ) }{ ' ' }
 								{ entry.ip_address }
 							</Text>
 						) }
 						{ entry?.source_url && (
 							<Text variant="muted" size="small">
-								{ __( 'Source:', 'flowforms' ) }{ ' ' }
+								{ __( 'Source:', 'formspress' ) }{ ' ' }
 								{ entry.source_url }
 							</Text>
 						) }
@@ -86,7 +86,7 @@ const EntryDetailModal = ( { entryId, onClose, onStatusChange } ) => {
 								<span className="ff-entry-value__value">
 									{ val.field_value || (
 										<em style={ { color: '#757575' } }>
-											{ __( '(empty)', 'flowforms' ) }
+											{ __( '(empty)', 'formspress' ) }
 										</em>
 									) }
 								</span>
@@ -96,7 +96,7 @@ const EntryDetailModal = ( { entryId, onClose, onStatusChange } ) => {
 
 					<HStack spacing={ 2 } justify="flex-start">
 						<SelectControl
-							label={ __( 'Status', 'flowforms' ) }
+							label={ __( 'Status', 'formspress' ) }
 							value={ status }
 							options={ STATUS_OPTIONS }
 							onChange={ setStatus }
@@ -111,7 +111,7 @@ const EntryDetailModal = ( { entryId, onClose, onStatusChange } ) => {
 							disabled={ isSaving }
 							style={ { marginTop: '24px' } }
 						>
-							{ __( 'Update', 'flowforms' ) }
+							{ __( 'Update', 'formspress' ) }
 						</Button>
 					</HStack>
 				</VStack>

@@ -12,12 +12,12 @@ const ListViewPanel = ( { onClose } ) => (
 	<aside className="ff-gb-treeview ff-std-treeview ff-std-treeview--narrow">
 		<div className="ff-std-treeview__head">
 			<h2 className="ff-std-treeview__title">
-				{ __( 'List view', 'flowforms' ) }
+				{ __( 'List view', 'formspress' ) }
 			</h2>
 			{ onClose && (
 				<Button
 					icon={ closeSmall }
-					label={ __( 'Close list view', 'flowforms' ) }
+					label={ __( 'Close list view', 'formspress' ) }
 					onClick={ onClose }
 				/>
 			) }
